@@ -71,81 +71,6 @@
       touch-action: manipulation;
     }
     
-    .coordinates-display {
-      background: #e7f3ff;
-      padding: 1rem;
-      border-radius: 6px;
-      margin-top: 1rem;
-      border-left: 4px solid #007bff;
-      display: none;
-    }
-    
-    .coordinates-display.show {
-      display: block;
-    }
-    
-    .coordinates-display h4 {
-      margin: 0 0 0.75rem 0;
-      color: #007bff;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .coord-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.75rem;
-    }
-    
-    .coord-item {
-      background: white;
-      padding: 0.75rem;
-      border-radius: 4px;
-      border: 1px solid #dee2e6;
-    }
-    
-    .coord-label {
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 0.25rem;
-      font-weight: 500;
-    }
-    
-    .coord-value {
-      font-family: 'Courier New', monospace;
-      font-size: 1rem;
-      color: #d63384;
-      font-weight: 600;
-      user-select: all;
-      cursor: pointer;
-      padding: 0.25rem;
-      border-radius: 3px;
-      transition: background 0.2s;
-    }
-    
-    .coord-value:hover {
-      background: #f0f0f0;
-    }
-    
-    .coord-copy-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 0.4rem 0.8rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      width: 100%;
-      transition: all 0.2s;
-    }
-    
-    .coord-copy-btn:hover {
-      background: #218838;
-    }
-    
     .location-info {
       background: #fff3cd;
       padding: 1rem;
@@ -197,10 +122,6 @@
         padding: 0.85rem;
         min-width: 100%;
       }
-      
-      .coord-grid {
-        grid-template-columns: 1fr;
-      }
     }
     
     /* Leaflet marker customization */
@@ -216,11 +137,10 @@
       font-size: 0.9rem;
       color: #666;
       margin-top: 0.5rem;
-      padding: 0.5rem;
+      padding: 0.75rem;
       background: white;
       border-radius: 4px;
-      max-height: 60px;
-      overflow-y: auto;
+      border: 1px solid #dee2e6;
     }
   </style>
 </head>
@@ -350,29 +270,10 @@
               <div id="deliveryMap"></div>
             </div>
             
-            <!-- Coordinates Display -->
-            <div id="coordinatesDisplay" class="coordinates-display">
-              <h4>
-                <span>✅ พิกัดที่เลือก / Selected Coordinates</span>
-              </h4>
-              <div class="coord-grid">
-                <div class="coord-item">
-                  <div class="coord-label">Latitude (ละติจูด)</div>
-                  <div class="coord-value" id="displayLat" onclick="copyToClipboard('displayLat')" title="Click to copy">-</div>
-                  <button class="coord-copy-btn" onclick="copyCoordinate('lat')">📋 Copy Lat</button>
-                </div>
-                <div class="coord-item">
-                  <div class="coord-label">Longitude (ลองจิจูด)</div>
-                  <div class="coord-value" id="displayLng" onclick="copyToClipboard('displayLng')" title="Click to copy">-</div>
-                  <button class="coord-copy-btn" onclick="copyCoordinate('lng')">📋 Copy Lng</button>
-                </div>
-                <div class="coord-item">
-                  <div class="coord-label">Full Coordinates</div>
-                  <div class="coord-value" id="displayBoth" onclick="copyToClipboard('displayBoth')" title="Click to copy">-</div>
-                  <button class="coord-copy-btn" onclick="copyCoordinate('both')">📋 Copy Both</button>
-                </div>
-              </div>
-              <div class="address-preview" id="addressPreview">-</div>
+            <!-- Address Preview (replaces coordinates display) -->
+            <div class="address-preview" id="addressPreview" style="display: none;">
+              <strong>📍 ตำแหน่งที่เลือก / Selected Location:</strong><br>
+              <span id="addressPreviewText">-</span>
             </div>
           </div>
           
@@ -544,34 +445,28 @@
           address: address
         };
         
-        // Update form fields
+        // Update form fields (including hidden lat/lng fields)
         document.getElementById('deliveryAddress').value = address;
         document.getElementById('delivery_lat').value = lat;
         document.getElementById('delivery_lng').value = lng;
         
-        // Update coordinates display
-        const coordDisplay = document.getElementById('coordinatesDisplay');
-        coordDisplay.classList.add('show');
-        
-        document.getElementById('displayLat').textContent = lat.toFixed(6);
-        document.getElementById('displayLng').textContent = lng.toFixed(6);
-        document.getElementById('displayBoth').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        document.getElementById('addressPreview').textContent = address;
+        // Update address preview (simplified display)
+        const addressPreview = document.getElementById('addressPreview');
+        addressPreview.style.display = 'block';
+        document.getElementById('addressPreviewText').textContent = address;
         
         // Update info display
         const locationInfo = document.getElementById('locationInfo');
         locationInfo.className = 'location-info selected';
         locationInfo.innerHTML = `
           <h4>✅ ตำแหน่งที่เลือก / Selected Location</h4>
-          <p><strong>พิกัด:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
           <p><strong>ที่อยู่:</strong> ${address}</p>
         `;
         
         // Update marker popup
         deliveryMarker.bindPopup(`
           <strong>📍 ตำแหน่งส่งของ</strong><br>
-          <small>${address}</small><br>
-          <small style="color: #666;">${lat.toFixed(6)}, ${lng.toFixed(6)}</small>
+          <small>${address}</small>
         `).openPopup();
         
       } catch (error) {
@@ -761,42 +656,6 @@
         console.error('Search error:', error);
         Toast.error('เกิดข้อผิดพลาดในการค้นหา');
       }
-    }
-    
-    // ==================== COPY COORDINATES ====================
-    function copyToClipboard(elementId) {
-      const element = document.getElementById(elementId);
-      const text = element.textContent;
-      
-      navigator.clipboard.writeText(text).then(() => {
-        Toast.success('คัดลอกแล้ว! / Copied!');
-      }).catch(() => {
-        // Fallback
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        Toast.success('คัดลอกแล้ว! / Copied!');
-      });
-    }
-    
-    function copyCoordinate(type) {
-      let text = '';
-      if (type === 'lat') {
-        text = document.getElementById('displayLat').textContent;
-      } else if (type === 'lng') {
-        text = document.getElementById('displayLng').textContent;
-      } else if (type === 'both') {
-        text = document.getElementById('displayBoth').textContent;
-      }
-      
-      navigator.clipboard.writeText(text).then(() => {
-        Toast.success('คัดลอก ' + (type === 'lat' ? 'Latitude' : type === 'lng' ? 'Longitude' : 'Coordinates') + ' แล้ว!');
-      }).catch(() => {
-        Toast.error('ไม่สามารถคัดลอกได้');
-      });
     }
     
     // ==================== EXPORT FUNCTIONS FOR EXTERNAL USE ====================
@@ -1136,7 +995,7 @@
           deliveryMarker.bindPopup('🖐️ ลากฉันไปที่ต้องการส่งของ!<br>Drag me to your delivery location!');
           
           // Reset displays
-          document.getElementById('coordinatesDisplay').classList.remove('show');
+          document.getElementById('addressPreview').style.display = 'none';
           document.getElementById('locationInfo').className = 'location-info';
           document.getElementById('locationInfo').innerHTML = `
             <h4>💡 วิธีใช้งาน / How to use:</h4>
