@@ -446,7 +446,9 @@
         };
         
         // Update form fields (including hidden lat/lng fields)
-        document.getElementById('deliveryAddress').value = address;
+        // Combine address with coordinates in the delivery address field
+        const fullAddress = `${address}\n[พิกัด: ${lat.toFixed(6)}, ${lng.toFixed(6)}]`;
+        document.getElementById('deliveryAddress').value = fullAddress;
         document.getElementById('delivery_lat').value = lat;
         document.getElementById('delivery_lng').value = lng;
         
