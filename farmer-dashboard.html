@@ -179,30 +179,6 @@
     </div>
   </div>
   
-  <!-- Assign Baler Modal -->
-  <div id="assignBalerModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>มอบหมายคนอัดฟาง / Assign Baler</h2>
-        <button type="button" class="close-modal" onclick="Modal.close('assignBalerModal')">&times;</button>
-      </div>
-      
-      <p style="margin-bottom: var(--space-md); color: var(--earth-brown);">
-        เลือกคนอัดฟางสำหรับออเดอร์ #<span id="assignOrderId"></span>
-      </p>
-      
-      <div id="balersListContainer">
-        <!-- Balers list will be loaded here -->
-      </div>
-      
-      <div class="d-flex gap-2 mt-2">
-        <button type="button" class="btn btn-secondary" onclick="Modal.close('assignBalerModal')" style="flex: 1;">
-          ยกเลิก / Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-  
   <!-- Leaflet JS for maps -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
@@ -221,11 +197,12 @@
     // Load orders
     let availableOrders = [];
     let myOrders = [];
-    let currentAssignOrderId = null;
     let orderMap = null; // For map instance
     
     // ==================== COORDINATE EXTRACTION ====================
     function extractCoordinates(deliveryAddress) {
+      if (!deliveryAddress) return null;
+      
       // Try to extract coordinates from format: "[พิกัด: lat, lng]"
       const coordPattern = /\[พิกัด:\s*([\d.]+),\s*([\d.]+)\]/;
       const match = deliveryAddress.match(coordPattern);
@@ -241,6 +218,7 @@
     }
     
     function getAddressWithoutCoordinates(deliveryAddress) {
+      if (!deliveryAddress) return 'ไม่ระบุที่อยู่';
       // Remove coordinate part from address
       return deliveryAddress.replace(/\[พิกัด:.*?\]/, '').trim();
     }
@@ -386,11 +364,6 @@
               <button class="btn-view btn-sm" onclick="viewOrderDetails('${order.order_id}')">
                 ดูรายละเอียด
               </button>
-              ${order.status === 'farmer_accepted' ? `
-                <button class="btn-primary btn-sm" onclick="openAssignBaler('${order.order_id}')">
-                  มอบหมายคนอัดฟาง
-                </button>
-              ` : ''}
             </div>
           </td>
         </tr>
@@ -416,13 +389,31 @@
         if (result.success) {
           const order = result.order;
           
-          // Extract coordinates from delivery address
-          const coords = extractCoordinates(order.delivery_address);
+          // Extract coordinates - try multiple sources
+          let lat = null;
+          let lng = null;
+          
+          // First try: Use delivery_lat and delivery_lng from API
+          if (order.delivery_lat && order.delivery_lng) {
+            lat = parseFloat(order.delivery_lat);
+            lng = parseFloat(order.delivery_lng);
+            console.log('Coordinates from API fields:', lat, lng);
+          }
+          
+          // Second try: Extract from delivery_address string
+          if (!lat || !lng) {
+            const coords = extractCoordinates(order.delivery_address);
+            if (coords) {
+              lat = coords.lat;
+              lng = coords.lng;
+              console.log('Coordinates from address string:', lat, lng);
+            }
+          }
+          
           const cleanAddress = getAddressWithoutCoordinates(order.delivery_address);
           
-          // Try to use delivery_lat and delivery_lng if available in API response
-          const lat = order.delivery_lat || (coords ? coords.lat : null);
-          const lng = order.delivery_lng || (coords ? coords.lng : null);
+          console.log('Final coordinates:', lat, lng);
+          console.log('Clean address:', cleanAddress);
           
           let content = `
             <div style="margin-bottom: var(--space-md);">
@@ -460,7 +451,7 @@
           `;
           
           // Add map section if coordinates are available
-          if (lat && lng) {
+          if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
             content += `
               <div style="margin-bottom: var(--space-lg);">
                 <div class="map-section-title">
@@ -473,7 +464,17 @@
                 <div class="coordinates-info">
                   <strong>พิกัด:</strong> <code>${lat.toFixed(6)}, ${lng.toFixed(6)}</code>
                   <br>
-                  <small>คลิกที่แผนที่เพื่อเปิดใน Google Maps</small>
+                  <small>📱 คลิก marker เพื่อดูรายละเอียด</small>
+                </div>
+              </div>
+            `;
+          } else {
+            // Show message if no coordinates available
+            content += `
+              <div style="margin-bottom: var(--space-lg);">
+                <div style="background: #fff3cd; padding: 1rem; border-radius: 6px; border-left: 4px solid #ffc107;">
+                  <strong>⚠️ ไม่มีข้อมูลพิกัด</strong><br>
+                  <small>ออเดอร์นี้ไม่มีพิกัดตำแหน่งส่งของ</small>
                 </div>
               </div>
             `;
@@ -504,7 +505,7 @@
           Modal.open('orderDetailsModal');
           
           // Show map if coordinates available
-          if (lat && lng) {
+          if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
             showOrderMap(lat, lng, cleanAddress, 'orderLocationMap');
           }
         } else {
@@ -539,71 +540,6 @@
         Loading.hide();
         Toast.error('เกิดข้อผิดพลาด');
         console.error('Accept order error:', error);
-      }
-    }
-    
-    async function openAssignBaler(orderId) {
-      currentAssignOrderId = orderId;
-      document.getElementById('assignOrderId').textContent = orderId.substring(0, 8);
-      
-      Loading.show();
-      
-      try {
-        const result = await API.getUsers('baler');
-        
-        Loading.hide();
-        
-        if (result.success && result.users.length > 0) {
-          const balersHtml = result.users.map(baler => `
-            <div class="card" style="margin-bottom: var(--space-sm); cursor: pointer;" 
-                 onclick="assignBaler('${baler.id}', '${baler.name}')">
-              <div class="d-flex justify-between align-center">
-                <div>
-                  <strong>${baler.name}</strong><br>
-                  <small>${formatPhone(baler.phone)}</small>
-                </div>
-                <button class="btn btn-primary btn-sm">
-                  เลือก
-                </button>
-              </div>
-            </div>
-          `).join('');
-          
-          document.getElementById('balersListContainer').innerHTML = balersHtml;
-          Modal.open('assignBalerModal');
-        } else {
-          Toast.warning('ไม่มีคนอัดฟางในระบบ / No balers available');
-        }
-      } catch (error) {
-        Loading.hide();
-        Toast.error('เกิดข้อผิดพลาด');
-        console.error('Get balers error:', error);
-      }
-    }
-    
-    async function assignBaler(balerId, balerName) {
-      if (!confirm(`มอบหมายงานให้ ${balerName}? / Assign this job to ${balerName}?`)) {
-        return;
-      }
-      
-      Loading.show();
-      
-      try {
-        const result = await API.assignBaler(currentAssignOrderId, balerId);
-        
-        Loading.hide();
-        
-        if (result.success) {
-          Toast.success('มอบหมายคนอัดฟางสำเร็จ / Baler assigned successfully');
-          Modal.close('assignBalerModal');
-          loadOrders();
-        } else {
-          Toast.error('ไม่สามารถมอบหมายคนอัดฟางได้');
-        }
-      } catch (error) {
-        Loading.hide();
-        Toast.error('เกิดข้อผิดพลาด');
-        console.error('Assign baler error:', error);
       }
     }
     
