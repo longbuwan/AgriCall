@@ -6,6 +6,52 @@
   <title>Farmer Dashboard - BaleConnect</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
+  
+  <!-- Leaflet CSS for maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    .order-map-container {
+      margin: 1rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 2px solid #e0e0e0;
+    }
+    
+    .order-map {
+      height: 350px;
+      width: 100%;
+    }
+    
+    .map-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .coordinates-info {
+      background: #e7f3ff;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      border-left: 4px solid #007bff;
+      font-size: 0.9rem;
+    }
+    
+    .coordinates-info code {
+      background: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #d63384;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body class="dashboard">
   <!-- Header -->
@@ -157,6 +203,9 @@
     </div>
   </div>
   
+  <!-- Leaflet JS for maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
@@ -173,6 +222,72 @@
     let availableOrders = [];
     let myOrders = [];
     let currentAssignOrderId = null;
+    let orderMap = null; // For map instance
+    
+    // ==================== COORDINATE EXTRACTION ====================
+    function extractCoordinates(deliveryAddress) {
+      // Try to extract coordinates from format: "[พิกัด: lat, lng]"
+      const coordPattern = /\[พิกัด:\s*([\d.]+),\s*([\d.]+)\]/;
+      const match = deliveryAddress.match(coordPattern);
+      
+      if (match) {
+        return {
+          lat: parseFloat(match[1]),
+          lng: parseFloat(match[2])
+        };
+      }
+      
+      return null;
+    }
+    
+    function getAddressWithoutCoordinates(deliveryAddress) {
+      // Remove coordinate part from address
+      return deliveryAddress.replace(/\[พิกัด:.*?\]/, '').trim();
+    }
+    
+    // ==================== MAP DISPLAY ====================
+    function showOrderMap(lat, lng, address, elementId) {
+      // Clean up existing map if any
+      if (orderMap) {
+        orderMap.remove();
+        orderMap = null;
+      }
+      
+      // Wait for element to be rendered
+      setTimeout(() => {
+        const mapElement = document.getElementById(elementId);
+        if (!mapElement) {
+          console.error('Map element not found');
+          return;
+        }
+        
+        // Create map
+        orderMap = L.map(elementId).setView([lat, lng], 15);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19
+        }).addTo(orderMap);
+        
+        // Add marker
+        L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(orderMap)
+          .bindPopup(`
+            <strong>📍 ตำแหน่งส่งของ</strong><br>
+            <small>${address}</small>
+          `)
+          .openPopup();
+      }, 100);
+    }
     
     async function loadOrders() {
       Loading.show();
@@ -218,26 +333,29 @@
         return;
       }
       
-      tbody.innerHTML = orders.map(order => `
-        <tr>
-          <td><strong>${order.order_id.substring(0, 8)}</strong></td>
-          <td>${order.customer_name}<br><small>${formatPhone(order.customer_phone)}</small></td>
-          <td>${order.bale_type}</td>
-          <td>${order.quantity} กำ</td>
-          <td>${order.delivery_address.substring(0, 30)}...</td>
-          <td>${formatDateShort(order.pickup_date)}</td>
-          <td>
-            <div class="action-buttons">
-              <button class="btn-view btn-sm" onclick="viewOrderDetails('${order.order_id}')">
-                ดูรายละเอียด
-              </button>
-              <button class="btn-accept btn-sm" onclick="acceptOrder('${order.order_id}')">
-                รับงาน
-              </button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = orders.map(order => {
+        const cleanAddress = getAddressWithoutCoordinates(order.delivery_address);
+        return `
+          <tr>
+            <td><strong>${order.order_id.substring(0, 8)}</strong></td>
+            <td>${order.customer_name}<br><small>${formatPhone(order.customer_phone)}</small></td>
+            <td>${order.bale_type}</td>
+            <td>${order.quantity} กำ</td>
+            <td>${cleanAddress.substring(0, 30)}...</td>
+            <td>${formatDateShort(order.pickup_date)}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-view btn-sm" onclick="viewOrderDetails('${order.order_id}')">
+                  ดูรายละเอียด
+                </button>
+                <button class="btn-accept btn-sm" onclick="acceptOrder('${order.order_id}')">
+                  รับงาน
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
     
     function renderMyOrders(orders) {
@@ -298,7 +416,15 @@
         if (result.success) {
           const order = result.order;
           
-          const content = `
+          // Extract coordinates from delivery address
+          const coords = extractCoordinates(order.delivery_address);
+          const cleanAddress = getAddressWithoutCoordinates(order.delivery_address);
+          
+          // Try to use delivery_lat and delivery_lng if available in API response
+          const lat = order.delivery_lat || (coords ? coords.lat : null);
+          const lng = order.delivery_lng || (coords ? coords.lng : null);
+          
+          let content = `
             <div style="margin-bottom: var(--space-md);">
               <h3 style="color: var(--field-green);">Order #${order.order_id.substring(0, 8)}</h3>
               <p>${getStatusBadge(order.status)}</p>
@@ -321,7 +447,7 @@
                 </tr>
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>ที่อยู่จัดส่ง:</strong></td>
-                  <td>${order.delivery_address}</td>
+                  <td>${cleanAddress}</td>
                 </tr>
                 ${order.notes ? `
                 <tr>
@@ -331,7 +457,29 @@
                 ` : ''}
               </table>
             </div>
-            
+          `;
+          
+          // Add map section if coordinates are available
+          if (lat && lng) {
+            content += `
+              <div style="margin-bottom: var(--space-lg);">
+                <div class="map-section-title">
+                  <span style="font-size: 1.2rem;">📍</span>
+                  <span>ตำแหน่งส่งของ / Delivery Location</span>
+                </div>
+                <div class="order-map-container">
+                  <div id="orderLocationMap" class="order-map"></div>
+                </div>
+                <div class="coordinates-info">
+                  <strong>พิกัด:</strong> <code>${lat.toFixed(6)}, ${lng.toFixed(6)}</code>
+                  <br>
+                  <small>คลิกที่แผนที่เพื่อเปิดใน Google Maps</small>
+                </div>
+              </div>
+            `;
+          }
+          
+          content += `
             <div style="margin-bottom: var(--space-lg);">
               <h4>ข้อมูลลูกค้า / Customer Information</h4>
               <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px;">
@@ -354,6 +502,11 @@
           
           document.getElementById('orderDetailsContent').innerHTML = content;
           Modal.open('orderDetailsModal');
+          
+          // Show map if coordinates available
+          if (lat && lng) {
+            showOrderMap(lat, lng, cleanAddress, 'orderLocationMap');
+          }
         } else {
           Toast.error('ไม่สามารถโหลดข้อมูลออเดอร์ได้');
         }
