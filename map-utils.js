@@ -293,8 +293,8 @@ function confirmLocation() {
     return;
   }
   
-  // Fill address field if exists
-  const addressField = document.getElementById('delivery_address');
+  // Fill address field if exists (try both possible IDs)
+  const addressField = document.getElementById('deliveryAddress') || document.getElementById('delivery_address');
   if (addressField) {
     addressField.value = selectedLocation.address;
   }
