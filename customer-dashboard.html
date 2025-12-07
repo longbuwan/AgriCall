@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard - BaleConnect</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <nav class="dashboard-nav">
+      <a href="#" class="dashboard-logo">
+        <span class="logo-icon">🌾</span>
+        <span>BaleConnect</span>
+      </a>
+      
+      <div class="dashboard-user">
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-type">ลูกค้า / Customer</div>
+        </div>
+        
+        <button class="notification-bell" onclick="alert('Notifications feature coming soon!')">
+          🔔
+          <span class="notification-badge hidden" id="notifBadge">0</span>
+        </button>
+        
+        <button class="logout-btn" onclick="Auth.logout()">
+          ออกจากระบบ / Logout
+        </button>
+      </div>
+    </nav>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="container">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">ออเดอร์ทั้งหมด / Total Orders</div>
+          <div class="stat-value" id="totalOrders">0</div>
+        </div>
+        
+        <div class="stat-card orange">
+          <div class="stat-label">รอดำเนินการ / Pending</div>
+          <div class="stat-value" id="pendingOrders">0</div>
+        </div>
+        
+        <div class="stat-card blue">
+          <div class="stat-label">ส่งมอบแล้ว / Delivered</div>
+          <div class="stat-value" id="deliveredOrders">0</div>
+        </div>
+      </div>
+      
+      <!-- Create New Order Section -->
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">สร้างออเดอร์ใหม่ / Create New Order</h2>
+        </div>
+        
+        <form id="createOrderForm">
+          <div class="d-flex gap-2" style="flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+              <label for="baleType">ประเภทฟาง / Bale Type</label>
+              <select id="baleType" name="bale_type" required>
+                <option value="">เลือกประเภทฟาง / Select Type</option>
+                <option value="ฟางข้าว (Rice Straw)">ฟางข้าว / Rice Straw</option>
+                <option value="ฟางข้าวโพด (Corn Straw)">ฟางข้าวโพด / Corn Straw</option>
+                <option value="ฟางข้าวสาลี (Wheat Straw)">ฟางข้าวสาลี / Wheat Straw</option>
+                <option value="ฟางอ้อย (Sugarcane Straw)">ฟางอ้อย / Sugarcane Straw</option>
+              </select>
+            </div>
+            
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+              <label for="quantity">จำนวน / Quantity</label>
+              <input type="number" id="quantity" name="quantity" placeholder="จำนวนกำ / Number of bales" min="1" required>
+            </div>
+            
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+              <label for="pickupDate">วันที่ต้องการรับ / Pickup Date</label>
+              <input type="date" id="pickupDate" name="pickup_date" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="deliveryAddress">ที่อยู่จัดส่ง / Delivery Address</label>
+            <textarea id="deliveryAddress" name="delivery_address" rows="2" placeholder="ที่อยู่สำหรับจัดส่งฟาง" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="notes">หมายเหตุ / Notes (Optional)</label>
+            <textarea id="notes" name="notes" rows="2" placeholder="ข้อมูลเพิ่มเติม เช่น เวลาที่สะดวก, ข้อกำหนดพิเศษ"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            สร้างออเดอร์ / Create Order
+          </button>
+        </form>
+      </div>
+      
+      <!-- My Orders Section -->
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">ออเดอร์ของฉัน / My Orders</h2>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>ประเภทฟาง / Type</th>
+                <th>จำนวน / Qty</th>
+                <th>วันที่รับ / Date</th>
+                <th>สถานะ / Status</th>
+                <th>เกษตรกร / Farmer</th>
+                <th>คนอัดฟาง / Baler</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTable">
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <div class="empty-state-icon">📦</div>
+                  <div class="empty-state-text">ยังไม่มีออเดอร์ / No orders yet</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Order Details Modal -->
+  <div id="orderDetailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>รายละเอียดออเดอร์ / Order Details</h2>
+        <button type="button" class="close-modal" onclick="Modal.close('orderDetailsModal')">&times;</button>
+      </div>
+      
+      <div id="orderDetailsContent">
+        <!-- Content will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+  
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check authentication
+    const currentUser = Auth.requireAuth(['customer']);
+    if (!currentUser) {
+      // Will redirect to login
+      throw new Error('Not authenticated');
+    }
+    
+    // Set user name
+    document.getElementById('userName').textContent = currentUser.name;
+    
+    // Load orders
+    let allOrders = [];
+    
+    async function loadOrders() {
+      Loading.show();
+      
+      try {
+        const result = await API.getOrders({ customer_id: currentUser.id });
+        
+        Loading.hide();
+        
+        if (result.success) {
+          allOrders = result.orders;
+          renderOrders(allOrders);
+          updateStats(allOrders);
+        } else {
+          Toast.error('ไม่สามารถโหลดข้อมูลออเดอร์ได้ / Cannot load orders');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด / An error occurred');
+        console.error('Load orders error:', error);
+      }
+    }
+    
+    function renderOrders(orders) {
+      const tbody = document.getElementById('ordersTable');
+      
+      if (orders.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state">
+              <div class="empty-state-icon">📦</div>
+              <div class="empty-state-text">ยังไม่มีออเดอร์ / No orders yet</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = orders.map(order => `
+        <tr>
+          <td><strong>${order.order_id.substring(0, 8)}</strong></td>
+          <td>${order.bale_type}</td>
+          <td>${order.quantity} กำ</td>
+          <td>${formatDateShort(order.pickup_date)}</td>
+          <td>${getStatusBadge(order.status)}</td>
+          <td>${order.farmer_name}</td>
+          <td>${order.baler_name}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view btn-sm" onclick="viewOrderDetails('${order.order_id}')">
+                ดูรายละเอียด
+              </button>
+              ${order.status === 'pending' ? `
+                <button class="btn-cancel btn-sm" onclick="cancelOrder('${order.order_id}')">
+                  ยกเลิก
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function updateStats(orders) {
+      document.getElementById('totalOrders').textContent = orders.length;
+      document.getElementById('pendingOrders').textContent = 
+        orders.filter(o => o.status === 'pending').length;
+      document.getElementById('deliveredOrders').textContent = 
+        orders.filter(o => o.status === 'delivered').length;
+    }
+    
+    async function viewOrderDetails(orderId) {
+      Loading.show();
+      
+      try {
+        const result = await API.getOrderById(orderId);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          const order = result.order;
+          
+          const content = `
+            <div style="margin-bottom: var(--space-md);">
+              <h3 style="color: var(--field-green);">Order #${order.order_id.substring(0, 8)}</h3>
+              <p>${getStatusBadge(order.status)}</p>
+            </div>
+            
+            <div style="margin-bottom: var(--space-lg);">
+              <h4>ข้อมูลออเดอร์ / Order Information</h4>
+              <table style="width: 100%;">
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>ประเภทฟาง:</strong></td>
+                  <td>${order.bale_type}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>จำนวน:</strong></td>
+                  <td>${order.quantity} กำ</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>วันที่รับ:</strong></td>
+                  <td>${formatDate(order.pickup_date)}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>ที่อยู่จัดส่ง:</strong></td>
+                  <td>${order.delivery_address}</td>
+                </tr>
+                ${order.notes ? `
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>หมายเหตุ:</strong></td>
+                  <td>${order.notes}</td>
+                </tr>
+                ` : ''}
+              </table>
+            </div>
+            
+            <div style="margin-bottom: var(--space-lg);">
+              <h4>ผู้ให้บริการ / Service Providers</h4>
+              <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm);">
+                <strong>เกษตรกร / Farmer:</strong> ${order.farmer_name}<br>
+                ${order.farmer_phone !== '-' ? `<strong>โทร:</strong> ${formatPhone(order.farmer_phone)}` : ''}
+              </div>
+              <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px;">
+                <strong>คนอัดฟาง / Baler:</strong> ${order.baler_name}<br>
+                ${order.baler_phone !== '-' ? `<strong>โทร:</strong> ${formatPhone(order.baler_phone)}` : ''}
+              </div>
+            </div>
+            
+            <div>
+              <h4>สถานะการดำเนินการ / Progress Timeline</h4>
+              <div class="timeline">
+                ${getTimeline(order.status)}
+              </div>
+            </div>
+          `;
+          
+          document.getElementById('orderDetailsContent').innerHTML = content;
+          Modal.open('orderDetailsModal');
+        } else {
+          Toast.error('ไม่สามารถโหลดข้อมูลออเดอร์ได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('View order error:', error);
+      }
+    }
+    
+    function getTimeline(currentStatus) {
+      const statuses = [
+        { key: 'pending', label: 'สร้างออเดอร์', icon: '📝' },
+        { key: 'farmer_accepted', label: 'เกษตรกรรับงาน', icon: '✅' },
+        { key: 'baler_assigned', label: 'มอบหมายคนอัดฟาง', icon: '🚜' },
+        { key: 'in_progress', label: 'กำลังดำเนินการ', icon: '⚙️' },
+        { key: 'delivered', label: 'ส่งมอบแล้ว', icon: '✓' }
+      ];
+      
+      const currentIndex = statuses.findIndex(s => s.key === currentStatus);
+      
+      return statuses.map((status, index) => {
+        const isCompleted = index < currentIndex;
+        const isActive = index === currentIndex;
+        const markerClass = isCompleted ? 'completed' : isActive ? 'active' : '';
+        
+        return `
+          <div class="timeline-item">
+            <div class="timeline-marker ${markerClass}">
+              ${status.icon}
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">${status.label}</div>
+              <div class="timeline-description">
+                ${isCompleted ? 'เสร็จสิ้น' : isActive ? 'กำลังดำเนินการ' : 'รอดำเนินการ'}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    async function cancelOrder(orderId) {
+      if (!confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกออเดอร์นี้? / Are you sure you want to cancel this order?')) {
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.cancelOrder(orderId);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('ยกเลิกออเดอร์สำเร็จ / Order cancelled successfully');
+          loadOrders();
+        } else {
+          Toast.error('ไม่สามารถยกเลิกออเดอร์ได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('Cancel order error:', error);
+      }
+    }
+    
+    // Create order form handler
+    document.getElementById('createOrderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const orderData = Object.fromEntries(formData.entries());
+      orderData.customer_id = currentUser.id;
+      
+      // Validate pickup date is not in the past
+      const pickupDate = new Date(orderData.pickup_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (pickupDate < today) {
+        Toast.error('วันที่รับต้องไม่อยู่ในอดีต / Pickup date cannot be in the past');
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.createOrder(orderData);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('สร้างออเดอร์สำเร็จ / Order created successfully');
+          e.target.reset();
+          loadOrders();
+        } else {
+          Toast.error(result.error);
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด / An error occurred');
+        console.error('Create order error:', error);
+      }
+    });
+    
+    // Set minimum date for pickup date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('pickupDate').setAttribute('min', today);
+    
+    // Initial load
+    loadOrders();
+  </script>
+</body>
+</html>

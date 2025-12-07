@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baler Dashboard - BaleConnect</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <nav class="dashboard-nav">
+      <a href="#" class="dashboard-logo">
+        <span class="logo-icon">🌾</span>
+        <span>BaleConnect</span>
+      </a>
+      
+      <div class="dashboard-user">
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-type">คนอัดฟาง / Baler</div>
+        </div>
+        
+        <button class="notification-bell" onclick="alert('Notifications feature coming soon!')">
+          🔔
+          <span class="notification-badge hidden" id="notifBadge">0</span>
+        </button>
+        
+        <button class="logout-btn" onclick="Auth.logout()">
+          ออกจากระบบ / Logout
+        </button>
+      </div>
+    </nav>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="container">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">งานที่ได้รับมอบหมาย / Assigned Jobs</div>
+          <div class="stat-value" id="assignedJobs">0</div>
+        </div>
+        
+        <div class="stat-card orange">
+          <div class="stat-label">กำลังดำเนินการ / In Progress</div>
+          <div class="stat-value" id="inProgressJobs">0</div>
+        </div>
+        
+        <div class="stat-card blue">
+          <div class="stat-label">เสร็จสิ้นแล้ว / Completed</div>
+          <div class="stat-value" id="completedJobs">0</div>
+        </div>
+      </div>
+      
+      <!-- Assigned Jobs Section -->
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">งานที่ได้รับมอบหมาย / Assigned Jobs</h2>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>เกษตรกร / Farmer</th>
+                <th>ลูกค้า / Customer</th>
+                <th>ประเภทฟาง / Type</th>
+                <th>จำนวน / Qty</th>
+                <th>วันที่รับ / Date</th>
+                <th>สถานะ / Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assignedJobsTable">
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <div class="empty-state-icon">🚜</div>
+                  <div class="empty-state-text">ยังไม่มีงานที่ได้รับมอบหมาย / No assigned jobs yet</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Job History Section -->
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">ประวัติการทำงาน / Job History</h2>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>เกษตรกร / Farmer</th>
+                <th>ประเภทฟาง / Type</th>
+                <th>จำนวน / Qty</th>
+                <th>วันที่ส่งมอบ / Delivered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-icon">📜</div>
+                  <div class="empty-state-text">ยังไม่มีประวัติการทำงาน / No job history yet</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Order Details Modal -->
+  <div id="orderDetailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>รายละเอียดงาน / Job Details</h2>
+        <button type="button" class="close-modal" onclick="Modal.close('orderDetailsModal')">&times;</button>
+      </div>
+      
+      <div id="orderDetailsContent">
+        <!-- Content will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+  
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check authentication
+    const currentUser = Auth.requireAuth(['baler']);
+    if (!currentUser) {
+      throw new Error('Not authenticated');
+    }
+    
+    // Set user name
+    document.getElementById('userName').textContent = currentUser.name;
+    
+    // Load jobs
+    let assignedJobs = [];
+    let jobHistory = [];
+    
+    async function loadJobs() {
+      Loading.show();
+      
+      try {
+        const result = await API.getOrders({ baler_id: currentUser.id });
+        
+        Loading.hide();
+        
+        if (result.success) {
+          // Separate active jobs from history
+          assignedJobs = result.orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
+          jobHistory = result.orders.filter(o => o.status === 'delivered');
+          
+          renderAssignedJobs(assignedJobs);
+          renderJobHistory(jobHistory);
+          updateStats(assignedJobs, jobHistory);
+        } else {
+          Toast.error('ไม่สามารถโหลดข้อมูลงานได้ / Cannot load jobs');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด / An error occurred');
+        console.error('Load jobs error:', error);
+      }
+    }
+    
+    function renderAssignedJobs(jobs) {
+      const tbody = document.getElementById('assignedJobsTable');
+      
+      if (jobs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state">
+              <div class="empty-state-icon">🚜</div>
+              <div class="empty-state-text">ยังไม่มีงานที่ได้รับมอบหมาย / No assigned jobs yet</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = jobs.map(job => `
+        <tr>
+          <td><strong>${job.order_id.substring(0, 8)}</strong></td>
+          <td>${job.farmer_name}<br><small>${formatPhone(job.farmer_phone)}</small></td>
+          <td>${job.customer_name}<br><small>${formatPhone(job.customer_phone)}</small></td>
+          <td>${job.bale_type}</td>
+          <td>${job.quantity} กำ</td>
+          <td>${formatDateShort(job.pickup_date)}</td>
+          <td>${getStatusBadge(job.status)}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}')">
+                ดูรายละเอียด
+              </button>
+              ${job.status === 'baler_assigned' ? `
+                <button class="btn-primary btn-sm" onclick="startJob('${job.order_id}')">
+                  เริ่มงาน
+                </button>
+              ` : ''}
+              ${job.status === 'in_progress' ? `
+                <button class="btn-success btn-sm" onclick="completeJob('${job.order_id}')">
+                  ส่งมอบแล้ว
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderJobHistory(jobs) {
+      const tbody = document.getElementById('historyTable');
+      
+      if (jobs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-state-icon">📜</div>
+              <div class="empty-state-text">ยังไม่มีประวัติการทำงาน / No job history yet</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = jobs.map(job => `
+        <tr>
+          <td><strong>${job.order_id.substring(0, 8)}</strong></td>
+          <td>${job.farmer_name}</td>
+          <td>${job.bale_type}</td>
+          <td>${job.quantity} กำ</td>
+          <td>${formatDateShort(job.delivered_at || job.created_at)}</td>
+          <td>
+            <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}')">
+              ดูรายละเอียด
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function updateStats(assigned, history) {
+      const inProgress = assigned.filter(j => j.status === 'in_progress').length;
+      
+      document.getElementById('assignedJobs').textContent = assigned.length;
+      document.getElementById('inProgressJobs').textContent = inProgress;
+      document.getElementById('completedJobs').textContent = history.length;
+    }
+    
+    async function viewJobDetails(orderId) {
+      Loading.show();
+      
+      try {
+        const result = await API.getOrderById(orderId);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          const order = result.order;
+          
+          const content = `
+            <div style="margin-bottom: var(--space-md);">
+              <h3 style="color: var(--field-green);">Order #${order.order_id.substring(0, 8)}</h3>
+              <p>${getStatusBadge(order.status)}</p>
+            </div>
+            
+            <div style="margin-bottom: var(--space-lg);">
+              <h4>ข้อมูลงาน / Job Information</h4>
+              <table style="width: 100%;">
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>ประเภทฟาง:</strong></td>
+                  <td>${order.bale_type}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>จำนวน:</strong></td>
+                  <td>${order.quantity} กำ</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>วันที่รับ:</strong></td>
+                  <td>${formatDate(order.pickup_date)}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>ที่อยู่จัดส่ง:</strong></td>
+                  <td>${order.delivery_address}</td>
+                </tr>
+                ${order.notes ? `
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>หมายเหตุ:</strong></td>
+                  <td>${order.notes}</td>
+                </tr>
+                ` : ''}
+              </table>
+            </div>
+            
+            <div style="margin-bottom: var(--space-lg);">
+              <h4>ข้อมูลเกษตรกร / Farmer Information</h4>
+              <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px;">
+                <strong>ชื่อ:</strong> ${order.farmer_name}<br>
+                <strong>โทร:</strong> ${formatPhone(order.farmer_phone)}
+              </div>
+            </div>
+            
+            <div>
+              <h4>ข้อมูลลูกค้า / Customer Information</h4>
+              <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px;">
+                <strong>ชื่อ:</strong> ${order.customer_name}<br>
+                <strong>โทร:</strong> ${formatPhone(order.customer_phone)}<br>
+                <strong>ที่อยู่:</strong> ${order.customer_address}
+              </div>
+            </div>
+          `;
+          
+          document.getElementById('orderDetailsContent').innerHTML = content;
+          Modal.open('orderDetailsModal');
+        } else {
+          Toast.error('ไม่สามารถโหลดข้อมูลงานได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('View job error:', error);
+      }
+    }
+    
+    async function startJob(orderId) {
+      if (!confirm('เริ่มทำงานนี้? / Start this job?')) {
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.updateOrderStatus(orderId, 'in_progress');
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('เริ่มงานสำเร็จ / Job started successfully');
+          loadJobs();
+        } else {
+          Toast.error('ไม่สามารถเริ่มงานได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('Start job error:', error);
+      }
+    }
+    
+    async function completeJob(orderId) {
+      if (!confirm('ยืนยันการส่งมอบงาน? / Confirm job delivery?')) {
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.updateOrderStatus(orderId, 'delivered');
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('ส่งมอบงานสำเร็จ / Job delivered successfully');
+          loadJobs();
+        } else {
+          Toast.error('ไม่สามารถอัพเดทสถานะได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('Complete job error:', error);
+      }
+    }
+    
+    // Initial load
+    loadJobs();
+  </script>
+</body>
+</html>

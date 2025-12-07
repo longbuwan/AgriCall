@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BaleConnect - เชื่อมโยงเกษตรกร คนอัดฟาง และลูกค้า</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+      position: relative;
+    }
+    
+    .login-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: var(--space-xl);
+      max-width: 500px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(244, 196, 48, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .logo {
+      font-size: 4rem;
+      margin-bottom: var(--space-sm);
+      animation: bounce 2s ease infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    .app-title {
+      font-family: 'Sriracha', cursive;
+      font-size: 2rem;
+      color: var(--field-green);
+      margin-bottom: 0.5rem;
+    }
+    
+    .app-subtitle {
+      color: var(--earth-brown);
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    
+    .user-type-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .user-type-option {
+      position: relative;
+    }
+    
+    .user-type-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .user-type-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-md);
+      border: 2px solid #E0E0E0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .user-type-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .user-type-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--earth-brown);
+    }
+    
+    .user-type-option input[type="radio"]:checked + .user-type-label {
+      border-color: var(--field-green);
+      background: linear-gradient(135deg, rgba(74, 124, 89, 0.1) 0%, rgba(74, 124, 89, 0.05) 100%);
+    }
+    
+    .user-type-label:hover {
+      border-color: var(--wheat-gold);
+    }
+    
+    .divider {
+      text-align: center;
+      margin: var(--space-lg) 0;
+      position: relative;
+    }
+    
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #E0E0E0;
+    }
+    
+    .divider span {
+      background: var(--white);
+      padding: 0 var(--space-sm);
+      position: relative;
+      color: var(--earth-brown);
+      opacity: 0.6;
+      font-size: 0.875rem;
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: var(--space-lg);
+      color: var(--earth-brown);
+    }
+    
+    .register-link a {
+      color: var(--field-green);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .demo-credentials {
+      background: rgba(244, 196, 48, 0.1);
+      border-radius: 8px;
+      padding: var(--space-md);
+      margin-top: var(--space-lg);
+      font-size: 0.875rem;
+    }
+    
+    .demo-credentials h4 {
+      color: var(--field-green);
+      margin-bottom: var(--space-xs);
+      font-size: 1rem;
+    }
+    
+    .demo-credentials p {
+      margin: 0.25rem 0;
+      color: var(--earth-brown);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">🌾</div>
+        <h1 class="app-title">BaleConnect</h1>
+        <p class="app-subtitle">เชื่อมโยงเกษตรกร คนอัดฟาง และลูกค้า<br>ลดการเผา ลด PM 2.5</p>
+      </div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label>ประเภทผู้ใช้ / User Type</label>
+          <div class="user-type-selector">
+            <div class="user-type-option">
+              <input type="radio" name="userType" id="typeCustomer" value="customer" checked>
+              <label for="typeCustomer" class="user-type-label">
+                <span class="user-type-icon">👨‍💼</span>
+                <span class="user-type-text">ลูกค้า<br>Customer</span>
+              </label>
+            </div>
+            
+            <div class="user-type-option">
+              <input type="radio" name="userType" id="typeFarmer" value="farmer">
+              <label for="typeFarmer" class="user-type-label">
+                <span class="user-type-icon">👨‍🌾</span>
+                <span class="user-type-text">เกษตรกร<br>Farmer</span>
+              </label>
+            </div>
+            
+            <div class="user-type-option">
+              <input type="radio" name="userType" id="typeBaler" value="baler">
+              <label for="typeBaler" class="user-type-label">
+                <span class="user-type-icon">🚜</span>
+                <span class="user-type-text">คนอัดฟาง<br>Baler</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">อีเมล / Email</label>
+          <input type="email" id="email" name="email" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">รหัสผ่าน / Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-md);">
+          เข้าสู่ระบบ / Login
+        </button>
+      </form>
+      
+      <div class="register-link">
+        ยังไม่มีบัญชี? <a onclick="openRegisterModal()">ลงทะเบียนที่นี่</a>
+      </div>
+      
+      <div class="demo-credentials">
+        <h4>🔑 Demo Login Credentials</h4>
+        <p><strong>Customer:</strong> customer@test.com / 123456</p>
+        <p><strong>Farmer:</strong> farmer@test.com / 123456</p>
+        <p><strong>Baler:</strong> baler@test.com / 123456</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Registration Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>ลงทะเบียน / Register</h2>
+        <button type="button" class="close-modal" onclick="Modal.close('registerModal')">&times;</button>
+      </div>
+      
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="regUserType">ประเภทผู้ใช้ / User Type</label>
+          <select id="regUserType" name="user_type" required>
+            <option value="customer">ลูกค้า / Customer</option>
+            <option value="farmer">เกษตรกร / Farmer</option>
+            <option value="baler">คนอัดฟาง / Baler</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="regFullName">ชื่อ-นามสกุล / Full Name</label>
+          <input type="text" id="regFullName" name="full_name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="regEmail">อีเมล / Email</label>
+          <input type="email" id="regEmail" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="regPassword">รหัสผ่าน / Password</label>
+          <input type="password" id="regPassword" name="password" minlength="6" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="regPhone">เบอร์โทร / Phone</label>
+          <input type="tel" id="regPhone" name="phone" placeholder="0812345678" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="regAddress">ที่อยู่ / Address</label>
+          <textarea id="regAddress" name="address" rows="3" required></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-secondary" onclick="Modal.close('registerModal')" style="flex: 1;">
+            ยกเลิก / Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">
+            ลงทะเบียน / Register
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check if user is already logged in
+    const currentUser = Auth.getCurrentUser();
+    if (currentUser) {
+      // Redirect to appropriate dashboard
+      const dashboards = {
+        customer: 'customer-dashboard.html',
+        farmer: 'farmer-dashboard.html',
+        baler: 'baler-dashboard.html'
+      };
+      window.location.href = dashboards[currentUser.type];
+    }
+    
+    // Login form handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const userType = document.querySelector('input[name="userType"]:checked').value;
+      
+      Loading.show();
+      
+      try {
+        const result = await API.login(email, password, userType);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Auth.setCurrentUser(result.user);
+          Toast.success('เข้าสู่ระบบสำเร็จ / Login successful');
+          
+          // Redirect to appropriate dashboard
+          setTimeout(() => {
+            const dashboards = {
+              customer: 'customer-dashboard.html',
+              farmer: 'farmer-dashboard.html',
+              baler: 'baler-dashboard.html'
+            };
+            window.location.href = dashboards[userType];
+          }, 1000);
+        } else {
+          Toast.error(result.error);
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด / An error occurred');
+        console.error('Login error:', error);
+      }
+    });
+    
+    // Registration form handler
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const userData = Object.fromEntries(formData.entries());
+      
+      // Validate phone number
+      if (!isValidPhone(userData.phone)) {
+        Toast.error('กรุณาใส่เบอร์โทรให้ถูกต้อง / Please enter a valid phone number');
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.register(userData);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('ลงทะเบียนสำเร็จ / Registration successful');
+          Modal.close('registerModal');
+          
+          // Auto login
+          Auth.setCurrentUser(result.user);
+          
+          setTimeout(() => {
+            const dashboards = {
+              customer: 'customer-dashboard.html',
+              farmer: 'farmer-dashboard.html',
+              baler: 'baler-dashboard.html'
+            };
+            window.location.href = dashboards[userData.user_type];
+          }, 1000);
+        } else {
+          Toast.error(result.error);
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด / An error occurred');
+        console.error('Registration error:', error);
+      }
+    });
+    
+    function openRegisterModal() {
+      Modal.open('registerModal');
+    }
+  </script>
+</body>
+</html>
