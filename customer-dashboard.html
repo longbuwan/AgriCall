@@ -417,8 +417,19 @@
       e.preventDefault();
       
       const formData = new FormData(e.target);
+      const formData = new FormData(e.target);
       const orderData = Object.fromEntries(formData.entries());
       orderData.customer_id = currentUser.id;
+      
+      // Validate that location is selected
+      if (!orderData.delivery_lat || !orderData.delivery_lng) {
+        Toast.error('กรุณาเลือกตำแหน่งส่งของบนแผนที่ / Please select delivery location on map');
+        return;
+      }
+      
+      // Convert coordinates to numbers
+      orderData.delivery_lat = parseFloat(orderData.delivery_lat);
+      orderData.delivery_lng = parseFloat(orderData.delivery_lng);
       
       // Validate pickup date is not in the past
       const pickupDate = new Date(orderData.pickup_date);
@@ -439,13 +450,31 @@
         
         if (result.success) {
           Toast.success('สร้างออเดอร์สำเร็จ / Order created successfully');
+          
+          // Reset form
           e.target.reset();
-          // Clear hidden coordinate fields
           document.getElementById('delivery_lat').value = '';
           document.getElementById('delivery_lng').value = '';
+          
+          // Reset map to default location
+          const defaultCenter = [18.7883, 98.9853];
+          deliveryMap.setView(defaultCenter, 13);
+          deliveryMarker.setLatLng(defaultCenter);
+          
+          // Reset location info
+          document.getElementById('locationInfo').className = 'location-info';
+          document.getElementById('locationInfo').innerHTML = `
+            <h4>💡 วิธีใช้งาน / How to use:</h4>
+            <p>• <strong>ลากปักหมุด</strong> บนแผนที่เพื่อเลือกตำแหน่ง / <strong>Drag the marker</strong> to select location</p>
+            <p>• หรือกด <strong>"📍 ใช้ตำแหน่งปัจจุบัน"</strong> เพื่อใช้ GPS / Or tap <strong>"Use GPS"</strong> button</p>
+            <p>• หรือ<strong>ค้นหาที่อยู่</strong>ด้านล่าง / Or <strong>search for address</strong> below</p>
+          `;
+          
+          selectedDeliveryLocation = null;
+          
           loadOrders();
         } else {
-          Toast.error(result.error);
+          Toast.error(result.error || 'ไม่สามารถสร้างออเดอร์ได้');
         }
       } catch (error) {
         Loading.hide();
@@ -457,6 +486,36 @@
     // Set minimum date for pickup date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('pickupDate').setAttribute('min', today);
+    
+    // Initialize map when page loads
+    setTimeout(() => {
+      initDeliveryMap();
+    }, 100);
+    
+    // Export location data for use in other operations
+    window.getDeliveryLocation = function() {
+      return selectedDeliveryLocation;
+    };
+    
+    window.setDeliveryLocation = function(lat, lng) {
+      if (deliveryMap && deliveryMarker) {
+        const position = [lat, lng];
+        deliveryMap.setView(position, 16);
+        deliveryMarker.setLatLng(position);
+        updateLocationFromMarker(position);
+      }
+    };
+    
+    window.getMapCoordinates = function() {
+      if (selectedDeliveryLocation) {
+        return {
+          lat: selectedDeliveryLocation.lat,
+          lng: selectedDeliveryLocation.lng,
+          address: selectedDeliveryLocation.address
+        };
+      }
+      return null;
+    };
     
     // Initial load
     loadOrders();
