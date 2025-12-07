@@ -6,6 +6,9 @@
   <title>Customer Dashboard - BaleConnect</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
+  
+  <!-- Leaflet CSS for maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="dashboard">
   <!-- Header -->
@@ -87,7 +90,18 @@
           
           <div class="form-group">
             <label for="deliveryAddress">ที่อยู่จัดส่ง / Delivery Address</label>
-            <textarea id="deliveryAddress" name="delivery_address" rows="2" placeholder="ที่อยู่สำหรับจัดส่งฟาง" required></textarea>
+            <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+              <textarea id="deliveryAddress" name="delivery_address" rows="2" placeholder="ที่อยู่สำหรับจัดส่งฟาง" required style="flex: 1;"></textarea>
+              <button type="button" class="btn btn-secondary" onclick="openLocationPickerModal()" style="white-space: nowrap; height: fit-content;">
+                📍 เลือกจากแผนที่
+              </button>
+            </div>
+            <small style="color: #666; display: block; margin-top: 0.25rem;">
+              💡 คลิกปุ่ม "เลือกจากแผนที่" เพื่อใช้แผนที่และ GPS หาตำแหน่งที่แม่นยำ
+            </small>
+            <!-- Hidden fields for coordinates -->
+            <input type="hidden" id="delivery_lat" name="delivery_lat">
+            <input type="hidden" id="delivery_lng" name="delivery_lng">
           </div>
           
           <div class="form-group">
@@ -149,8 +163,13 @@
     </div>
   </div>
   
+  <!-- Leaflet JS for maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
   <script src="utils.js"></script>
   <script src="api.js"></script>
+  <script src="map-utils.js"></script>
+  
   <script>
     // Check authentication
     const currentUser = Auth.requireAuth(['customer']);
@@ -246,7 +265,7 @@
         if (result.success) {
           const order = result.order;
           
-          const content = `
+          let content = `
             <div style="margin-bottom: var(--space-md);">
               <h3 style="color: var(--field-green);">Order #${order.order_id.substring(0, 8)}</h3>
               <p>${getStatusBadge(order.status)}</p>
@@ -279,7 +298,19 @@
                 ` : ''}
               </table>
             </div>
-            
+          `;
+          
+          // Add map if coordinates exist
+          if (order.delivery_lat && order.delivery_lng) {
+            content += `
+              <div style="margin-bottom: var(--space-lg);">
+                <h4>ตำแหน่งจัดส่ง / Delivery Location</h4>
+                <div id="orderLocationMap" style="height: 300px; border-radius: 8px; border: 2px solid #e0e0e0;"></div>
+              </div>
+            `;
+          }
+          
+          content += `
             <div style="margin-bottom: var(--space-lg);">
               <h4>ผู้ให้บริการ / Service Providers</h4>
               <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm);">
@@ -302,6 +333,18 @@
           
           document.getElementById('orderDetailsContent').innerHTML = content;
           Modal.open('orderDetailsModal');
+          
+          // Initialize map after modal is opened and DOM is ready
+          if (order.delivery_lat && order.delivery_lng) {
+            setTimeout(() => {
+              showOrderLocation(
+                parseFloat(order.delivery_lat),
+                parseFloat(order.delivery_lng),
+                order.delivery_address,
+                'orderLocationMap'
+              );
+            }, 100);
+          }
         } else {
           Toast.error('ไม่สามารถโหลดข้อมูลออเดอร์ได้');
         }
@@ -397,6 +440,9 @@
         if (result.success) {
           Toast.success('สร้างออเดอร์สำเร็จ / Order created successfully');
           e.target.reset();
+          // Clear hidden coordinate fields
+          document.getElementById('delivery_lat').value = '';
+          document.getElementById('delivery_lng').value = '';
           loadOrders();
         } else {
           Toast.error(result.error);
