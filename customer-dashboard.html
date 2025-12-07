@@ -9,6 +9,220 @@
   
   <!-- Leaflet CSS for maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    /* Map container styles */
+    .map-section {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .map-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .map-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .map-container {
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    #deliveryMap {
+      height: 450px;
+      width: 100%;
+      touch-action: pan-y;
+    }
+    
+    .map-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .map-controls .btn {
+      flex: 1;
+      min-width: 160px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      touch-action: manipulation;
+    }
+    
+    .coordinates-display {
+      background: #e7f3ff;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border-left: 4px solid #007bff;
+      display: none;
+    }
+    
+    .coordinates-display.show {
+      display: block;
+    }
+    
+    .coordinates-display h4 {
+      margin: 0 0 0.75rem 0;
+      color: #007bff;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .coord-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    
+    .coord-item {
+      background: white;
+      padding: 0.75rem;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .coord-label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+    
+    .coord-value {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      color: #d63384;
+      font-weight: 600;
+      user-select: all;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    
+    .coord-value:hover {
+      background: #f0f0f0;
+    }
+    
+    .coord-copy-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    
+    .coord-copy-btn:hover {
+      background: #218838;
+    }
+    
+    .location-info {
+      background: #fff3cd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      border-left: 4px solid #ffc107;
+    }
+    
+    .location-info.selected {
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+    
+    .location-info h4 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+      font-size: 0.95rem;
+    }
+    
+    .location-info p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .search-box {
+      display: none;
+      margin-bottom: 1rem;
+      animation: slideDown 0.3s;
+    }
+    
+    .search-box.show {
+      display: block;
+    }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      #deliveryMap {
+        height: 350px;
+      }
+      
+      .map-controls .btn {
+        font-size: 0.9rem;
+        padding: 0.85rem;
+        min-width: 100%;
+      }
+      
+      .coord-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Leaflet marker customization */
+    .leaflet-marker-icon {
+      cursor: move !important;
+    }
+    
+    .leaflet-dragging .leaflet-marker-icon {
+      cursor: grabbing !important;
+    }
+    
+    .address-preview {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: white;
+      border-radius: 4px;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body class="dashboard">
   <!-- Header -->
@@ -88,20 +302,99 @@
             </div>
           </div>
           
-          <div class="form-group">
-            <label for="deliveryAddress">ที่อยู่จัดส่ง / Delivery Address</label>
-            <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
-              <textarea id="deliveryAddress" name="delivery_address" rows="2" placeholder="ที่อยู่สำหรับจัดส่งฟาง" required style="flex: 1;"></textarea>
-              <button type="button" class="btn btn-secondary" onclick="openLocationPickerModal()" style="white-space: nowrap; height: fit-content;">
-                📍 เลือกจากแผนที่
+          <!-- MAP SECTION - PRIMARY METHOD -->
+          <div class="map-section">
+            <div class="map-section-header">
+              <div class="map-section-title">
+                <span style="font-size: 1.3rem;">📍</span>
+                <span>เลือกตำแหน่งส่งของบนแผนที่ / Select Delivery Location</span>
+              </div>
+            </div>
+            
+            <!-- Location Status Info -->
+            <div id="locationInfo" class="location-info">
+              <h4>💡 วิธีใช้งาน / How to use:</h4>
+              <p>• <strong>ลากปักหมุดสีแดง</strong> ไปที่ตำแหน่งที่ต้องการ / <strong>Drag the red marker</strong> to your location</p>
+              <p>• หรือกด <strong>"📍 ใช้ตำแหน่งปัจจุบัน"</strong> เพื่อใช้ GPS / Or tap <strong>"Use GPS"</strong></p>
+              <p>• หรือ<strong>ค้นหาที่อยู่</strong> / Or <strong>search address</strong></p>
+            </div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+              <button type="button" class="btn btn-primary" onclick="useGPSLocation()">
+                📍 ใช้ตำแหน่งปัจจุบัน / Use GPS
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="toggleAddressSearch()">
+                🔍 ค้นหาที่อยู่ / Search Address
               </button>
             </div>
-            <small style="color: #666; display: block; margin-top: 0.25rem;">
-              💡 คลิกปุ่ม "เลือกจากแผนที่" เพื่อใช้แผนที่และ GPS หาตำแหน่งที่แม่นยำ
-            </small>
+            
+            <!-- Search Box -->
+            <div id="searchBox" class="search-box">
+              <div style="display: flex; gap: 0.5rem;">
+                <input 
+                  type="text" 
+                  id="addressSearchInput" 
+                  placeholder="พิมพ์ที่อยู่ เช่น ถนนนิมมานเหมินท์, เชียงใหม่"
+                  style="flex: 1;"
+                  onkeypress="if(event.key==='Enter'){event.preventDefault();searchAddress();}"
+                >
+                <button type="button" class="btn btn-primary" onclick="searchAddress()">
+                  ค้นหา
+                </button>
+              </div>
+            </div>
+            
+            <!-- Interactive Map -->
+            <div class="map-container">
+              <div id="deliveryMap"></div>
+            </div>
+            
+            <!-- Coordinates Display -->
+            <div id="coordinatesDisplay" class="coordinates-display">
+              <h4>
+                <span>✅ พิกัดที่เลือก / Selected Coordinates</span>
+              </h4>
+              <div class="coord-grid">
+                <div class="coord-item">
+                  <div class="coord-label">Latitude (ละติจูด)</div>
+                  <div class="coord-value" id="displayLat" onclick="copyToClipboard('displayLat')" title="Click to copy">-</div>
+                  <button class="coord-copy-btn" onclick="copyCoordinate('lat')">📋 Copy Lat</button>
+                </div>
+                <div class="coord-item">
+                  <div class="coord-label">Longitude (ลองจิจูด)</div>
+                  <div class="coord-value" id="displayLng" onclick="copyToClipboard('displayLng')" title="Click to copy">-</div>
+                  <button class="coord-copy-btn" onclick="copyCoordinate('lng')">📋 Copy Lng</button>
+                </div>
+                <div class="coord-item">
+                  <div class="coord-label">Full Coordinates</div>
+                  <div class="coord-value" id="displayBoth" onclick="copyToClipboard('displayBoth')" title="Click to copy">-</div>
+                  <button class="coord-copy-btn" onclick="copyCoordinate('both')">📋 Copy Both</button>
+                </div>
+              </div>
+              <div class="address-preview" id="addressPreview">-</div>
+            </div>
+          </div>
+          
+          <!-- Address Field (Auto-filled from map) -->
+          <div class="form-group">
+            <label for="deliveryAddress">
+              ที่อยู่จัดส่ง / Delivery Address
+              <small style="color: #666; font-weight: normal;">(จะถูกกรอกอัตโนมัติจากแผนที่ / Auto-filled from map)</small>
+            </label>
+            <textarea 
+              id="deliveryAddress" 
+              name="delivery_address" 
+              rows="2" 
+              placeholder="กรุณาเลือกตำแหน่งบนแผนที่ด้านบน / Please select location on map above"
+              required
+              readonly
+              style="background-color: #f8f9fa; cursor: not-allowed;"
+            ></textarea>
+            
             <!-- Hidden fields for coordinates -->
-            <input type="hidden" id="delivery_lat" name="delivery_lat">
-            <input type="hidden" id="delivery_lng" name="delivery_lng">
+            <input type="hidden" id="delivery_lat" name="delivery_lat" required>
+            <input type="hidden" id="delivery_lng" name="delivery_lng" required>
           </div>
           
           <div class="form-group">
@@ -109,8 +402,8 @@
             <textarea id="notes" name="notes" rows="2" placeholder="ข้อมูลเพิ่มเติม เช่น เวลาที่สะดวก, ข้อกำหนดพิเศษ"></textarea>
           </div>
           
-          <button type="submit" class="btn btn-primary">
-            สร้างออเดอร์ / Create Order
+          <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+            ✓ สร้างออเดอร์ / Create Order
           </button>
         </form>
       </div>
@@ -168,20 +461,370 @@
   
   <script src="utils.js"></script>
   <script src="api.js"></script>
-  <script src="map-utils.js"></script>
   
   <script>
     // Check authentication
     const currentUser = Auth.requireAuth(['customer']);
     if (!currentUser) {
-      // Will redirect to login
       throw new Error('Not authenticated');
     }
     
     // Set user name
     document.getElementById('userName').textContent = currentUser.name;
     
-    // Load orders
+    // ==================== MAP VARIABLES ====================
+    let deliveryMap = null;
+    let deliveryMarker = null;
+    let selectedDeliveryLocation = null;
+    
+    // ==================== MAP INITIALIZATION ====================
+    function initDeliveryMap() {
+      const defaultCenter = [18.7883, 98.9853]; // Chiang Mai
+      
+      // Create map
+      deliveryMap = L.map('deliveryMap', {
+        center: defaultCenter,
+        zoom: 13,
+        zoomControl: true,
+        touchZoom: true,
+        dragging: true,
+        tap: true
+      });
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(deliveryMap);
+      
+      // Add draggable marker
+      deliveryMarker = L.marker(defaultCenter, {
+        draggable: true,
+        icon: L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        })
+      }).addTo(deliveryMap);
+      
+      // Bind popup to marker
+      deliveryMarker.bindPopup('🖐️ ลากฉันไปที่ต้องการส่งของ!<br>Drag me to your delivery location!').openPopup();
+      
+      // Handle marker drag
+      deliveryMarker.on('dragend', async function(e) {
+        const position = e.target.getLatLng();
+        await updateLocationFromMarker([position.lat, position.lng]);
+      });
+      
+      // Handle map click (move marker)
+      deliveryMap.on('click', async function(e) {
+        const position = [e.latlng.lat, e.latlng.lng];
+        deliveryMarker.setLatLng(position);
+        await updateLocationFromMarker(position);
+      });
+      
+      // Try to get user's location on initial load
+      tryAutoGPS();
+    }
+    
+    // ==================== UPDATE LOCATION FUNCTION ====================
+    async function updateLocationFromMarker(position) {
+      const [lat, lng] = position;
+      
+      Loading.show();
+      try {
+        const address = await reverseGeocode(lat, lng);
+        
+        selectedDeliveryLocation = {
+          lat: lat,
+          lng: lng,
+          address: address
+        };
+        
+        // Update form fields
+        document.getElementById('deliveryAddress').value = address;
+        document.getElementById('delivery_lat').value = lat;
+        document.getElementById('delivery_lng').value = lng;
+        
+        // Update coordinates display
+        const coordDisplay = document.getElementById('coordinatesDisplay');
+        coordDisplay.classList.add('show');
+        
+        document.getElementById('displayLat').textContent = lat.toFixed(6);
+        document.getElementById('displayLng').textContent = lng.toFixed(6);
+        document.getElementById('displayBoth').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('addressPreview').textContent = address;
+        
+        // Update info display
+        const locationInfo = document.getElementById('locationInfo');
+        locationInfo.className = 'location-info selected';
+        locationInfo.innerHTML = `
+          <h4>✅ ตำแหน่งที่เลือก / Selected Location</h4>
+          <p><strong>พิกัด:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+          <p><strong>ที่อยู่:</strong> ${address}</p>
+        `;
+        
+        // Update marker popup
+        deliveryMarker.bindPopup(`
+          <strong>📍 ตำแหน่งส่งของ</strong><br>
+          <small>${address}</small><br>
+          <small style="color: #666;">${lat.toFixed(6)}, ${lng.toFixed(6)}</small>
+        `).openPopup();
+        
+      } catch (error) {
+        console.error('Error getting address:', error);
+        Toast.error('ไม่สามารถดึงข้อมูลที่อยู่ได้');
+      } finally {
+        Loading.hide();
+      }
+    }
+    
+    // ==================== REVERSE GEOCODE FUNCTION ====================
+    async function reverseGeocode(lat, lng) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+          {
+            headers: {
+              'Accept-Language': 'th,en'
+            }
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error('Geocoding failed');
+        }
+        
+        const data = await response.json();
+        
+        // Format Thai address
+        const addr = data.address || {};
+        let addressParts = [];
+        
+        if (addr.house_number) addressParts.push(addr.house_number);
+        if (addr.road) addressParts.push(addr.road);
+        if (addr.suburb) addressParts.push(addr.suburb);
+        if (addr.city || addr.town || addr.village) {
+          addressParts.push(addr.city || addr.town || addr.village);
+        }
+        if (addr.state) addressParts.push(addr.state);
+        if (addr.postcode) addressParts.push(addr.postcode);
+        
+        return addressParts.length > 0 
+          ? addressParts.join(', ')
+          : data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          
+      } catch (error) {
+        console.error('Reverse geocode error:', error);
+        return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      }
+    }
+    
+    // ==================== GPS LOCATION FUNCTION ====================
+    async function useGPSLocation() {
+      if (!navigator.geolocation) {
+        Toast.error('เบราว์เซอร์ของคุณไม่รองรับ GPS');
+        return;
+      }
+      
+      Loading.show();
+      Toast.show('กำลังค้นหาตำแหน่งของคุณ...', 'info', 2000);
+      
+      navigator.geolocation.getCurrentPosition(
+        async function(position) {
+          const userLocation = [position.coords.latitude, position.coords.longitude];
+          
+          // Move map and marker
+          deliveryMap.setView(userLocation, 16);
+          deliveryMarker.setLatLng(userLocation);
+          
+          // Add accuracy circle
+          L.circle(userLocation, {
+            radius: position.coords.accuracy,
+            color: '#4285F4',
+            fillColor: '#4285F4',
+            fillOpacity: 0.1
+          }).addTo(deliveryMap);
+          
+          await updateLocationFromMarker(userLocation);
+          Loading.hide();
+          Toast.success('🎯 พบตำแหน่งของคุณแล้ว!');
+        },
+        function(error) {
+          Loading.hide();
+          let errorMessage = 'ไม่สามารถระบุตำแหน่งได้';
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'กรุณาอนุญาตให้เข้าถึงตำแหน่ง';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'ไม่พบข้อมูลตำแหน่ง';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'หมดเวลาในการค้นหาตำแหน่ง';
+              break;
+          }
+          
+          Toast.error(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+    
+    // Try to auto-detect GPS on page load (silently)
+    function tryAutoGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async function(position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            deliveryMap.setView(userLocation, 15);
+            deliveryMarker.setLatLng(userLocation);
+            await updateLocationFromMarker(userLocation);
+            Toast.success('🎯 พบตำแหน่งของคุณแล้ว!');
+          },
+          function(error) {
+            // Silently fail, user can manually select
+            console.log('Auto GPS detection skipped:', error.message);
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 60000
+          }
+        );
+      }
+    }
+    
+    // ==================== ADDRESS SEARCH ====================
+    function toggleAddressSearch() {
+      const searchBox = document.getElementById('searchBox');
+      searchBox.classList.toggle('show');
+      if (searchBox.classList.contains('show')) {
+        document.getElementById('addressSearchInput').focus();
+      }
+    }
+    
+    async function searchAddress() {
+      const query = document.getElementById('addressSearchInput').value.trim();
+      
+      if (!query) {
+        Toast.warning('กรุณาใส่ที่อยู่ที่ต้องการค้นหา');
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=th&limit=5`,
+          {
+            headers: {
+              'Accept-Language': 'th,en'
+            }
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error('Search failed');
+        }
+        
+        const results = await response.json();
+        
+        if (results.length === 0) {
+          Loading.hide();
+          Toast.warning('ไม่พบผลลัพธ์ กรุณาลองค้นหาใหม่');
+          return;
+        }
+        
+        // Use first result
+        const location = results[0];
+        const position = [parseFloat(location.lat), parseFloat(location.lon)];
+        
+        // Move map and marker
+        deliveryMap.setView(position, 16);
+        deliveryMarker.setLatLng(position);
+        
+        await updateLocationFromMarker(position);
+        Loading.hide();
+        Toast.success(`พบ ${results.length} ผลลัพธ์`);
+        
+      } catch (error) {
+        Loading.hide();
+        console.error('Search error:', error);
+        Toast.error('เกิดข้อผิดพลาดในการค้นหา');
+      }
+    }
+    
+    // ==================== COPY COORDINATES ====================
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      const text = element.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        Toast.success('คัดลอกแล้ว! / Copied!');
+      }).catch(() => {
+        // Fallback
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        Toast.success('คัดลอกแล้ว! / Copied!');
+      });
+    }
+    
+    function copyCoordinate(type) {
+      let text = '';
+      if (type === 'lat') {
+        text = document.getElementById('displayLat').textContent;
+      } else if (type === 'lng') {
+        text = document.getElementById('displayLng').textContent;
+      } else if (type === 'both') {
+        text = document.getElementById('displayBoth').textContent;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        Toast.success('คัดลอก ' + (type === 'lat' ? 'Latitude' : type === 'lng' ? 'Longitude' : 'Coordinates') + ' แล้ว!');
+      }).catch(() => {
+        Toast.error('ไม่สามารถคัดลอกได้');
+      });
+    }
+    
+    // ==================== EXPORT FUNCTIONS FOR EXTERNAL USE ====================
+    window.getDeliveryLocation = function() {
+      return selectedDeliveryLocation;
+    };
+    
+    window.setDeliveryLocation = function(lat, lng) {
+      if (deliveryMap && deliveryMarker) {
+        const position = [lat, lng];
+        deliveryMap.setView(position, 16);
+        deliveryMarker.setLatLng(position);
+        updateLocationFromMarker(position);
+      }
+    };
+    
+    window.getMapCoordinates = function() {
+      if (selectedDeliveryLocation) {
+        return {
+          lat: selectedDeliveryLocation.lat,
+          lng: selectedDeliveryLocation.lng,
+          address: selectedDeliveryLocation.address
+        };
+      }
+      return null;
+    };
+    
+    // ==================== ORDERS FUNCTIONS ====================
     let allOrders = [];
     
     async function loadOrders() {
@@ -290,6 +933,12 @@
                   <td style="padding: 0.5rem 0;"><strong>ที่อยู่จัดส่ง:</strong></td>
                   <td>${order.delivery_address}</td>
                 </tr>
+                ${order.delivery_lat && order.delivery_lng ? `
+                <tr>
+                  <td style="padding: 0.5rem 0;"><strong>พิกัด:</strong></td>
+                  <td><code>${parseFloat(order.delivery_lat).toFixed(6)}, ${parseFloat(order.delivery_lng).toFixed(6)}</code></td>
+                </tr>
+                ` : ''}
                 ${order.notes ? `
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>หมายเหตุ:</strong></td>
@@ -334,7 +983,7 @@
           document.getElementById('orderDetailsContent').innerHTML = content;
           Modal.open('orderDetailsModal');
           
-          // Initialize map after modal is opened and DOM is ready
+          // Initialize map after modal is opened
           if (order.delivery_lat && order.delivery_lng) {
             setTimeout(() => {
               showOrderLocation(
@@ -353,6 +1002,30 @@
         Toast.error('เกิดข้อผิดพลาด');
         console.error('View order error:', error);
       }
+    }
+    
+    function showOrderLocation(lat, lng, address, elementId) {
+      const map = L.map(elementId).setView([lat, lng], 15);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
+      
+      L.marker([lat, lng], {
+        icon: L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+        })
+      }).addTo(map)
+        .bindPopup(`<strong>📍 ตำแหน่งส่งของ</strong><br><small>${address}</small>`)
+        .openPopup();
+      
+      return map;
     }
     
     function getTimeline(currentStatus) {
@@ -412,11 +1085,10 @@
       }
     }
     
-    // Create order form handler
+    // ==================== FORM SUBMISSION ====================
     document.getElementById('createOrderForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const formData = new FormData(e.target);
       const formData = new FormData(e.target);
       const orderData = Object.fromEntries(formData.entries());
       orderData.customer_id = currentUser.id;
@@ -424,6 +1096,7 @@
       // Validate that location is selected
       if (!orderData.delivery_lat || !orderData.delivery_lng) {
         Toast.error('กรุณาเลือกตำแหน่งส่งของบนแผนที่ / Please select delivery location on map');
+        document.getElementById('deliveryMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
       
@@ -449,25 +1122,27 @@
         Loading.hide();
         
         if (result.success) {
-          Toast.success('สร้างออเดอร์สำเร็จ / Order created successfully');
+          Toast.success('สร้างออเดอร์สำเร็จ! / Order created successfully! 🎉');
           
           // Reset form
           e.target.reset();
           document.getElementById('delivery_lat').value = '';
           document.getElementById('delivery_lng').value = '';
           
-          // Reset map to default location
+          // Reset map to default
           const defaultCenter = [18.7883, 98.9853];
           deliveryMap.setView(defaultCenter, 13);
           deliveryMarker.setLatLng(defaultCenter);
+          deliveryMarker.bindPopup('🖐️ ลากฉันไปที่ต้องการส่งของ!<br>Drag me to your delivery location!');
           
-          // Reset location info
+          // Reset displays
+          document.getElementById('coordinatesDisplay').classList.remove('show');
           document.getElementById('locationInfo').className = 'location-info';
           document.getElementById('locationInfo').innerHTML = `
             <h4>💡 วิธีใช้งาน / How to use:</h4>
-            <p>• <strong>ลากปักหมุด</strong> บนแผนที่เพื่อเลือกตำแหน่ง / <strong>Drag the marker</strong> to select location</p>
-            <p>• หรือกด <strong>"📍 ใช้ตำแหน่งปัจจุบัน"</strong> เพื่อใช้ GPS / Or tap <strong>"Use GPS"</strong> button</p>
-            <p>• หรือ<strong>ค้นหาที่อยู่</strong>ด้านล่าง / Or <strong>search for address</strong> below</p>
+            <p>• <strong>ลากปักหมุดสีแดง</strong> ไปที่ตำแหน่งที่ต้องการ / <strong>Drag the red marker</strong> to your location</p>
+            <p>• หรือกด <strong>"📍 ใช้ตำแหน่งปัจจุบัน"</strong> เพื่อใช้ GPS / Or tap <strong>"Use GPS"</strong></p>
+            <p>• หรือ<strong>ค้นหาที่อยู่</strong> / Or <strong>search address</strong></p>
           `;
           
           selectedDeliveryLocation = null;
@@ -483,41 +1158,17 @@
       }
     });
     
-    // Set minimum date for pickup date to today
+    // ==================== INITIALIZATION ====================
+    // Set minimum date for pickup date
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('pickupDate').setAttribute('min', today);
     
-    // Initialize map when page loads
+    // Initialize map
     setTimeout(() => {
       initDeliveryMap();
     }, 100);
     
-    // Export location data for use in other operations
-    window.getDeliveryLocation = function() {
-      return selectedDeliveryLocation;
-    };
-    
-    window.setDeliveryLocation = function(lat, lng) {
-      if (deliveryMap && deliveryMarker) {
-        const position = [lat, lng];
-        deliveryMap.setView(position, 16);
-        deliveryMarker.setLatLng(position);
-        updateLocationFromMarker(position);
-      }
-    };
-    
-    window.getMapCoordinates = function() {
-      if (selectedDeliveryLocation) {
-        return {
-          lat: selectedDeliveryLocation.lat,
-          lng: selectedDeliveryLocation.lng,
-          address: selectedDeliveryLocation.address
-        };
-      }
-      return null;
-    };
-    
-    // Initial load
+    // Load orders
     loadOrders();
   </script>
 </body>
