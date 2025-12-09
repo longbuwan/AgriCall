@@ -3,7 +3,7 @@
 // Configuration for Python Backend
 const CONFIG = {
   // Python Flask backend URLs (running on localhost:5000)
-  PYTHON_BACKEND: 'https://agricall.onrender.com',
+  PYTHON_BACKEND: 'https://techno.varee.ac.th/users/QS/backend.py',
   
   // API Endpoints
   API_ENDPOINTS: {
