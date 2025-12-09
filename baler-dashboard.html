@@ -11,17 +11,26 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
+    /* Larger map containers */
     .route-map-container {
       margin: 1rem 0;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border: 2px solid #e0e0e0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      border: 3px solid #e0e0e0;
     }
     
     .route-map {
-      height: 450px;
+      height: 500px;
       width: 100%;
+    }
+    
+    .job-preview-map {
+      height: 300px;
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border: 2px solid #e0e0e0;
     }
     
     .location-card {
@@ -41,18 +50,16 @@
     }
     
     .distance-info {
-      background: #fff3cd;
-      padding: 1rem;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
       margin: 1rem 0;
-      border-left: 4px solid #ffc107;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      border-left: 5px solid #ffc107;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .distance-info .icon {
-      font-size: 2rem;
+      font-size: 2.5rem;
     }
     
     .distance-info .details {
@@ -60,66 +67,68 @@
     }
     
     .distance-info .distance-value {
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 700;
       color: #856404;
     }
     
+    .distance-info .time-estimate {
+      font-size: 1.1rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    
     .route-instructions {
       background: white;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.5rem;
+      border-radius: 12px;
       margin: 1rem 0;
-      border: 1px solid #dee2e6;
+      border: 2px solid #dee2e6;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
     .route-instructions h4 {
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 1rem 0;
       color: #333;
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
     
     .route-step {
-      padding: 0.5rem;
-      margin: 0.25rem 0;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
       background: #f8f9fa;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-    
-    .preview-map {
-      height: 200px;
-      width: 100%;
       border-radius: 6px;
-      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      border-left: 3px solid #007bff;
     }
     
     .job-card {
       background: white;
       border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
       transition: all 0.3s;
     }
     
     .job-card:hover {
       border-color: #007bff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
     }
     
     .job-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e0e0e0;
     }
     
     .job-card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: 1.2rem;
+      font-weight: 700;
       color: #333;
     }
     
@@ -150,20 +159,69 @@
     
     .job-card-footer {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
       justify-content: flex-end;
+      margin-top: 1rem;
     }
     
     .distance-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      background: #e7f3ff;
+      background: linear-gradient(135deg, #e7f3ff 0%, #cce5ff 100%);
+      padding: 0.75rem 1.25rem;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0066cc;
+      border: 2px solid #99ccff;
+    }
+    
+    .loading-route {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .route-polyline {
+      stroke: #007bff;
+      stroke-width: 4;
+      stroke-opacity: 0.7;
+      fill: none;
+    }
+    
+    /* Enhanced modal */
+    .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    /* Routing status */
+    .routing-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       padding: 0.5rem 1rem;
+      background: #e7f3ff;
       border-radius: 20px;
       font-size: 0.9rem;
-      font-weight: 600;
       color: #0066cc;
+    }
+    
+    .routing-status.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .routing-status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .routing-status.error {
+      background: #f8d7da;
+      color: #721c24;
     }
   </style>
 </head>
@@ -220,7 +278,8 @@
         <div class="section-header">
           <h2 class="section-title">🔍 งานที่พร้อมรับ / Available Jobs from Farmers</h2>
           <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
-            เลือกงานที่คุณต้องการทำจากเกษตรกรที่รับออเดอร์แล้ว / Choose jobs from farmer-accepted orders
+            เลือกงานที่คุณต้องการทำจากเกษตรกรที่รับออเดอร์แล้ว / Choose jobs from farmer-accepted orders<br>
+            <small>💡 ระยะทางคำนวณจากเส้นทางจริงบนถนน / Distances calculated from actual road routes</small>
           </p>
         </div>
         
@@ -298,7 +357,7 @@
   
   <!-- Order Details Modal with Route Map -->
   <div id="orderDetailsModal" class="modal">
-    <div class="modal-content" style="max-width: 1000px;">
+    <div class="modal-content" style="max-width: 1200px;">
       <div class="modal-header">
         <h2>รายละเอียดงาน / Job Details</h2>
         <button type="button" class="close-modal" onclick="Modal.close('orderDetailsModal')">&times;</button>
@@ -330,6 +389,7 @@
     let myJobs = [];
     let jobHistory = [];
     let routeMap = null;
+    let previewMaps = {};
     let balerLocation = null;
     
     // ==================== COORDINATE EXTRACTION ====================
@@ -354,21 +414,66 @@
       return addressString.replace(/\[พิกัด:.*?\]/, '').trim();
     }
     
-    // ==================== DISTANCE CALCULATION ====================
-    function calculateDistance(lat1, lng1, lat2, lng2) {
-      const R = 6371; // Earth's radius in km
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLng = (lng2 - lng1) * Math.PI / 180;
-      
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLng/2) * Math.sin(dLng/2);
-      
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const distance = R * c;
-      
-      return distance; // in kilometers
+    // ==================== OSRM ROUTING ====================
+    async function getRoute(startLat, startLng, endLat, endLng) {
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Routing failed');
+        }
+        
+        const data = await response.json();
+        
+        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          return {
+            distance: route.distance / 1000, // Convert to km
+            duration: route.duration / 60, // Convert to minutes
+            geometry: route.geometry.coordinates.map(coord => [coord[1], coord[0]]) // Swap lng,lat to lat,lng
+          };
+        }
+        
+        return null;
+      } catch (error) {
+        console.error('Routing error:', error);
+        return null;
+      }
+    }
+    
+    async function getCompleteRoute(balerLat, balerLng, fieldLat, fieldLng, deliveryLat, deliveryLng) {
+      try {
+        // Get route from baler to field
+        const route1 = await getRoute(balerLat, balerLng, fieldLat, fieldLng);
+        
+        // Get route from field to delivery
+        const route2 = await getRoute(fieldLat, fieldLng, deliveryLat, deliveryLng);
+        
+        if (!route1 || !route2) {
+          return null;
+        }
+        
+        return {
+          segment1: route1,
+          segment2: route2,
+          totalDistance: route1.distance + route2.distance,
+          totalDuration: route1.duration + route2.duration
+        };
+      } catch (error) {
+        console.error('Complete route error:', error);
+        return null;
+      }
+    }
+    
+    function formatDuration(minutes) {
+      if (minutes < 60) {
+        return `${Math.round(minutes)} นาที`;
+      } else {
+        const hours = Math.floor(minutes / 60);
+        const mins = Math.round(minutes % 60);
+        return `${hours} ชม. ${mins} นาที`;
+      }
     }
     
     function formatDistance(km) {
@@ -385,7 +490,6 @@
       
       return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
-          // Default to Chiang Mai
           balerLocation = { lat: 18.7883, lng: 98.9853 };
           resolve(balerLocation);
           return;
@@ -397,10 +501,10 @@
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
+            console.log('Baler location:', balerLocation);
             resolve(balerLocation);
           },
           (error) => {
-            // Fallback to default location if GPS fails
             console.log('GPS failed, using default location');
             balerLocation = { lat: 18.7883, lng: 98.9853 };
             resolve(balerLocation);
@@ -432,7 +536,7 @@
         
         if (availableResult.success) {
           availableJobs = availableResult.orders;
-          renderAvailableJobs(availableJobs);
+          await renderAvailableJobs(availableJobs);
         }
         
         if (myResult.success) {
@@ -453,7 +557,7 @@
     }
     
     // ==================== RENDER AVAILABLE JOBS ====================
-    function renderAvailableJobs(jobs) {
+    async function renderAvailableJobs(jobs) {
       const container = document.getElementById('availableJobsContainer');
       
       if (jobs.length === 0) {
@@ -466,107 +570,230 @@
         return;
       }
       
-      container.innerHTML = jobs.map(job => {
-        // Extract coordinates
-        let fieldLat = null, fieldLng = null;
-        if (job.field_lat && job.field_lng) {
-          fieldLat = parseFloat(job.field_lat);
-          fieldLng = parseFloat(job.field_lng);
-        } else {
-          const fieldCoords = extractCoordinates(job.field_address);
-          if (fieldCoords) {
-            fieldLat = fieldCoords.lat;
-            fieldLng = fieldCoords.lng;
-          }
+      // Show loading state first
+      container.innerHTML = jobs.map(job => `
+        <div class="job-card" id="job-${job.order_id}">
+          <div class="loading-route">
+            🔄 กำลังคำนวณเส้นทาง... / Calculating route...
+          </div>
+        </div>
+      `).join('');
+      
+      // Calculate routes for each job
+      for (const job of jobs) {
+        await renderJobCard(job);
+      }
+    }
+    
+    async function renderJobCard(job) {
+      // Extract coordinates
+      let fieldLat = null, fieldLng = null;
+      if (job.field_lat && job.field_lng) {
+        fieldLat = parseFloat(job.field_lat);
+        fieldLng = parseFloat(job.field_lng);
+      } else {
+        const fieldCoords = extractCoordinates(job.field_address);
+        if (fieldCoords) {
+          fieldLat = fieldCoords.lat;
+          fieldLng = fieldCoords.lng;
         }
-        
-        let deliveryLat = null, deliveryLng = null;
-        if (job.delivery_lat && job.delivery_lng) {
-          deliveryLat = parseFloat(job.delivery_lat);
-          deliveryLng = parseFloat(job.delivery_lng);
-        } else {
-          const deliveryCoords = extractCoordinates(job.delivery_address);
-          if (deliveryCoords) {
-            deliveryLat = deliveryCoords.lat;
-            deliveryLng = deliveryCoords.lng;
-          }
+      }
+      
+      let deliveryLat = null, deliveryLng = null;
+      if (job.delivery_lat && job.delivery_lng) {
+        deliveryLat = parseFloat(job.delivery_lat);
+        deliveryLng = parseFloat(job.delivery_lng);
+      } else {
+        const deliveryCoords = extractCoordinates(job.delivery_address);
+        if (deliveryCoords) {
+          deliveryLat = deliveryCoords.lat;
+          deliveryLng = deliveryCoords.lng;
         }
+      }
+      
+      const cleanFieldAddress = getAddressWithoutCoordinates(job.field_address || 'ไม่ระบุ');
+      const cleanDeliveryAddress = getAddressWithoutCoordinates(job.delivery_address);
+      
+      let distanceInfo = '';
+      let mapPreview = '';
+      
+      // Get route if coordinates available
+      if (balerLocation && fieldLat && fieldLng && deliveryLat && deliveryLng) {
+        const routeData = await getCompleteRoute(
+          balerLocation.lat, balerLocation.lng,
+          fieldLat, fieldLng,
+          deliveryLat, deliveryLng
+        );
         
-        // Calculate distances
-        let distanceInfo = '';
-        if (balerLocation && fieldLat && fieldLng && deliveryLat && deliveryLng) {
-          const distToField = calculateDistance(balerLocation.lat, balerLocation.lng, fieldLat, fieldLng);
-          const fieldToDelivery = calculateDistance(fieldLat, fieldLng, deliveryLat, deliveryLng);
-          const totalDist = distToField + fieldToDelivery;
-          
+        if (routeData) {
           distanceInfo = `
             <div class="distance-badge">
-              📏 ${formatDistance(totalDist)} 
-              <small style="color: #666;">(${formatDistance(distToField)} + ${formatDistance(fieldToDelivery)})</small>
+              📏 ${formatDistance(routeData.totalDistance)}
+              <small style="color: #0052a3;">(${formatDuration(routeData.totalDuration)})</small>
             </div>
           `;
+          
+          // Add preview map
+          mapPreview = `
+            <div class="job-preview-map" id="preview-map-${job.order_id}"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+              <small style="color: #666;">
+                🚜→🌾: ${formatDistance(routeData.segment1.distance)} (${formatDuration(routeData.segment1.duration)}) | 
+                🌾→📍: ${formatDistance(routeData.segment2.distance)} (${formatDuration(routeData.segment2.duration)})
+              </small>
+            </div>
+          `;
+          
+          // Store route data for later use
+          job._routeData = routeData;
         }
-        
-        const cleanFieldAddress = getAddressWithoutCoordinates(job.field_address || 'ไม่ระบุ');
-        const cleanDeliveryAddress = getAddressWithoutCoordinates(job.delivery_address);
-        
-        return `
-          <div class="job-card">
-            <div class="job-card-header">
-              <div>
-                <div class="job-card-title">Order #${job.order_id.substring(0, 8)}</div>
-                <small style="color: #666;">สร้างเมื่อ: ${formatDate(job.created_at)}</small>
-              </div>
-              ${distanceInfo}
+      }
+      
+      const jobCard = `
+        <div class="job-card">
+          <div class="job-card-header">
+            <div>
+              <div class="job-card-title">Order #${job.order_id.substring(0, 8)}</div>
+              <small style="color: #666;">สร้างเมื่อ: ${formatDate(job.created_at)}</small>
+            </div>
+            ${distanceInfo}
+          </div>
+          
+          <div class="job-card-body">
+            <div class="job-info-item">
+              <div class="job-info-label">🌾 เกษตรกร / Farmer</div>
+              <div class="job-info-value">${job.farmer_name}</div>
+              <small style="color: #666;">${formatPhone(job.farmer_phone)}</small>
             </div>
             
-            <div class="job-card-body">
-              <div class="job-info-item">
-                <div class="job-info-label">🌾 เกษตรกร / Farmer</div>
-                <div class="job-info-value">${job.farmer_name}</div>
-                <small style="color: #666;">${formatPhone(job.farmer_phone)}</small>
-              </div>
-              
-              <div class="job-info-item">
-                <div class="job-info-label">👤 ลูกค้า / Customer</div>
-                <div class="job-info-value">${job.customer_name}</div>
-                <small style="color: #666;">${formatPhone(job.customer_phone)}</small>
-              </div>
-              
-              <div class="job-info-item">
-                <div class="job-info-label">📦 ประเภท / Type</div>
-                <div class="job-info-value">${job.bale_type}</div>
-              </div>
-              
-              <div class="job-info-item">
-                <div class="job-info-label">🔢 จำนวน / Quantity</div>
-                <div class="job-info-value">${job.quantity} กำ</div>
-              </div>
-              
-              <div class="job-info-item">
-                <div class="job-info-label">📅 วันที่รับ / Pickup Date</div>
-                <div class="job-info-value">${formatDateShort(job.pickup_date)}</div>
-              </div>
-              
-              <div class="job-info-item">
-                <div class="job-info-label">📍 สถานที่ไร่ / Field</div>
-                <div class="job-info-value" style="font-size: 0.85rem; font-weight: normal;">
-                  ${cleanFieldAddress.substring(0, 40)}${cleanFieldAddress.length > 40 ? '...' : ''}
-                </div>
-              </div>
+            <div class="job-info-item">
+              <div class="job-info-label">👤 ลูกค้า / Customer</div>
+              <div class="job-info-value">${job.customer_name}</div>
+              <small style="color: #666;">${formatPhone(job.customer_phone)}</small>
             </div>
             
-            <div class="job-card-footer">
-              <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', true)">
-                📋 ดูรายละเอียดและแผนที่
-              </button>
-              <button class="btn-success btn-sm" onclick="acceptJob('${job.order_id}')" style="min-width: 120px;">
-                ✓ รับงานนี้
-              </button>
+            <div class="job-info-item">
+              <div class="job-info-label">📦 ประเภท / Type</div>
+              <div class="job-info-value">${job.bale_type}</div>
+            </div>
+            
+            <div class="job-info-item">
+              <div class="job-info-label">🔢 จำนวน / Quantity</div>
+              <div class="job-info-value">${job.quantity} กำ</div>
+            </div>
+            
+            <div class="job-info-item">
+              <div class="job-info-label">📅 วันที่รับ / Pickup Date</div>
+              <div class="job-info-value">${formatDateShort(job.pickup_date)}</div>
+            </div>
+            
+            <div class="job-info-item">
+              <div class="job-info-label">📍 สถานที่ไร่ / Field</div>
+              <div class="job-info-value" style="font-size: 0.85rem; font-weight: normal;">
+                ${cleanFieldAddress.substring(0, 40)}${cleanFieldAddress.length > 40 ? '...' : ''}
+              </div>
             </div>
           </div>
-        `;
-      }).join('');
+          
+          ${mapPreview}
+          
+          <div class="job-card-footer">
+            <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', true)">
+              📋 ดูรายละเอียดเต็ม
+            </button>
+            <button class="btn-success btn-sm" onclick="acceptJob('${job.order_id}')" style="min-width: 150px;">
+              ✓ รับงานนี้
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Replace the loading placeholder
+      const jobElement = document.getElementById(`job-${job.order_id}`);
+      if (jobElement) {
+        jobElement.outerHTML = jobCard;
+      }
+      
+      // Render preview map if route data available
+      if (job._routeData && fieldLat && fieldLng && deliveryLat && deliveryLng) {
+        setTimeout(() => {
+          renderPreviewMap(
+            job.order_id,
+            balerLocation, 
+            { lat: fieldLat, lng: fieldLng },
+            { lat: deliveryLat, lng: deliveryLng },
+            job._routeData
+          );
+        }, 100);
+      }
+    }
+    
+    function renderPreviewMap(orderId, balerLoc, fieldLoc, deliveryLoc, routeData) {
+      const mapId = `preview-map-${orderId}`;
+      const mapElement = document.getElementById(mapId);
+      
+      if (!mapElement) return;
+      
+      // Create map
+      const bounds = L.latLngBounds([
+        [balerLoc.lat, balerLoc.lng],
+        [fieldLoc.lat, fieldLoc.lng],
+        [deliveryLoc.lat, deliveryLoc.lng]
+      ]);
+      
+      const map = L.map(mapId).fitBounds(bounds, { padding: [30, 30] });
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19
+      }).addTo(map);
+      
+      // Add markers
+      L.marker([balerLoc.lat, balerLoc.lng], {
+        icon: L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [20, 33],
+          iconAnchor: [10, 33]
+        })
+      }).addTo(map).bindPopup('🚜 คุณ');
+      
+      L.marker([fieldLoc.lat, fieldLoc.lng], {
+        icon: L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [20, 33],
+          iconAnchor: [10, 33]
+        })
+      }).addTo(map).bindPopup('🌾 ไร่');
+      
+      L.marker([deliveryLoc.lat, deliveryLoc.lng], {
+        icon: L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [20, 33],
+          iconAnchor: [10, 33]
+        })
+      }).addTo(map).bindPopup('📍 ส่งของ');
+      
+      // Draw route polylines
+      if (routeData.segment1.geometry) {
+        L.polyline(routeData.segment1.geometry, {
+          color: '#007bff',
+          weight: 4,
+          opacity: 0.7
+        }).addTo(map);
+      }
+      
+      if (routeData.segment2.geometry) {
+        L.polyline(routeData.segment2.geometry, {
+          color: '#28a745',
+          weight: 4,
+          opacity: 0.7
+        }).addTo(map);
+      }
+      
+      previewMaps[orderId] = map;
     }
     
     // ==================== RENDER MY JOBS ====================
@@ -652,8 +879,8 @@
       document.getElementById('completedJobs').textContent = history.length;
     }
     
-    // ==================== SHOW ROUTE MAP ====================
-    async function showRouteMap(fieldLat, fieldLng, fieldAddress, deliveryLat, deliveryLng, deliveryAddress, elementId) {
+    // ==================== SHOW DETAILED ROUTE MAP ====================
+    async function showDetailedRouteMap(fieldLat, fieldLng, fieldAddress, deliveryLat, deliveryLng, deliveryAddress, elementId) {
       if (routeMap) {
         routeMap.remove();
         routeMap = null;
@@ -668,21 +895,32 @@
         
         const balerLoc = await getBalerLocation();
         
-        // Calculate bounds to fit all markers
+        // Get detailed route
+        const routeData = await getCompleteRoute(
+          balerLoc.lat, balerLoc.lng,
+          fieldLat, fieldLng,
+          deliveryLat, deliveryLng
+        );
+        
+        if (!routeData) {
+          mapElement.innerHTML = '<div class="loading-route">⚠️ ไม่สามารถคำนวณเส้นทางได้</div>';
+          return;
+        }
+        
         const bounds = L.latLngBounds([
           [balerLoc.lat, balerLoc.lng],
           [fieldLat, fieldLng],
           [deliveryLat, deliveryLng]
         ]);
         
-        routeMap = L.map(elementId).fitBounds(bounds, { padding: [50, 50] });
+        routeMap = L.map(elementId).fitBounds(bounds, { padding: [60, 60] });
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',
           maxZoom: 19
         }).addTo(routeMap);
         
-        // Baler location (blue)
+        // Add markers
         L.marker([balerLoc.lat, balerLoc.lng], {
           icon: L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
@@ -695,7 +933,6 @@
         }).addTo(routeMap)
           .bindPopup('<strong>🚜 ตำแหน่งของคุณ</strong><br><small>Your Current Location</small>');
         
-        // Field location (green)
         L.marker([fieldLat, fieldLng], {
           icon: L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -708,7 +945,6 @@
         }).addTo(routeMap)
           .bindPopup(`<strong>🌾 ไร่เกษตรกร</strong><br><small>${fieldAddress}</small>`);
         
-        // Delivery location (red)
         L.marker([deliveryLat, deliveryLng], {
           icon: L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -721,25 +957,24 @@
         }).addTo(routeMap)
           .bindPopup(`<strong>📍 จุดส่งของ</strong><br><small>${deliveryAddress}</small>`);
         
-        // Draw route lines
-        L.polyline([
-          [balerLoc.lat, balerLoc.lng],
-          [fieldLat, fieldLng]
-        ], {
-          color: '#007bff',
-          weight: 3,
-          opacity: 0.7,
-          dashArray: '10, 10'
-        }).addTo(routeMap);
+        // Draw actual routes
+        if (routeData.segment1.geometry) {
+          L.polyline(routeData.segment1.geometry, {
+            color: '#007bff',
+            weight: 5,
+            opacity: 0.8
+          }).addTo(routeMap);
+        }
         
-        L.polyline([
-          [fieldLat, fieldLng],
-          [deliveryLat, deliveryLng]
-        ], {
-          color: '#28a745',
-          weight: 4,
-          opacity: 0.8
-        }).addTo(routeMap);
+        if (routeData.segment2.geometry) {
+          L.polyline(routeData.segment2.geometry, {
+            color: '#28a745',
+            weight: 5,
+            opacity: 0.8
+          }).addTo(routeMap);
+        }
+        
+        return routeData;
       }, 100);
     }
     
@@ -797,31 +1032,14 @@
             
             const balerLoc = await getBalerLocation();
             
-            const distanceToField = calculateDistance(
-              balerLoc.lat, balerLoc.lng,
-              fieldLat, fieldLng
-            );
-            const distanceFieldToDelivery = calculateDistance(
-              fieldLat, fieldLng,
-              deliveryLat, deliveryLng
-            );
-            const totalDistance = distanceToField + distanceFieldToDelivery;
-            
             content += `
               <div style="margin-bottom: var(--space-lg);">
                 <h4 style="margin-bottom: 1rem;">🗺️ เส้นทางการทำงาน / Route Map</h4>
-                
-                <div class="distance-info">
-                  <div class="icon">📏</div>
-                  <div class="details">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">ระยะทางรวม / Total Distance</div>
-                    <div class="distance-value">${formatDistance(totalDistance)}</div>
-                    <div style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">
-                      🚜 → 🌾: ${formatDistance(distanceToField)} | 
-                      🌾 → 📍: ${formatDistance(distanceFieldToDelivery)}
-                    </div>
-                  </div>
+                <div class="routing-status loading" id="routingStatus">
+                  🔄 กำลังคำนวณเส้นทางจริง... / Calculating actual route...
                 </div>
+                
+                <div id="routeDistanceInfo"></div>
                 
                 <div class="location-card">
                   <strong>🚜 จุดเริ่มต้น:</strong> ตำแหน่งของคุณ (Your Location)<br>
@@ -842,18 +1060,7 @@
                   <div id="routeMap" class="route-map"></div>
                 </div>
                 
-                <div class="route-instructions">
-                  <h4>📋 ขั้นตอนการทำงาน / Work Steps:</h4>
-                  <div class="route-step">
-                    <strong>1.</strong> เดินทางไปยังไร่เกษตรกร (${formatDistance(distanceToField)})
-                  </div>
-                  <div class="route-step">
-                    <strong>2.</strong> รับฟางจากเกษตรกรและอัดฟาง
-                  </div>
-                  <div class="route-step">
-                    <strong>3.</strong> ส่งมอบที่จุดหมาย (${formatDistance(distanceFieldToDelivery)})
-                  </div>
-                </div>
+                <div id="routeInstructions"></div>
               </div>
             `;
           }
@@ -902,7 +1109,6 @@
             </div>
           `;
           
-          // Add accept button if viewing from available jobs
           if (showAcceptButton) {
             content += `
               <div style="margin-top: 1.5rem; text-align: right;">
@@ -919,15 +1125,68 @@
           document.getElementById('orderDetailsContent').innerHTML = content;
           Modal.open('orderDetailsModal');
           
-          // Show route map
+          // Show route map and calculate
           if (fieldLat && fieldLng && deliveryLat && deliveryLng && 
               !isNaN(fieldLat) && !isNaN(fieldLng) && 
               !isNaN(deliveryLat) && !isNaN(deliveryLng)) {
-            await showRouteMap(
+            
+            const routeData = await showDetailedRouteMap(
               fieldLat, fieldLng, cleanFieldAddress,
               deliveryLat, deliveryLng, cleanDeliveryAddress,
               'routeMap'
             );
+            
+            if (routeData) {
+              // Update status
+              const statusEl = document.getElementById('routingStatus');
+              if (statusEl) {
+                statusEl.className = 'routing-status success';
+                statusEl.innerHTML = '✓ คำนวณเส้นทางเสร็จสิ้น / Route calculated successfully';
+              }
+              
+              // Show distance info
+              const distInfoEl = document.getElementById('routeDistanceInfo');
+              if (distInfoEl) {
+                distInfoEl.innerHTML = `
+                  <div class="distance-info">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="icon">📏</div>
+                      <div class="details">
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">ระยะทางรวม / Total Distance</div>
+                        <div class="distance-value">${formatDistance(routeData.totalDistance)}</div>
+                        <div class="time-estimate">⏱️ เวลาโดยประมาณ: ${formatDuration(routeData.totalDuration)}</div>
+                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                          🚜 → 🌾: ${formatDistance(routeData.segment1.distance)} (${formatDuration(routeData.segment1.duration)}) | 
+                          🌾 → 📍: ${formatDistance(routeData.segment2.distance)} (${formatDuration(routeData.segment2.duration)})
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }
+              
+              // Show route instructions
+              const instructEl = document.getElementById('routeInstructions');
+              if (instructEl) {
+                instructEl.innerHTML = `
+                  <div class="route-instructions">
+                    <h4>📋 ขั้นตอนการทำงาน / Work Steps:</h4>
+                    <div class="route-step">
+                      <strong>1. เดินทางไปยังไร่เกษตรกร</strong><br>
+                      ระยะทาง: ${formatDistance(routeData.segment1.distance)} | เวลา: ${formatDuration(routeData.segment1.duration)}
+                    </div>
+                    <div class="route-step">
+                      <strong>2. รับฟางจากเกษตรกรและอัดฟาง</strong><br>
+                      ดำเนินการอัดฟาง ${order.quantity} กำ
+                    </div>
+                    <div class="route-step">
+                      <strong>3. ส่งมอบที่จุดหมาย</strong><br>
+                      ระยะทาง: ${formatDistance(routeData.segment2.distance)} | เวลา: ${formatDuration(routeData.segment2.duration)}
+                    </div>
+                  </div>
+                `;
+              }
+            }
           }
         } else {
           Toast.error('ไม่สามารถโหลดข้อมูลงานได้');
