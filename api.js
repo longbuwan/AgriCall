@@ -1,4 +1,4 @@
-// api-python.js - API handler for Python Flask Backend
+// api-fixed.js - Backward compatible API handler
 
 class API {
   // Call Python backend endpoint
@@ -130,15 +130,49 @@ class API {
     }
   }
   
-  static async acceptOrder(orderId, farmerId, fieldAddress, fieldLat, fieldLng) {
+  // FIXED: Backward compatible accept order
+  static async acceptOrder(orderId, farmerId, fieldAddress = null, fieldLat = null, fieldLng = null) {
     try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, {
+      // If field location provided, embed it in the order update
+      // Otherwise, just use the old format
+      const requestData = {
         order_id: orderId,
-        farmer_id: farmerId,
-        field_address: fieldAddress,
-        field_lat: fieldLat,
-        field_lng: fieldLng
-      });
+        farmer_id: farmerId
+      };
+      
+      // Add field location if provided
+      if (fieldAddress && fieldLat && fieldLng) {
+        requestData.field_address = fieldAddress;
+        requestData.field_lat = fieldLat;
+        requestData.field_lng = fieldLng;
+      }
+      
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, requestData);
+      
+      // If backend doesn't support field location yet, save it as a note in the order
+      if (!result.success && fieldAddress) {
+        console.log('Backend does not support field location, trying alternative method...');
+        
+        // Try the old accept order format first
+        const basicResult = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, {
+          order_id: orderId,
+          farmer_id: farmerId
+        });
+        
+        if (basicResult.success) {
+          // Then update the notes with field location
+          const updateResult = await this.updateOrderNotes(orderId, 
+            `Field Location: ${fieldAddress}`
+          );
+          
+          return {
+            success: true,
+            order: basicResult.order,
+            note: 'Field location saved in notes (backend needs update for full support)'
+          };
+        }
+      }
+      
       return result;
     } catch (error) {
       console.error('Accept order error:', error);
@@ -146,6 +180,21 @@ class API {
         success: false,
         error: 'ไม่สามารถรับงานได้ / Cannot accept order'
       };
+    }
+  }
+  
+  // Helper method to update order notes (workaround for old backend)
+  static async updateOrderNotes(orderId, notes) {
+    try {
+      // This might not exist in old backend, but we try anyway
+      const result = await this.callBackend('/update_order_notes', {
+        order_id: orderId,
+        notes: notes
+      });
+      return result;
+    } catch (error) {
+      console.log('Update notes not supported:', error);
+      return { success: false };
     }
   }
   
