@@ -147,7 +147,7 @@ h3 {
    ============================================= */
 .dashboard-header {
   background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
-  color: var(--white);
+  color: var(--primary-green);
   padding: var(--space-md);
   box-shadow: var(--shadow-md);
   position: sticky;
