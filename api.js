@@ -130,11 +130,14 @@ class API {
     }
   }
   
-  static async acceptOrder(orderId, farmerId) {
+  static async acceptOrder(orderId, farmerId, fieldAddress, fieldLat, fieldLng) {
     try {
       const result = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, {
         order_id: orderId,
-        farmer_id: farmerId
+        farmer_id: farmerId,
+        field_address: fieldAddress,
+        field_lat: fieldLat,
+        field_lng: fieldLng
       });
       return result;
     } catch (error) {
