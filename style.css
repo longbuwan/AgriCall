@@ -106,7 +106,7 @@ h3 {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--white);
+  background: var(--primary-green);
   box-shadow: 0 -2px 16px var(--shadow-color);
   display: flex;
   justify-content: space-around;
