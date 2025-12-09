@@ -468,13 +468,14 @@
     // Check if user is already logged in
     const currentUser = Auth.getCurrentUser();
     if (currentUser) {
+      console.log('User already logged in:', currentUser);
       // Redirect to appropriate dashboard
       const dashboards = {
         customer: 'customer-dashboard.html',
         farmer: 'farmer-dashboard.html',
         baler: 'baler-dashboard.html'
       };
-      window.location.href = dashboards[currentUser.type];
+      window.location.replace(dashboards[currentUser.type]);
     }
     
     // Login form handler
@@ -485,23 +486,40 @@
       const password = document.getElementById('password').value;
       const userType = document.querySelector('input[name="userType"]:checked').value;
       
+      console.log('Attempting login:', { email, userType });
       Loading.show();
       
       try {
         const user = await API.login(email, password, userType);
+        console.log('Login API response:', user);
+        
+        // Ensure user data is saved before redirecting
+        if (!user) {
+          throw new Error('Login failed - no user data returned');
+        }
+        
+        // Verify the user was saved
+        const savedUser = Auth.getCurrentUser();
+        if (!savedUser) {
+          throw new Error('Login failed - user data not saved properly');
+        }
+        
+        console.log('Login successful, user data saved:', savedUser);
         
         Loading.hide();
         Toast.success('เข้าสู่ระบบสำเร็จ / Login successful 🎉');
         
-        // Redirect to appropriate dashboard
-        setTimeout(() => {
-          const dashboards = {
-            customer: 'customer-dashboard.html',
-            farmer: 'farmer-dashboard.html',
-            baler: 'baler-dashboard.html'
-          };
-          window.location.href = dashboards[userType];
-        }, 1000);
+        // Redirect to appropriate dashboard immediately
+        const dashboards = {
+          customer: 'customer-dashboard.html',
+          farmer: 'farmer-dashboard.html',
+          baler: 'baler-dashboard.html'
+        };
+        
+        console.log('Redirecting to:', dashboards[savedUser.type]);
+        
+        // Use replace instead of href to prevent back button issues
+        window.location.replace(dashboards[savedUser.type]);
         
       } catch (error) {
         Loading.hide();
@@ -523,28 +541,45 @@
         return;
       }
       
+      console.log('Attempting registration:', userData);
       Loading.show();
       
       try {
-        const user = await api.register(userData);
+        const user = await API.register(userData);
+        console.log('Registration API response:', user);
+        
+        // Ensure user data is saved before redirecting
+        if (!user) {
+          throw new Error('Registration failed - no user data returned');
+        }
+        
+        // Verify the user was saved
+        const savedUser = Auth.getCurrentUser();
+        if (!savedUser) {
+          throw new Error('Registration failed - user data not saved properly');
+        }
+        
+        console.log('Registration successful, user data saved:', savedUser);
         
         Loading.hide();
         Toast.success('ลงทะเบียนสำเร็จ / Registration successful 🎉');
         Modal.close('registerModal');
         
-        // Redirect to appropriate dashboard
-        setTimeout(() => {
-          const dashboards = {
-            customer: 'customer-dashboard.html',
-            farmer: 'farmer-dashboard.html',
-            baler: 'baler-dashboard.html'
-          };
-          window.location.href = dashboards[userData.user_type];
-        }, 1000);
+        // Redirect to appropriate dashboard immediately
+        const dashboards = {
+          customer: 'customer-dashboard.html',
+          farmer: 'farmer-dashboard.html',
+          baler: 'baler-dashboard.html'
+        };
+        
+        console.log('Redirecting to:', dashboards[savedUser.type]);
+        
+        // Use replace instead of href to prevent back button issues
+        window.location.replace(dashboards[savedUser.type]);
         
       } catch (error) {
         Loading.hide();
-        Toast.error(error.message || 'เกิดข้อผิดพლาด / An error occurred');
+        Toast.error(error.message || 'เกิดข้อผิดพลาด / An error occurred');
         console.error('Registration error:', error);
       }
     });
