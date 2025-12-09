@@ -147,7 +147,7 @@ h3 {
    ============================================= */
 .dashboard-header {
   background: var(--primary-green);
-  color: var(--white);
+  color: var(--primary-green);
   padding: var(--space-md);
   box-shadow: var(--shadow-md);
   position: sticky;
