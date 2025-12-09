@@ -1,14 +1,14 @@
-/* Dashboard Layout */
+/* Dashboard Layout - FIXED VERSION */
 .dashboard {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Header/Navigation */
+/* Header/Navigation - FIXED: White text on green background */
 .dashboard-header {
-  background: linear-gradient(135deg, var(--field-green) 0%, #3a614a 100%);
-  color: var(--primary-green);
+  background: var(--primary-green);
+  color: var(--white);
   padding: var(--space-md) 0;
   box-shadow: var(--shadow-md);
   position: sticky;
@@ -47,21 +47,24 @@
 
 .user-info {
   text-align: right;
+  color: var(--white);
 }
 
 .user-name {
   font-weight: 600;
   font-size: 1rem;
+  color: var(--white);
 }
 
 .user-type {
   font-size: 0.875rem;
   opacity: 0.9;
+  color: var(--white);
 }
 
 .notification-bell {
   position: relative;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border: none;
   color: var(--white);
   font-size: 1.5rem;
@@ -72,7 +75,7 @@
 }
 
 .notification-bell:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .notification-badge {
@@ -88,19 +91,19 @@
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border: none;
   color: var(--white);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Prompt', 'Outfit', sans-serif;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 /* Dashboard Content */
@@ -122,8 +125,9 @@
   border-radius: 12px;
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
-  border-left: 4px solid var(--wheat-gold);
+  border-left: 4px solid var(--primary-green);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .stat-card:hover {
@@ -132,7 +136,7 @@
 }
 
 .stat-card.green {
-  border-left-color: var(--field-green);
+  border-left-color: var(--primary-green);
 }
 
 .stat-card.orange {
@@ -155,7 +159,7 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--field-green);
+  color: var(--primary-green);
   line-height: 1;
 }
 
@@ -175,12 +179,12 @@
   align-items: center;
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
-  border-bottom: 2px solid var(--wheat-gold);
+  border-bottom: 3px solid var(--primary-green);
 }
 
 .section-title {
   font-size: 1.5rem;
-  color: var(--field-green);
+  color: var(--primary-green);
   margin: 0;
 }
 
@@ -220,7 +224,7 @@
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Prompt', 'Outfit', sans-serif;
   font-weight: 500;
   transition: all 0.3s ease;
 }
@@ -231,13 +235,13 @@
 }
 
 .btn-accept {
-  background: linear-gradient(135deg, var(--field-green) 0%, #3a614a 100%);
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
   color: var(--white);
   border: none;
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Prompt', 'Outfit', sans-serif;
   font-weight: 500;
   transition: all 0.3s ease;
 }
@@ -254,7 +258,7 @@
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Prompt', 'Outfit', sans-serif;
   font-weight: 500;
   transition: all 0.3s ease;
 }
@@ -300,7 +304,7 @@
 }
 
 .timeline-marker.active {
-  background: var(--field-green);
+  background: var(--primary-green);
   color: var(--white);
 }
 
