@@ -8,7 +8,7 @@
 /* Header/Navigation */
 .dashboard-header {
   background: linear-gradient(135deg, var(--field-green) 0%, #3a614a 100%);
-  color: var(--white);
+  color: var(--primary-green);
   padding: var(--space-md) 0;
   box-shadow: var(--shadow-md);
   position: sticky;
