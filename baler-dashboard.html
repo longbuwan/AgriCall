@@ -86,6 +86,85 @@
       border-radius: 4px;
       font-size: 0.9rem;
     }
+    
+    .preview-map {
+      height: 200px;
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+    }
+    
+    .job-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .job-card:hover {
+      border-color: #007bff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .job-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .job-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .job-card-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .job-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .job-info-label {
+      font-size: 0.85rem;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .job-info-value {
+      font-size: 1rem;
+      color: #333;
+      font-weight: 600;
+    }
+    
+    .job-card-footer {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+    
+    .distance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #e7f3ff;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0066cc;
+    }
   </style>
 </head>
 <body class="dashboard">
@@ -120,14 +199,14 @@
     <div class="container">
       <!-- Stats -->
       <div class="stats-grid">
-        <div class="stat-card green">
-          <div class="stat-label">งานที่ได้รับมอบหมาย / Assigned Jobs</div>
-          <div class="stat-value" id="assignedJobs">0</div>
+        <div class="stat-card orange">
+          <div class="stat-label">งานที่พร้อมรับ / Available Jobs</div>
+          <div class="stat-value" id="availableJobs">0</div>
         </div>
         
-        <div class="stat-card orange">
-          <div class="stat-label">กำลังดำเนินการ / In Progress</div>
-          <div class="stat-value" id="inProgressJobs">0</div>
+        <div class="stat-card green">
+          <div class="stat-label">งานที่รับแล้ว / My Jobs</div>
+          <div class="stat-value" id="myJobs">0</div>
         </div>
         
         <div class="stat-card blue">
@@ -136,10 +215,27 @@
         </div>
       </div>
       
-      <!-- Assigned Jobs Section -->
+      <!-- Available Jobs Section -->
       <div class="card">
         <div class="section-header">
-          <h2 class="section-title">งานที่ได้รับมอบหมาย / Assigned Jobs</h2>
+          <h2 class="section-title">🔍 งานที่พร้อมรับ / Available Jobs from Farmers</h2>
+          <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+            เลือกงานที่คุณต้องการทำจากเกษตรกรที่รับออเดอร์แล้ว / Choose jobs from farmer-accepted orders
+          </p>
+        </div>
+        
+        <div id="availableJobsContainer">
+          <div class="empty-state" style="padding: 3rem; text-align: center;">
+            <div class="empty-state-icon" style="font-size: 3rem;">🚜</div>
+            <div class="empty-state-text">ยังไม่มีงานที่พร้อมรับ / No available jobs yet</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- My Accepted Jobs Section -->
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">✅ งานที่ฉันรับแล้ว / My Accepted Jobs</h2>
         </div>
         
         <div class="table-container">
@@ -156,11 +252,11 @@
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="assignedJobsTable">
+            <tbody id="myJobsTable">
               <tr>
                 <td colspan="8" class="empty-state">
-                  <div class="empty-state-icon">🚜</div>
-                  <div class="empty-state-text">ยังไม่มีงานที่ได้รับมอบหมาย / No assigned jobs yet</div>
+                  <div class="empty-state-icon">📦</div>
+                  <div class="empty-state-text">ยังไม่มีงานที่รับ / No accepted jobs yet</div>
                 </td>
               </tr>
             </tbody>
@@ -171,7 +267,7 @@
       <!-- Job History Section -->
       <div class="card">
         <div class="section-header">
-          <h2 class="section-title">ประวัติการทำงาน / Job History</h2>
+          <h2 class="section-title">📜 ประวัติการทำงาน / Job History</h2>
         </div>
         
         <div class="table-container">
@@ -230,9 +326,11 @@
     document.getElementById('userName').textContent = currentUser.name;
     
     // Load jobs
-    let assignedJobs = [];
+    let availableJobs = [];
+    let myJobs = [];
     let jobHistory = [];
     let routeMap = null;
+    let balerLocation = null;
     
     // ==================== COORDINATE EXTRACTION ====================
     function extractCoordinates(addressString) {
@@ -275,7 +373,7 @@
     
     function formatDistance(km) {
       if (km < 1) {
-        return `${Math.round(km * 1000)} เมตร`;
+        return `${Math.round(km * 1000)} ม.`;
       } else {
         return `${km.toFixed(1)} กม.`;
       }
@@ -283,26 +381,29 @@
     
     // ==================== GET BALER LOCATION ====================
     async function getBalerLocation() {
+      if (balerLocation) return balerLocation;
+      
       return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
-          reject(new Error('Geolocation not supported'));
+          // Default to Chiang Mai
+          balerLocation = { lat: 18.7883, lng: 98.9853 };
+          resolve(balerLocation);
           return;
         }
         
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            resolve({
+            balerLocation = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
-            });
+            };
+            resolve(balerLocation);
           },
           (error) => {
-            // If GPS fails, use default location (Chiang Mai)
+            // Fallback to default location if GPS fails
             console.log('GPS failed, using default location');
-            resolve({
-              lat: 18.7883,
-              lng: 98.9853
-            });
+            balerLocation = { lat: 18.7883, lng: 98.9853 };
+            resolve(balerLocation);
           },
           {
             enableHighAccuracy: false,
@@ -313,144 +414,37 @@
       });
     }
     
-    // ==================== SHOW ROUTE MAP ====================
-    async function showRouteMap(fieldLat, fieldLng, fieldAddress, deliveryLat, deliveryLng, deliveryAddress, elementId) {
-      if (routeMap) {
-        routeMap.remove();
-        routeMap = null;
-      }
-      
-      setTimeout(async () => {
-        const mapElement = document.getElementById(elementId);
-        if (!mapElement) {
-          console.error('Map element not found');
-          return;
-        }
-        
-        // Get baler's current location
-        let balerLocation;
-        try {
-          balerLocation = await getBalerLocation();
-        } catch (error) {
-          console.error('Error getting baler location:', error);
-          balerLocation = { lat: 18.7883, lng: 98.9853 }; // Default to Chiang Mai
-        }
-        
-        // Calculate bounds to fit all markers
-        const bounds = L.latLngBounds([
-          [balerLocation.lat, balerLocation.lng],
-          [fieldLat, fieldLng],
-          [deliveryLat, deliveryLng]
-        ]);
-        
-        // Create map
-        routeMap = L.map(elementId).fitBounds(bounds, { padding: [50, 50] });
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors',
-          maxZoom: 19
-        }).addTo(routeMap);
-        
-        // Add baler location marker (blue)
-        L.marker([balerLocation.lat, balerLocation.lng], {
-          icon: L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          })
-        }).addTo(routeMap)
-          .bindPopup('<strong>🚜 ตำแหน่งของคุณ</strong><br><small>Your Current Location</small>');
-        
-        // Add field location marker (green)
-        L.marker([fieldLat, fieldLng], {
-          icon: L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          })
-        }).addTo(routeMap)
-          .bindPopup(`<strong>🌾 ไร่เกษตรกร</strong><br><small>${fieldAddress}</small>`);
-        
-        // Add delivery location marker (red)
-        L.marker([deliveryLat, deliveryLng], {
-          icon: L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          })
-        }).addTo(routeMap)
-          .bindPopup(`<strong>📍 จุดส่งของ</strong><br><small>${deliveryAddress}</small>`);
-        
-        // Draw lines between locations
-        // Line 1: Baler -> Field (blue dashed)
-        L.polyline([
-          [balerLocation.lat, balerLocation.lng],
-          [fieldLat, fieldLng]
-        ], {
-          color: '#007bff',
-          weight: 3,
-          opacity: 0.7,
-          dashArray: '10, 10'
-        }).addTo(routeMap);
-        
-        // Line 2: Field -> Delivery (green solid)
-        L.polyline([
-          [fieldLat, fieldLng],
-          [deliveryLat, deliveryLng]
-        ], {
-          color: '#28a745',
-          weight: 4,
-          opacity: 0.8
-        }).addTo(routeMap);
-        
-        // Calculate distances
-        const distanceToField = calculateDistance(
-          balerLocation.lat, balerLocation.lng,
-          fieldLat, fieldLng
-        );
-        const distanceFieldToDelivery = calculateDistance(
-          fieldLat, fieldLng,
-          deliveryLat, deliveryLng
-        );
-        const totalDistance = distanceToField + distanceFieldToDelivery;
-        
-        return {
-          balerLocation,
-          distanceToField,
-          distanceFieldToDelivery,
-          totalDistance
-        };
-      }, 100);
-    }
-    
     // ==================== LOAD JOBS ====================
     async function loadJobs() {
       Loading.show();
       
       try {
-        const result = await API.getOrders({ baler_id: currentUser.id });
+        // Get baler location first
+        await getBalerLocation();
+        
+        // Get available jobs (farmer_accepted but no baler assigned)
+        const availableResult = await API.getOrders({ status: 'farmer_accepted' });
+        
+        // Get my jobs (assigned to this baler)
+        const myResult = await API.getOrders({ baler_id: currentUser.id });
         
         Loading.hide();
         
-        if (result.success) {
-          assignedJobs = result.orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
-          jobHistory = result.orders.filter(o => o.status === 'delivered');
-          
-          renderAssignedJobs(assignedJobs);
-          renderJobHistory(jobHistory);
-          updateStats(assignedJobs, jobHistory);
-        } else {
-          Toast.error('ไม่สามารถโหลดข้อมูลงานได้ / Cannot load jobs');
+        if (availableResult.success) {
+          availableJobs = availableResult.orders;
+          renderAvailableJobs(availableJobs);
         }
+        
+        if (myResult.success) {
+          myJobs = myResult.orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
+          jobHistory = myResult.orders.filter(o => o.status === 'delivered');
+          
+          renderMyJobs(myJobs);
+          renderJobHistory(jobHistory);
+        }
+        
+        updateStats(availableJobs, myJobs, jobHistory);
+        
       } catch (error) {
         Loading.hide();
         Toast.error('เกิดข้อผิดพลาด / An error occurred');
@@ -458,15 +452,133 @@
       }
     }
     
-    function renderAssignedJobs(jobs) {
-      const tbody = document.getElementById('assignedJobsTable');
+    // ==================== RENDER AVAILABLE JOBS ====================
+    function renderAvailableJobs(jobs) {
+      const container = document.getElementById('availableJobsContainer');
+      
+      if (jobs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 3rem; text-align: center;">
+            <div class="empty-state-icon" style="font-size: 3rem;">🚜</div>
+            <div class="empty-state-text">ยังไม่มีงานที่พร้อมรับ / No available jobs yet</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = jobs.map(job => {
+        // Extract coordinates
+        let fieldLat = null, fieldLng = null;
+        if (job.field_lat && job.field_lng) {
+          fieldLat = parseFloat(job.field_lat);
+          fieldLng = parseFloat(job.field_lng);
+        } else {
+          const fieldCoords = extractCoordinates(job.field_address);
+          if (fieldCoords) {
+            fieldLat = fieldCoords.lat;
+            fieldLng = fieldCoords.lng;
+          }
+        }
+        
+        let deliveryLat = null, deliveryLng = null;
+        if (job.delivery_lat && job.delivery_lng) {
+          deliveryLat = parseFloat(job.delivery_lat);
+          deliveryLng = parseFloat(job.delivery_lng);
+        } else {
+          const deliveryCoords = extractCoordinates(job.delivery_address);
+          if (deliveryCoords) {
+            deliveryLat = deliveryCoords.lat;
+            deliveryLng = deliveryCoords.lng;
+          }
+        }
+        
+        // Calculate distances
+        let distanceInfo = '';
+        if (balerLocation && fieldLat && fieldLng && deliveryLat && deliveryLng) {
+          const distToField = calculateDistance(balerLocation.lat, balerLocation.lng, fieldLat, fieldLng);
+          const fieldToDelivery = calculateDistance(fieldLat, fieldLng, deliveryLat, deliveryLng);
+          const totalDist = distToField + fieldToDelivery;
+          
+          distanceInfo = `
+            <div class="distance-badge">
+              📏 ${formatDistance(totalDist)} 
+              <small style="color: #666;">(${formatDistance(distToField)} + ${formatDistance(fieldToDelivery)})</small>
+            </div>
+          `;
+        }
+        
+        const cleanFieldAddress = getAddressWithoutCoordinates(job.field_address || 'ไม่ระบุ');
+        const cleanDeliveryAddress = getAddressWithoutCoordinates(job.delivery_address);
+        
+        return `
+          <div class="job-card">
+            <div class="job-card-header">
+              <div>
+                <div class="job-card-title">Order #${job.order_id.substring(0, 8)}</div>
+                <small style="color: #666;">สร้างเมื่อ: ${formatDate(job.created_at)}</small>
+              </div>
+              ${distanceInfo}
+            </div>
+            
+            <div class="job-card-body">
+              <div class="job-info-item">
+                <div class="job-info-label">🌾 เกษตรกร / Farmer</div>
+                <div class="job-info-value">${job.farmer_name}</div>
+                <small style="color: #666;">${formatPhone(job.farmer_phone)}</small>
+              </div>
+              
+              <div class="job-info-item">
+                <div class="job-info-label">👤 ลูกค้า / Customer</div>
+                <div class="job-info-value">${job.customer_name}</div>
+                <small style="color: #666;">${formatPhone(job.customer_phone)}</small>
+              </div>
+              
+              <div class="job-info-item">
+                <div class="job-info-label">📦 ประเภท / Type</div>
+                <div class="job-info-value">${job.bale_type}</div>
+              </div>
+              
+              <div class="job-info-item">
+                <div class="job-info-label">🔢 จำนวน / Quantity</div>
+                <div class="job-info-value">${job.quantity} กำ</div>
+              </div>
+              
+              <div class="job-info-item">
+                <div class="job-info-label">📅 วันที่รับ / Pickup Date</div>
+                <div class="job-info-value">${formatDateShort(job.pickup_date)}</div>
+              </div>
+              
+              <div class="job-info-item">
+                <div class="job-info-label">📍 สถานที่ไร่ / Field</div>
+                <div class="job-info-value" style="font-size: 0.85rem; font-weight: normal;">
+                  ${cleanFieldAddress.substring(0, 40)}${cleanFieldAddress.length > 40 ? '...' : ''}
+                </div>
+              </div>
+            </div>
+            
+            <div class="job-card-footer">
+              <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', true)">
+                📋 ดูรายละเอียดและแผนที่
+              </button>
+              <button class="btn-success btn-sm" onclick="acceptJob('${job.order_id}')" style="min-width: 120px;">
+                ✓ รับงานนี้
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ==================== RENDER MY JOBS ====================
+    function renderMyJobs(jobs) {
+      const tbody = document.getElementById('myJobsTable');
       
       if (jobs.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="8" class="empty-state">
-              <div class="empty-state-icon">🚜</div>
-              <div class="empty-state-text">ยังไม่มีงานที่ได้รับมอบหมาย / No assigned jobs yet</div>
+              <div class="empty-state-icon">📦</div>
+              <div class="empty-state-text">ยังไม่มีงานที่รับ / No accepted jobs yet</div>
             </td>
           </tr>
         `;
@@ -484,7 +596,7 @@
           <td>${getStatusBadge(job.status)}</td>
           <td>
             <div class="action-buttons">
-              <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}')">
+              <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', false)">
                 ดูรายละเอียด
               </button>
               ${job.status === 'baler_assigned' ? `
@@ -526,7 +638,7 @@
           <td>${job.quantity} กำ</td>
           <td>${formatDateShort(job.delivered_at || job.created_at)}</td>
           <td>
-            <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}')">
+            <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', false)">
               ดูรายละเอียด
             </button>
           </td>
@@ -534,16 +646,105 @@
       `).join('');
     }
     
-    function updateStats(assigned, history) {
-      const inProgress = assigned.filter(j => j.status === 'in_progress').length;
-      
-      document.getElementById('assignedJobs').textContent = assigned.length;
-      document.getElementById('inProgressJobs').textContent = inProgress;
+    function updateStats(available, my, history) {
+      document.getElementById('availableJobs').textContent = available.length;
+      document.getElementById('myJobs').textContent = my.length;
       document.getElementById('completedJobs').textContent = history.length;
     }
     
-    // ==================== VIEW JOB DETAILS WITH ROUTE MAP ====================
-    async function viewJobDetails(orderId) {
+    // ==================== SHOW ROUTE MAP ====================
+    async function showRouteMap(fieldLat, fieldLng, fieldAddress, deliveryLat, deliveryLng, deliveryAddress, elementId) {
+      if (routeMap) {
+        routeMap.remove();
+        routeMap = null;
+      }
+      
+      setTimeout(async () => {
+        const mapElement = document.getElementById(elementId);
+        if (!mapElement) {
+          console.error('Map element not found');
+          return;
+        }
+        
+        const balerLoc = await getBalerLocation();
+        
+        // Calculate bounds to fit all markers
+        const bounds = L.latLngBounds([
+          [balerLoc.lat, balerLoc.lng],
+          [fieldLat, fieldLng],
+          [deliveryLat, deliveryLng]
+        ]);
+        
+        routeMap = L.map(elementId).fitBounds(bounds, { padding: [50, 50] });
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(routeMap);
+        
+        // Baler location (blue)
+        L.marker([balerLoc.lat, balerLoc.lng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(routeMap)
+          .bindPopup('<strong>🚜 ตำแหน่งของคุณ</strong><br><small>Your Current Location</small>');
+        
+        // Field location (green)
+        L.marker([fieldLat, fieldLng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(routeMap)
+          .bindPopup(`<strong>🌾 ไร่เกษตรกร</strong><br><small>${fieldAddress}</small>`);
+        
+        // Delivery location (red)
+        L.marker([deliveryLat, deliveryLng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(routeMap)
+          .bindPopup(`<strong>📍 จุดส่งของ</strong><br><small>${deliveryAddress}</small>`);
+        
+        // Draw route lines
+        L.polyline([
+          [balerLoc.lat, balerLoc.lng],
+          [fieldLat, fieldLng]
+        ], {
+          color: '#007bff',
+          weight: 3,
+          opacity: 0.7,
+          dashArray: '10, 10'
+        }).addTo(routeMap);
+        
+        L.polyline([
+          [fieldLat, fieldLng],
+          [deliveryLat, deliveryLng]
+        ], {
+          color: '#28a745',
+          weight: 4,
+          opacity: 0.8
+        }).addTo(routeMap);
+      }, 100);
+    }
+    
+    // ==================== VIEW JOB DETAILS ====================
+    async function viewJobDetails(orderId, showAcceptButton = false) {
       Loading.show();
       
       try {
@@ -554,7 +755,7 @@
         if (result.success) {
           const order = result.order;
           
-          // Extract field coordinates
+          // Extract coordinates
           let fieldLat = null, fieldLng = null;
           if (order.field_lat && order.field_lng) {
             fieldLat = parseFloat(order.field_lat);
@@ -567,7 +768,6 @@
             }
           }
           
-          // Extract delivery coordinates
           let deliveryLat = null, deliveryLng = null;
           if (order.delivery_lat && order.delivery_lng) {
             deliveryLat = parseFloat(order.delivery_lat);
@@ -590,21 +790,15 @@
             </div>
           `;
           
-          // Show route map if both coordinates available
+          // Show route map if coordinates available
           if (fieldLat && fieldLng && deliveryLat && deliveryLng && 
               !isNaN(fieldLat) && !isNaN(fieldLng) && 
               !isNaN(deliveryLat) && !isNaN(deliveryLng)) {
             
-            // Get baler location for distance calculation
-            let balerLocation;
-            try {
-              balerLocation = await getBalerLocation();
-            } catch (error) {
-              balerLocation = { lat: 18.7883, lng: 98.9853 };
-            }
+            const balerLoc = await getBalerLocation();
             
             const distanceToField = calculateDistance(
-              balerLocation.lat, balerLocation.lng,
+              balerLoc.lat, balerLoc.lng,
               fieldLat, fieldLng
             );
             const distanceFieldToDelivery = calculateDistance(
@@ -631,7 +825,7 @@
                 
                 <div class="location-card">
                   <strong>🚜 จุดเริ่มต้น:</strong> ตำแหน่งของคุณ (Your Location)<br>
-                  <small style="color: #666;">GPS: ${balerLocation.lat.toFixed(6)}, ${balerLocation.lng.toFixed(6)}</small>
+                  <small style="color: #666;">GPS: ${balerLoc.lat.toFixed(6)}, ${balerLoc.lng.toFixed(6)}</small>
                 </div>
                 
                 <div class="location-card field">
@@ -659,15 +853,6 @@
                   <div class="route-step">
                     <strong>3.</strong> ส่งมอบที่จุดหมาย (${formatDistance(distanceFieldToDelivery)})
                   </div>
-                </div>
-              </div>
-            `;
-          } else {
-            content += `
-              <div style="margin-bottom: var(--space-lg);">
-                <div style="background: #fff3cd; padding: 1rem; border-radius: 6px; border-left: 4px solid #ffc107;">
-                  <strong>⚠️ ไม่สามารถแสดงแผนที่ได้</strong><br>
-                  <small>ออเดอร์นี้ไม่มีข้อมูลพิกัดครบถ้วน</small>
                 </div>
               </div>
             `;
@@ -707,7 +892,7 @@
               </div>
             </div>
             
-            <div>
+            <div style="margin-bottom: var(--space-lg);">
               <h4>ข้อมูลลูกค้า / Customer Information</h4>
               <div style="background: #F9F9F9; padding: var(--space-md); border-radius: 8px;">
                 <strong>ชื่อ:</strong> ${order.customer_name}<br>
@@ -716,6 +901,20 @@
               </div>
             </div>
           `;
+          
+          // Add accept button if viewing from available jobs
+          if (showAcceptButton) {
+            content += `
+              <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="btn btn-secondary" onclick="Modal.close('orderDetailsModal')" style="margin-right: 0.5rem;">
+                  ยกเลิก / Cancel
+                </button>
+                <button class="btn btn-success" onclick="acceptJobFromModal('${order.order_id}')" style="min-width: 150px;">
+                  ✓ รับงานนี้ / Accept Job
+                </button>
+              </div>
+            `;
+          }
           
           document.getElementById('orderDetailsContent').innerHTML = content;
           Modal.open('orderDetailsModal');
@@ -738,6 +937,37 @@
         Toast.error('เกิดข้อผิดพลาด');
         console.error('View job error:', error);
       }
+    }
+    
+    // ==================== ACCEPT JOB ====================
+    async function acceptJob(orderId) {
+      if (!confirm('คุณแน่ใจหรือไม่ที่จะรับงานนี้? / Are you sure you want to accept this job?')) {
+        return;
+      }
+      
+      Loading.show();
+      
+      try {
+        const result = await API.assignBaler(orderId, currentUser.id);
+        
+        Loading.hide();
+        
+        if (result.success) {
+          Toast.success('รับงานสำเร็จ! / Job accepted successfully! 🎉');
+          loadJobs();
+        } else {
+          Toast.error('ไม่สามารถรับงานได้ / Cannot accept job');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาด');
+        console.error('Accept job error:', error);
+      }
+    }
+    
+    async function acceptJobFromModal(orderId) {
+      Modal.close('orderDetailsModal');
+      await acceptJob(orderId);
     }
     
     async function startJob(orderId) {
