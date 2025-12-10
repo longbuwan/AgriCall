@@ -679,7 +679,7 @@
             
             <div class="job-info-item">
               <div class="job-info-label">🔢 จำนวน / Quantity</div>
-              <div class="job-info-value">${job.quantity} กำ</div>
+              <div class="job-info-value">${job.quantity} ก้อน</div>
             </div>
             
             <div class="job-info-item">
@@ -818,7 +818,7 @@
           <td>${job.farmer_name}<br><small>${formatPhone(job.farmer_phone)}</small></td>
           <td>${job.customer_name}<br><small>${formatPhone(job.customer_phone)}</small></td>
           <td>${job.bale_type}</td>
-          <td>${job.quantity} กำ</td>
+          <td>${job.quantity} ก้อน</td>
           <td>${formatDateShort(job.pickup_date)}</td>
           <td>${getStatusBadge(job.status)}</td>
           <td>
@@ -862,7 +862,7 @@
           <td><strong>${job.order_id.substring(0, 8)}</strong></td>
           <td>${job.farmer_name}</td>
           <td>${job.bale_type}</td>
-          <td>${job.quantity} กำ</td>
+          <td>${job.quantity} ก้อน</td>
           <td>${formatDateShort(job.delivered_at || job.created_at)}</td>
           <td>
             <button class="btn-view btn-sm" onclick="viewJobDetails('${job.order_id}', false)">
@@ -1075,7 +1075,7 @@
                 </tr>
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>จำนวน:</strong></td>
-                  <td>${order.quantity} กำ</td>
+                  <td>${order.quantity} ก้อน</td>
                 </tr>
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>วันที่รับ:</strong></td>
@@ -1177,7 +1177,7 @@
                     </div>
                     <div class="route-step">
                       <strong>2. รับฟางจากเกษตรกรและอัดฟาง</strong><br>
-                      ดำเนินการอัดฟาง ${order.quantity} กำ
+                      ดำเนินการอัดฟาง ${order.quantity} ก้อน
                     </div>
                     <div class="route-step">
                       <strong>3. ส่งมอบที่จุดหมาย</strong><br>
