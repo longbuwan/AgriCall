@@ -205,15 +205,13 @@
               <select id="baleType" name="bale_type" required>
                 <option value="">เลือกประเภทฟาง / Select Type</option>
                 <option value="ฟางข้าว (Rice Straw)">ฟางข้าว / Rice Straw</option>
-                <option value="ฟางข้าวโพด (Corn Straw)">ฟางข้าวโพด / Corn Straw</option>
                 <option value="ฟางข้าวสาลี (Wheat Straw)">ฟางข้าวสาลี / Wheat Straw</option>
-                <option value="ฟางอ้อย (Sugarcane Straw)">ฟางอ้อย / Sugarcane Straw</option>
               </select>
             </div>
             
             <div class="form-group" style="flex: 1; min-width: 200px;">
               <label for="quantity">จำนวน / Quantity</label>
-              <input type="number" id="quantity" name="quantity" placeholder="จำนวนกำ / Number of bales" min="1" required>
+              <input type="number" id="quantity" name="quantity" placeholder="จำนวนก้อน / Number of bales" min="1" required>
             </div>
             
             <div class="form-group" style="flex: 1; min-width: 200px;">
@@ -300,7 +298,7 @@
           
           <div class="form-group">
             <label for="notes">หมายเหตุ / Notes (Optional)</label>
-            <textarea id="notes" name="notes" rows="2" placeholder="ข้อมูลเพิ่มเติม เช่น เวลาที่สะดวก, ข้อกำหนดพิเศษ"></textarea>
+            <textarea id="notes" name="notes" rows="2" placeholder="ข้อมูลเพิ่มเติม เช่น เวลาที่สะดวก, ข้อก้อนหนดพิเศษ"></textarea>
           </div>
           
           <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
@@ -528,7 +526,7 @@
       }
       
       Loading.show();
-      Toast.show('กำลังค้นหาตำแหน่งของคุณ...', 'info', 2000);
+      Toast.show('ก้อนลังค้นหาตำแหน่งของคุณ...', 'info', 2000);
       
       navigator.geolocation.getCurrentPosition(
         async function(position) {
@@ -729,7 +727,7 @@
         <tr>
           <td><strong>${order.order_id.substring(0, 8)}</strong></td>
           <td>${order.bale_type}</td>
-          <td>${order.quantity} กำ</td>
+          <td>${order.quantity} ก้อน</td>
           <td>${formatDateShort(order.pickup_date)}</td>
           <td>${getStatusBadge(order.status)}</td>
           <td>${order.farmer_name}</td>
@@ -784,7 +782,7 @@
                 </tr>
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>จำนวน:</strong></td>
-                  <td>${order.quantity} กำ</td>
+                  <td>${order.quantity} ก้อน</td>
                 </tr>
                 <tr>
                   <td style="padding: 0.5rem 0;"><strong>วันที่รับ:</strong></td>
@@ -894,7 +892,7 @@
         { key: 'pending', label: 'สร้างออเดอร์', icon: '📝' },
         { key: 'farmer_accepted', label: 'เกษตรกรรับงาน', icon: '✅' },
         { key: 'baler_assigned', label: 'มอบหมายคนอัดฟาง', icon: '🚜' },
-        { key: 'in_progress', label: 'กำลังดำเนินการ', icon: '⚙️' },
+        { key: 'in_progress', label: 'ก้อนลังดำเนินการ', icon: '⚙️' },
         { key: 'delivered', label: 'ส่งมอบแล้ว', icon: '✓' }
       ];
       
@@ -913,7 +911,7 @@
             <div class="timeline-content">
               <div class="timeline-title">${status.label}</div>
               <div class="timeline-description">
-                ${isCompleted ? 'เสร็จสิ้น' : isActive ? 'กำลังดำเนินการ' : 'รอดำเนินการ'}
+                ${isCompleted ? 'เสร็จสิ้น' : isActive ? 'ก้อนลังดำเนินการ' : 'รอดำเนินการ'}
               </div>
             </div>
           </div>
