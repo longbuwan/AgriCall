@@ -176,6 +176,55 @@
       box-shadow: 0 0 0 3px rgba(127, 173, 107, 0.1);
     }
     
+    /* Phone Input with Country Code */
+    .phone-input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .country-code {
+      width: 80px;
+      flex-shrink: 0;
+      text-align: center;
+      background: var(--light-cream);
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    .phone-input {
+      flex: 1;
+    }
+    
+    /* OTP Input Group */
+    .otp-input-group {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    
+    .otp-input {
+      width: 55px;
+      height: 60px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+    }
+    
+    .otp-input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(127, 173, 107, 0.15);
+    }
+    
+    .otp-input.filled {
+      border-color: var(--primary-green);
+      background: rgba(127, 173, 107, 0.05);
+    }
+    
     /* Submit Button */
     .submit-btn {
       width: 100%;
@@ -194,6 +243,31 @@
     }
     
     .submit-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* Secondary Button */
+    .secondary-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background: var(--white);
+      color: var(--primary-green);
+      border: 2px solid var(--primary-green);
+      border-radius: var(--radius-md);
+      font-family: 'Prompt', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 0.75rem;
+    }
+    
+    .secondary-btn:active {
       transform: scale(0.98);
     }
     
@@ -243,6 +317,133 @@
     
     .demo-credentials strong {
       color: var(--text-dark);
+    }
+    
+    /* Step Indicator */
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-light);
+      transition: all 0.3s ease;
+    }
+    
+    .step-dot.active {
+      background: var(--primary-green);
+      width: 30px;
+      border-radius: 5px;
+    }
+    
+    .step-dot.completed {
+      background: var(--primary-green);
+    }
+    
+    /* OTP Info Box */
+    .otp-info {
+      background: rgba(91, 138, 200, 0.1);
+      border: 1px solid rgba(91, 138, 200, 0.2);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .otp-info-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .otp-info-text {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+    
+    .otp-info-phone {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 1.125rem;
+      margin-top: 0.25rem;
+    }
+    
+    /* Resend OTP */
+    .resend-otp {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-medium);
+    }
+    
+    .resend-otp a {
+      color: var(--primary-green);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    .resend-otp a.disabled {
+      color: var(--text-light);
+      cursor: not-allowed;
+    }
+    
+    /* SMS Animation */
+    .sms-animation {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .sms-animation.active {
+      display: block;
+    }
+    
+    .sms-icon {
+      font-size: 4rem;
+      animation: smsFloat 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes smsFloat {
+      0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+      }
+      50% {
+        transform: translateY(-15px) rotate(5deg);
+      }
+    }
+    
+    .sms-text {
+      margin-top: 1rem;
+      color: var(--text-medium);
+      font-size: 0.9375rem;
+    }
+    
+    /* Hidden forms */
+    .form-step {
+      display: none;
+    }
+    
+    .form-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     /* Modal Adjustments for Mobile */
@@ -308,6 +509,12 @@
       .demo-credentials h4 {
         font-size: 0.875rem;
       }
+      
+      .otp-input {
+        width: 48px;
+        height: 55px;
+        font-size: 1.25rem;
+      }
     }
     
     /* Landscape Mobile */
@@ -349,126 +556,131 @@
         <p class="app-subtitle">เชื่อมโยงเกษตรกร คนอัดฟาง และลูกค้า<br>ลดการเผา ลด PM 2.5</p>
       </div>
       
-      <form id="loginForm">
-        <div class="form-group">
-          <label>ประเภทผู้ใช้ / User Type</label>
-          <div class="user-type-selector">
-            <div class="user-type-option">
-              <input type="radio" name="userType" id="typeCustomer" value="customer" checked>
-              <label for="typeCustomer" class="user-type-label">
-                <span class="user-type-icon">👨‍💼</span>
-                <span class="user-type-text">ลูกค้า<br>Customer</span>
-              </label>
-            </div>
-            
-            <div class="user-type-option">
-              <input type="radio" name="userType" id="typeFarmer" value="farmer">
-              <label for="typeFarmer" class="user-type-label">
-                <span class="user-type-icon">👨‍🌾</span>
-                <span class="user-type-text">เกษตรกร<br>Farmer</span>
-              </label>
-            </div>
-            
-            <div class="user-type-option">
-              <input type="radio" name="userType" id="typeBaler" value="baler">
-              <label for="typeBaler" class="user-type-label">
-                <span class="user-type-icon">🚜</span>
-                <span class="user-type-text">คนอัดฟาง<br>Baler</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="email">อีเมล / Email</label>
-          <input type="email" id="email" name="email" placeholder="your@email.com" required autocomplete="email">
-        </div>
-        
-        <div class="form-group">
-          <label for="password">รหัสผ่าน / Password</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        
-        <button type="submit" class="submit-btn">
-          เข้าสู่ระบบ / Login
-        </button>
-      </form>
-      
-      <div class="register-link">
-        ยังไม่มีบัญชี? <a onclick="openRegisterModal()">ลงทะเบียนที่นี่</a>
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step-dot active" id="step1Dot"></div>
+        <div class="step-dot" id="step2Dot"></div>
       </div>
       
-      <div class="demo-credentials">
-        <h4>🔑 Demo Login</h4>
-        <p><strong>Customer:</strong> customer@test.com / 123456</p>
-        <p><strong>Farmer:</strong> farmer@test.com / 123456</p>
-        <p><strong>Baler:</strong> baler@test.com / 123456</p>
+      <!-- Step 1: Phone Number -->
+      <div class="form-step active" id="step1">
+        <form id="phoneForm">
+          <div class="form-group">
+            <label>ประเภทผู้ใช้ / User Type</label>
+            <div class="user-type-selector">
+              <div class="user-type-option">
+                <input type="radio" name="userType" id="typeCustomer" value="customer" checked>
+                <label for="typeCustomer" class="user-type-label">
+                  <span class="user-type-icon">👨‍💼</span>
+                  <span class="user-type-text">ลูกค้า<br>Customer</span>
+                </label>
+              </div>
+              
+              <div class="user-type-option">
+                <input type="radio" name="userType" id="typeFarmer" value="farmer">
+                <label for="typeFarmer" class="user-type-label">
+                  <span class="user-type-icon">👨‍🌾</span>
+                  <span class="user-type-text">เกษตรกร<br>Farmer</span>
+                </label>
+              </div>
+              
+              <div class="user-type-option">
+                <input type="radio" name="userType" id="typeBaler" value="baler">
+                <label for="typeBaler" class="user-type-label">
+                  <span class="user-type-icon">🚜</span>
+                  <span class="user-type-text">คนอัดฟาง<br>Baler</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="phone">เบอร์โทรศัพท์ / Phone Number</label>
+            <div class="phone-input-group">
+              <input type="text" class="country-code" value="+66" readonly>
+              <input type="tel" id="phone" name="phone" class="phone-input" 
+                     placeholder="812345678" required 
+                     pattern="[0-9]{9,10}" 
+                     maxlength="10"
+                     autocomplete="tel">
+            </div>
+          </div>
+          
+          <button type="submit" class="submit-btn">
+            📱 รับรหัส OTP / Get OTP
+          </button>
+        </form>
+        
+        <div class="demo-credentials">
+          <h4>📱 Demo Phone Numbers</h4>
+          <p><strong>Customer:</strong> 0812345678</p>
+          <p><strong>Farmer:</strong> 0823456789</p>
+          <p><strong>Baler:</strong> 0834567890</p>
+          <p style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(127, 173, 107, 0.3);">
+            <strong>🔑 OTP Code:</strong> 1234 (ทุกเบอร์)
+          </p>
+        </div>
+      </div>
+      
+      <!-- SMS Sending Animation -->
+      <div class="sms-animation" id="smsAnimation">
+        <div class="sms-icon">📨</div>
+        <p class="sms-text">กำลังส่ง SMS...<br>Sending SMS...</p>
+      </div>
+      
+      <!-- Step 2: OTP Verification -->
+      <div class="form-step" id="step2">
+        <div class="otp-info">
+          <div class="otp-info-icon">📱</div>
+          <p class="otp-info-text">กรุณากรอกรหัส OTP 4 หลัก<br>ที่ส่งไปยังเบอร์</p>
+          <p class="otp-info-phone" id="displayPhone">081-234-5678</p>
+        </div>
+        
+        <form id="otpForm">
+          <div class="otp-input-group">
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" required>
+          </div>
+          
+          <button type="submit" class="submit-btn" id="verifyBtn">
+            ✓ ยืนยัน OTP / Verify
+          </button>
+          
+          <button type="button" class="secondary-btn" id="backBtn">
+            ← กลับ / Back
+          </button>
+        </form>
+        
+        <div class="resend-otp">
+          <span id="resendText">ไม่ได้รับ OTP? </span>
+          <a id="resendLink" onclick="resendOTP()">ส่งอีกครั้ง</a>
+          <span id="resendTimer"></span>
+        </div>
       </div>
     </div>
   </div>
   
-  <!-- Registration Modal -->
-  <div id="registerModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>ลงทะเบียน / Register</h2>
-        <button type="button" class="close-modal" onclick="Modal.close('registerModal')">&times;</button>
-      </div>
-      
-      <form id="registerForm">
-        <div class="form-group">
-          <label for="regUserType">ประเภทผู้ใช้ / User Type</label>
-          <select id="regUserType" name="user_type" required>
-            <option value="customer">ลูกค้า / Customer</option>
-            <option value="farmer">เกษตรกร / Farmer</option>
-            <option value="baler">คนอัดฟาง / Baler</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="regFullName">ชื่อ-นามสกุล / Full Name</label>
-          <input type="text" id="regFullName" name="full_name" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="regEmail">อีเมล / Email</label>
-          <input type="email" id="regEmail" name="email" required autocomplete="email">
-        </div>
-        
-        <div class="form-group">
-          <label for="regPassword">รหัสผ่าน / Password</label>
-          <input type="password" id="regPassword" name="password" minlength="6" required autocomplete="new-password">
-        </div>
-        
-        <div class="form-group">
-          <label for="regPhone">เบอร์โทร / Phone</label>
-          <input type="tel" id="regPhone" name="phone" placeholder="0812345678" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="regAddress">ที่อยู่ / Address</label>
-          <textarea id="regAddress" name="address" rows="3" required></textarea>
-        </div>
-        
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-secondary" onclick="Modal.close('registerModal')" style="flex: 1;">
-            ยกเลิก / Cancel
-          </button>
-          <button type="submit" class="btn btn-primary" style="flex: 1;">
-            ลงทะเบียน / Register
-          </button>
-        </div>
-      </form>
-    </div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+  
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
   </div>
    
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
+    // State
+    let currentPhone = '';
+    let currentUserType = 'customer';
+    let resendCountdown = 0;
+    
     // Check if user is already logged in
     const currentUser = Auth.getCurrentUser();
     if (currentUser) {
-      // Redirect to appropriate dashboard
       const dashboards = {
         customer: 'customer-dashboard.html',
         farmer: 'farmer-dashboard.html',
@@ -477,92 +689,239 @@
       window.location.href = dashboards[currentUser.type];
     }
     
-    // Login form handler
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    // Format phone number for display
+    function formatPhoneDisplay(phone) {
+      // Remove leading 0 if present
+      const cleaned = phone.replace(/^0/, '');
+      // Format as XXX-XXX-XXXX
+      if (cleaned.length === 9) {
+        return `0${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5)}`;
+      }
+      return `0${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5, 9)}`;
+    }
+    
+    // Normalize phone number for API
+    function normalizePhone(phone) {
+      // Remove any non-digit characters
+      let cleaned = phone.replace(/\D/g, '');
+      // Ensure it starts with 0
+      if (!cleaned.startsWith('0')) {
+        cleaned = '0' + cleaned;
+      }
+      return cleaned;
+    }
+    
+    // Show step
+    function showStep(step) {
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step${step}`).classList.add('active');
+      
+      // Update step indicators
+      document.getElementById('step1Dot').classList.toggle('active', step === 1);
+      document.getElementById('step1Dot').classList.toggle('completed', step > 1);
+      document.getElementById('step2Dot').classList.toggle('active', step === 2);
+    }
+    
+    // Show SMS animation
+    function showSMSAnimation() {
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('smsAnimation').classList.add('active');
+    }
+    
+    // Hide SMS animation
+    function hideSMSAnimation() {
+      document.getElementById('smsAnimation').classList.remove('active');
+    }
+    
+    // Start resend countdown
+    function startResendCountdown() {
+      resendCountdown = 30;
+      const resendLink = document.getElementById('resendLink');
+      const resendTimer = document.getElementById('resendTimer');
+      
+      resendLink.classList.add('disabled');
+      resendLink.style.display = 'none';
+      
+      const interval = setInterval(() => {
+        resendCountdown--;
+        resendTimer.textContent = ` (${resendCountdown}s)`;
+        
+        if (resendCountdown <= 0) {
+          clearInterval(interval);
+          resendLink.classList.remove('disabled');
+          resendLink.style.display = 'inline';
+          resendTimer.textContent = '';
+        }
+      }, 1000);
+    }
+    
+    // Resend OTP
+    function resendOTP() {
+      if (resendCountdown > 0) return;
+      
+      Toast.info('📨 ส่ง OTP ใหม่แล้ว / New OTP sent!');
+      startResendCountdown();
+    }
+    
+    // Phone form handler
+    document.getElementById('phoneForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const userType = document.querySelector('input[name="userType"]:checked').value;
+      const phone = document.getElementById('phone').value;
+      currentUserType = document.querySelector('input[name="userType"]:checked').value;
       
-      Loading.show();
-      
-      try {
-        const result = await API.login(email, password, userType);
-        
-        Loading.hide();
-        
-        if (result.success) {
-          Auth.setCurrentUser(result.user);
-          Toast.success('เข้าสู่ระบบสำเร็จ / Login successful');
-          
-          // Redirect to appropriate dashboard
-          setTimeout(() => {
-            const dashboards = {
-              customer: 'customer-dashboard.html',
-              farmer: 'farmer-dashboard.html',
-              baler: 'baler-dashboard.html'
-            };
-            window.location.href = dashboards[userType];
-          }, 1000);
-        } else {
-          Toast.error(result.error);
-        }
-      } catch (error) {
-        Loading.hide();
-        Toast.error('เกิดข้อผิดพลาด / An error occurred');
-        console.error('Login error:', error);
+      // Validate phone
+      if (!/^0?[0-9]{9,10}$/.test(phone.replace(/\D/g, ''))) {
+        Toast.error('กรุณากรอกเบอร์โทรให้ถูกต้อง / Please enter a valid phone number');
+        return;
       }
+      
+      currentPhone = normalizePhone(phone);
+      
+      // Show SMS animation
+      showSMSAnimation();
+      
+      // Simulate SMS sending delay
+      setTimeout(() => {
+        hideSMSAnimation();
+        showStep(2);
+        
+        // Update display phone
+        document.getElementById('displayPhone').textContent = formatPhoneDisplay(currentPhone);
+        
+        // Focus first OTP input
+        document.querySelector('.otp-input').focus();
+        
+        // Start resend countdown
+        startResendCountdown();
+        
+        Toast.success('📱 ส่ง OTP แล้ว! / OTP sent!');
+      }, 1500);
     });
     
-    // Registration form handler
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    // OTP input handling
+    const otpInputs = document.querySelectorAll('.otp-input');
+    
+    otpInputs.forEach((input, index) => {
+      // Handle input
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        
+        // Only allow numbers
+        e.target.value = value.replace(/\D/g, '');
+        
+        // Add filled class
+        if (e.target.value) {
+          e.target.classList.add('filled');
+          
+          // Auto-focus next input
+          if (index < otpInputs.length - 1) {
+            otpInputs[index + 1].focus();
+          }
+        } else {
+          e.target.classList.remove('filled');
+        }
+        
+        // Check if all filled - auto submit
+        const allFilled = Array.from(otpInputs).every(i => i.value.length === 1);
+        if (allFilled) {
+          document.getElementById('otpForm').dispatchEvent(new Event('submit'));
+        }
+      });
+      
+      // Handle backspace
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+      
+      // Handle paste
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+        
+        pastedData.split('').forEach((char, i) => {
+          if (otpInputs[i]) {
+            otpInputs[i].value = char;
+            otpInputs[i].classList.add('filled');
+          }
+        });
+        
+        // Focus last input or the one after pasted content
+        const focusIndex = Math.min(pastedData.length, otpInputs.length - 1);
+        otpInputs[focusIndex].focus();
+      });
+    });
+    
+    // OTP form handler
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const formData = new FormData(e.target);
-      const userData = Object.fromEntries(formData.entries());
+      // Get OTP value
+      const otp = Array.from(otpInputs).map(i => i.value).join('');
       
-      // Validate phone number
-      if (!isValidPhone(userData.phone)) {
-        Toast.error('กรุณาใส่เบอร์โทรให้ถูกต้อง / Please enter a valid phone number');
+      if (otp.length !== 4) {
+        Toast.error('กรุณากรอก OTP 4 หลัก / Please enter 4-digit OTP');
         return;
       }
       
       Loading.show();
       
-      try {
-        const result = await API.register(userData);
-        
-        Loading.hide();
-        
-        if (result.success) {
-          Toast.success('ลงทะเบียนสำเร็จ / Registration successful');
-          Modal.close('registerModal');
-          
-          // Auto login
-          Auth.setCurrentUser(result.user);
-          
-          setTimeout(() => {
-            const dashboards = {
-              customer: 'customer-dashboard.html',
-              farmer: 'farmer-dashboard.html',
-              baler: 'baler-dashboard.html'
-            };
-            window.location.href = dashboards[userData.user_type];
-          }, 1000);
+      // Simulate OTP verification (always accept 1234)
+      setTimeout(async () => {
+        if (otp === '1234') {
+          // OTP verified - login with phone
+          try {
+            const result = await API.loginWithPhone(currentPhone, currentUserType);
+            
+            Loading.hide();
+            
+            if (result.success) {
+              Auth.setCurrentUser(result.user);
+              Toast.success('🎉 เข้าสู่ระบบสำเร็จ / Login successful!');
+              
+              // Redirect to appropriate dashboard
+              setTimeout(() => {
+                const dashboards = {
+                  customer: 'customer-dashboard.html',
+                  farmer: 'farmer-dashboard.html',
+                  baler: 'baler-dashboard.html'
+                };
+                window.location.href = dashboards[currentUserType];
+              }, 1000);
+            } else {
+              Toast.error(result.error);
+            }
+          } catch (error) {
+            Loading.hide();
+            Toast.error('เกิดข้อผิดพลาด / An error occurred');
+            console.error('Login error:', error);
+          }
         } else {
-          Toast.error(result.error);
+          Loading.hide();
+          Toast.error('❌ OTP ไม่ถูกต้อง / Invalid OTP');
+          
+          // Clear OTP inputs
+          otpInputs.forEach(i => {
+            i.value = '';
+            i.classList.remove('filled');
+          });
+          otpInputs[0].focus();
         }
-      } catch (error) {
-        Loading.hide();
-        Toast.error('เกิดข้อผิดพลาด / An error occurred');
-        console.error('Registration error:', error);
-      }
+      }, 1000);
     });
     
-    function openRegisterModal() {
-      Modal.open('registerModal');
-    }
+    // Back button
+    document.getElementById('backBtn').addEventListener('click', () => {
+      showStep(1);
+      
+      // Clear OTP inputs
+      otpInputs.forEach(i => {
+        i.value = '';
+        i.classList.remove('filled');
+      });
+    });
   </script>
 </body>
 </html>
