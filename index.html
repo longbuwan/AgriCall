@@ -180,19 +180,24 @@
     .phone-input-group {
       display: flex;
       gap: 0.5rem;
+      max-width: 100%;
     }
     
     .country-code {
-      width: 80px;
+      width: 65px;
+      min-width: 65px;
       flex-shrink: 0;
       text-align: center;
       background: var(--light-cream);
       font-weight: 600;
       color: var(--text-dark);
+      padding: 0.875rem 0.5rem;
     }
     
     .phone-input {
       flex: 1;
+      min-width: 0;
+      max-width: calc(100% - 75px);
     }
     
     /* OTP Input Group */
@@ -515,6 +520,21 @@
         height: 55px;
         font-size: 1.25rem;
       }
+      
+      .phone-input-group {
+        flex-wrap: nowrap;
+      }
+      
+      .country-code {
+        width: 60px;
+        min-width: 60px;
+        font-size: 0.75rem;
+        padding: 0.875rem 0.25rem;
+      }
+      
+      .phone-input {
+        font-size: 1rem;
+      }
     }
     
     /* Landscape Mobile */
@@ -597,9 +617,9 @@
           <div class="form-group">
             <label for="phone">เบอร์โทรศัพท์ / Phone Number</label>
             <div class="phone-input-group">
-              <input type="text" class="country-code" value="+66" readonly>
+              <input type="text" class="country-code" value="🇹🇭 +66" readonly>
               <input type="tel" id="phone" name="phone" class="phone-input" 
-                     placeholder="812345678" required 
+                     placeholder="81-234-5678" required 
                      pattern="[0-9]{9,10}" 
                      maxlength="10"
                      autocomplete="tel">
