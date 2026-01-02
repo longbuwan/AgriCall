@@ -180,24 +180,27 @@
     .phone-input-group {
       display: flex;
       gap: 0.5rem;
-      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
     }
     
-    .country-code {
-      width: 65px;
-      min-width: 65px;
-      flex-shrink: 0;
+    .phone-input-group input.country-code {
+      width: 70px !important;
+      min-width: 70px !important;
+      max-width: 70px !important;
+      flex: 0 0 70px !important;
       text-align: center;
       background: var(--light-cream);
       font-weight: 600;
       color: var(--text-dark);
-      padding: 0.875rem 0.5rem;
+      padding: 0.875rem 0.25rem;
+      font-size: 0.875rem;
     }
     
-    .phone-input {
-      flex: 1;
-      min-width: 0;
-      max-width: calc(100% - 75px);
+    .phone-input-group input.phone-input {
+      flex: 1 1 auto !important;
+      width: auto !important;
+      min-width: 0 !important;
     }
     
     /* OTP Input Group */
@@ -473,7 +476,7 @@
     /* Mobile Optimizations */
     @media (max-width: 480px) {
       .login-card {
-        padding: 1.75rem 1.25rem;
+        padding: 1.5rem 1rem;
       }
       
       .logo {
@@ -521,19 +524,13 @@
         font-size: 1.25rem;
       }
       
-      .phone-input-group {
-        flex-wrap: nowrap;
-      }
-      
-      .country-code {
-        width: 60px;
-        min-width: 60px;
+      .phone-input-group input.country-code {
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+        flex: 0 0 60px !important;
         font-size: 0.75rem;
-        padding: 0.875rem 0.25rem;
-      }
-      
-      .phone-input {
-        font-size: 1rem;
+        padding: 0.875rem 0.125rem;
       }
     }
     
@@ -617,9 +614,9 @@
           <div class="form-group">
             <label for="phone">เบอร์โทรศัพท์ / Phone Number</label>
             <div class="phone-input-group">
-              <input type="text" class="country-code" value="🇹🇭 +66" readonly>
+              <input type="text" class="country-code" value="+66" readonly>
               <input type="tel" id="phone" name="phone" class="phone-input" 
-                     placeholder="81-234-5678" required 
+                     placeholder="812345678" required 
                      pattern="[0-9]{9,10}" 
                      maxlength="10"
                      autocomplete="tel">
