@@ -1,234 +1,356 @@
-// utils-python.js - Utility functions for Python Backend
+// utils.js - Utility functions for AgriCall
 
-// Configuration for Python Backend
-const CONFIG = {
-  // Python Flask backend URLs (running on localhost:5000)
-  PYTHON_BACKEND: 'https://agricall.onrender.com',
+// ========================================
+// AUTHENTICATION
+// ========================================
+
+const Auth = {
+  // Get current user from localStorage
+  getCurrentUser() {
+    const userData = localStorage.getItem('agricall_user');
+    return userData ? JSON.parse(userData) : null;
+  },
   
-  // API Endpoints
-  API_ENDPOINTS: {
-    AUTH: '/auth',
-    REGISTER: '/register',
-    CREATE_ORDER: '/create_order',
-    ACCEPT_ORDER: '/accept_order',
-    ASSIGN_BALER: '/assign_baler',
-    UPDATE_STATUS: '/update_status',
-    GET_ORDERS: '/get_orders',
-    GET_USERS: '/get_users',
+  // Set current user in localStorage
+  setCurrentUser(user) {
+    localStorage.setItem('agricall_user', JSON.stringify(user));
+  },
+  
+  // Clear current user (logout)
+  logout() {
+    localStorage.removeItem('agricall_user');
+  },
+  
+  // Check if user is logged in
+  isLoggedIn() {
+    return this.getCurrentUser() !== null;
+  },
+  
+  // Get user type
+  getUserType() {
+    const user = this.getCurrentUser();
+    return user ? user.type : null;
+  },
+  
+  // Check if user has specific type
+  isUserType(type) {
+    return this.getUserType() === type;
   }
 };
 
-// Toast Notification System
-class Toast {
-  static show(message, type = 'success', duration = 3000) {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="font-size: 1.5rem;">
-          ${type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠'}
-        </span>
-        <span>${message}</span>
-      </div>
-    `;
+// ========================================
+// TOAST NOTIFICATIONS
+// ========================================
+
+const Toast = {
+  container: null,
+  
+  // Initialize toast container
+  init() {
+    if (!this.container) {
+      this.container = document.getElementById('toast');
+      
+      if (!this.container) {
+        this.container = document.createElement('div');
+        this.container.id = 'toast';
+        this.container.className = 'toast';
+        this.container.style.display = 'none';
+        document.body.appendChild(this.container);
+      }
+    }
+  },
+  
+  // Show toast
+  show(message, type = 'info', duration = 3000) {
+    this.init();
     
-    document.body.appendChild(toast);
+    this.container.textContent = message;
+    this.container.className = `toast ${type}`;
+    this.container.style.display = 'block';
     
+    // Auto hide
     setTimeout(() => {
-      toast.style.animation = 'slideInRight 0.3s ease reverse';
-      setTimeout(() => toast.remove(), 300);
+      this.hide();
     }, duration);
-  }
+  },
   
-  static success(message) {
-    this.show(message, 'success');
-  }
+  // Hide toast
+  hide() {
+    if (this.container) {
+      this.container.style.display = 'none';
+    }
+  },
   
-  static error(message) {
-    this.show(message, 'error', 4000);
-  }
+  // Convenience methods
+  success(message, duration = 3000) {
+    this.show(message, 'success', duration);
+  },
   
-  static warning(message) {
-    this.show(message, 'warning');
+  error(message, duration = 4000) {
+    this.show(message, 'error', duration);
+  },
+  
+  warning(message, duration = 3500) {
+    this.show(message, 'warning', duration);
+  },
+  
+  info(message, duration = 3000) {
+    this.show(message, 'info', duration);
   }
-}
+};
 
-// Loading Overlay
-class Loading {
-  static show() {
-    const overlay = document.createElement('div');
-    overlay.className = 'loading-overlay';
-    overlay.id = 'loadingOverlay';
-    overlay.innerHTML = '<div class="spinner"></div>';
-    document.body.appendChild(overlay);
-  }
-  
-  static hide() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-      overlay.remove();
-    }
-  }
-}
+// ========================================
+// LOADING OVERLAY
+// ========================================
 
-// Authentication Helper
-class Auth {
-  static getCurrentUser() {
-    const userId = localStorage.getItem('user_id');
-    const userType = localStorage.getItem('user_type');
-    const userName = localStorage.getItem('user_name');
-    
-    if (!userId || !userType || !userName) {
-      return null;
+const Loading = {
+  overlay: null,
+  
+  // Initialize loading overlay
+  init() {
+    if (!this.overlay) {
+      this.overlay = document.getElementById('loadingOverlay');
+      
+      if (!this.overlay) {
+        this.overlay = document.createElement('div');
+        this.overlay.id = 'loadingOverlay';
+        this.overlay.className = 'loading-overlay';
+        this.overlay.innerHTML = '<div class="spinner"></div>';
+        this.overlay.style.display = 'none';
+        document.body.appendChild(this.overlay);
+      }
     }
-    
-    return {
-      id: userId,
-      type: userType,
-      name: userName
-    };
-  }
+  },
   
-  static setCurrentUser(user) {
-    localStorage.setItem('user_id', user.id);
-    localStorage.setItem('user_type', user.type);
-    localStorage.setItem('user_name', user.name);
-  }
+  // Show loading overlay
+  show() {
+    this.init();
+    this.overlay.style.display = 'flex';
+  },
   
-  static clearCurrentUser() {
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('user_type');
-    localStorage.removeItem('user_name');
-  }
-  
-  static logout() {
-    this.clearCurrentUser();
-    window.location.href = 'index.html';
-  }
-  
-  static requireAuth(allowedTypes = []) {
-    const user = this.getCurrentUser();
-    
-    if (!user) {
-      window.location.href = 'index.html';
-      return null;
+  // Hide loading overlay
+  hide() {
+    if (this.overlay) {
+      this.overlay.style.display = 'none';
     }
-    
-    if (allowedTypes.length > 0 && !allowedTypes.includes(user.type)) {
-      Toast.error('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ / You do not have permission to access this page');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 2000);
-      return null;
-    }
-    
-    return user;
   }
-}
+};
 
-// Modal Helper
-class Modal {
-  static open(modalId) {
+// ========================================
+// MODAL
+// ========================================
+
+const Modal = {
+  // Open modal by ID
+  open(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
-  }
+  },
   
-  static close(modalId) {
+  // Close modal by ID
+  close(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
       modal.classList.remove('active');
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = '';
     }
-  }
+  },
   
-  static closeAll() {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
+  // Close all modals
+  closeAll() {
+    document.querySelectorAll('.modal.active').forEach(modal => {
       modal.classList.remove('active');
     });
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = '';
   }
+};
+
+// ========================================
+// VALIDATION
+// ========================================
+
+// Validate Thai phone number
+function isValidPhone(phone) {
+  // Remove any non-digit characters
+  const cleaned = phone.replace(/\D/g, '');
+  // Thai phone numbers: 10 digits starting with 0, or 9 digits without leading 0
+  return /^0[0-9]{9}$/.test(cleaned) || /^[0-9]{9}$/.test(cleaned);
 }
 
-// Date Formatter
+// Validate email
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ========================================
+// FORMATTING
+// ========================================
+
+// Format phone number for display
+function formatPhone(phone) {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  } else if (cleaned.length === 9) {
+    return `0${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5)}`;
+  }
+  return phone;
+}
+
+// Format date for display
 function formatDate(dateString) {
   if (!dateString) return '-';
   const date = new Date(dateString);
   return date.toLocaleDateString('th-TH', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric'
   });
 }
 
-// Date to Thai format
-function formatDateShort(dateString) {
+// Format date and time
+function formatDateTime(dateString) {
   if (!dateString) return '-';
   const date = new Date(dateString);
   return date.toLocaleDateString('th-TH', {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit'
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 }
 
-// Generate unique ID
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+// Format currency (Thai Baht)
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
 }
 
-// Status translation
+// Format number with commas
+function formatNumber(num) {
+  return new Intl.NumberFormat('th-TH').format(num);
+}
+
+// ========================================
+// STATUS HELPERS
+// ========================================
+
+// Get status badge class
+function getStatusBadgeClass(status) {
+  const statusClasses = {
+    'pending': 'badge-pending',
+    'farmer_accepted': 'badge-farmer-accepted',
+    'accepted': 'badge-accepted',
+    'baler_assigned': 'badge-accepted',
+    'in_progress': 'badge-progress',
+    'delivered': 'badge-delivered',
+    'completed': 'badge-delivered',
+    'cancelled': 'badge-cancelled'
+  };
+  return statusClasses[status] || 'badge-pending';
+}
+
+// Get status text (Thai/English)
 function getStatusText(status) {
-  const statusMap = {
-    'pending': 'รอดำเนินการ',
-    'farmer_accepted': 'เกษตรกรรับงาน',
-    'baler_assigned': 'มอบหมายคนอัดฟาง',
-    'in_progress': 'กำลังดำเนินการ',
-    'delivered': 'ส่งมอบแล้ว',
-    'cancelled': 'ยกเลิก'
+  const statusTexts = {
+    'pending': 'รอดำเนินการ / Pending',
+    'farmer_accepted': 'เกษตรกรรับงาน / Farmer Accepted',
+    'accepted': 'รับงานแล้ว / Accepted',
+    'baler_assigned': 'มอบหมายแล้ว / Baler Assigned',
+    'in_progress': 'กำลังดำเนินการ / In Progress',
+    'delivered': 'ส่งแล้ว / Delivered',
+    'completed': 'สำเร็จ / Completed',
+    'cancelled': 'ยกเลิก / Cancelled'
   };
-  return statusMap[status] || status;
+  return statusTexts[status] || status;
 }
 
-// Get status badge HTML
-function getStatusBadge(status) {
-  const statusClass = status.replace('_', '-');
-  return `<span class="badge badge-${statusClass}">${getStatusText(status)}</span>`;
-}
-
-// Format phone number
-function formatPhone(phone) {
-  if (!phone) return '-';
-  // Format as XXX-XXX-XXXX
-  return phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-}
-
-// Validate email
-function isValidEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-}
-
-// Validate Thai phone number
-function isValidPhone(phone) {
-  const re = /^[0-9]{10}$/;
-  return re.test(phone.replace(/[^0-9]/g, ''));
-}
-
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
+// Get bale type text
+function getBaleTypeText(type) {
+  const types = {
+    'rice_straw': 'ฟางข้าว / Rice Straw',
+    'corn_stover': 'ตอซังข้าวโพด / Corn Stover',
+    'sugarcane_leaves': 'ใบอ้อย / Sugarcane Leaves',
+    'mixed': 'ผสม / Mixed'
   };
-  return text.replace(/[&<>"']/g, m => map[m]);
+  return types[type] || type;
 }
+
+// ========================================
+// STAR RATING
+// ========================================
+
+// Generate star rating HTML
+function generateStarRating(rating, maxStars = 5) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = maxStars - fullStars - (hasHalfStar ? 1 : 0);
+  
+  let html = '';
+  
+  for (let i = 0; i < fullStars; i++) {
+    html += '⭐';
+  }
+  
+  if (hasHalfStar) {
+    html += '✨';
+  }
+  
+  for (let i = 0; i < emptyStars; i++) {
+    html += '☆';
+  }
+  
+  return html;
+}
+
+// ========================================
+// URL PARAMS
+// ========================================
+
+// Get URL parameter
+function getUrlParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+}
+
+// ========================================
+// LOCAL STORAGE
+// ========================================
+
+// Set item in localStorage with JSON
+function setStorageItem(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+// Get item from localStorage with JSON parsing
+function getStorageItem(key, defaultValue = null) {
+  const item = localStorage.getItem(key);
+  if (item) {
+    try {
+      return JSON.parse(item);
+    } catch (e) {
+      return item;
+    }
+  }
+  return defaultValue;
+}
+
+// Remove item from localStorage
+function removeStorageItem(key) {
+  localStorage.removeItem(key);
+}
+
+// ========================================
+// DEBOUNCE / THROTTLE
+// ========================================
 
 // Debounce function
 function debounce(func, wait) {
@@ -243,36 +365,40 @@ function debounce(func, wait) {
   };
 }
 
-// Initialize common event listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Close modal when clicking outside
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-      Modal.closeAll();
+// Throttle function
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
     }
-  });
-  
-  // Close modal with Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      Modal.closeAll();
-    }
-  });
-});
+  };
+}
 
-// Export for use in other files
+// ========================================
+// EXPORTS
+// ========================================
+
+window.Auth = Auth;
 window.Toast = Toast;
 window.Loading = Loading;
-window.Auth = Auth;
 window.Modal = Modal;
-window.CONFIG = CONFIG;
-window.formatDate = formatDate;
-window.formatDateShort = formatDateShort;
-window.generateId = generateId;
-window.getStatusText = getStatusText;
-window.getStatusBadge = getStatusBadge;
-window.formatPhone = formatPhone;
-window.isValidEmail = isValidEmail;
 window.isValidPhone = isValidPhone;
-window.escapeHtml = escapeHtml;
+window.isValidEmail = isValidEmail;
+window.formatPhone = formatPhone;
+window.formatDate = formatDate;
+window.formatDateTime = formatDateTime;
+window.formatCurrency = formatCurrency;
+window.formatNumber = formatNumber;
+window.getStatusBadgeClass = getStatusBadgeClass;
+window.getStatusText = getStatusText;
+window.getBaleTypeText = getBaleTypeText;
+window.generateStarRating = generateStarRating;
+window.getUrlParam = getUrlParam;
+window.setStorageItem = setStorageItem;
+window.getStorageItem = getStorageItem;
+window.removeStorageItem = removeStorageItem;
 window.debounce = debounce;
+window.throttle = throttle;
