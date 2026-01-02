@@ -1,4 +1,24 @@
-// api-fixed.js - Backward compatible API handler
+// api.js - API handler with phone auth support
+
+// Configuration
+const CONFIG = {
+  PYTHON_BACKEND: 'http://localhost:5000',
+  API_ENDPOINTS: {
+    AUTH: '/auth',
+    AUTH_PHONE: '/auth/phone',
+    REGISTER: '/register',
+    CREATE_ORDER: '/create_order',
+    GET_ORDERS: '/get_orders',
+    ACCEPT_ORDER: '/accept_order',
+    ASSIGN_BALER: '/assign_baler',
+    UPDATE_STATUS: '/update_status',
+    GET_USERS: '/get_users',
+    SUBMIT_RATING: '/submit_rating',
+    GET_RATINGS: '/get_ratings',
+    GET_USER_RATINGS: '/get_user_ratings',
+    GET_ORDER_RATINGS: '/get_order_ratings'
+  }
+};
 
 class API {
   // Call Python backend endpoint
@@ -38,7 +58,11 @@ class API {
     }
   }
   
-  // Authentication
+  // ========================================
+  // AUTHENTICATION
+  // ========================================
+  
+  // Legacy email/password login
   static async login(email, password, userType) {
     try {
       const result = await this.callBackend(CONFIG.API_ENDPOINTS.AUTH, {
@@ -56,6 +80,24 @@ class API {
     }
   }
   
+  // Phone number login (after OTP verification)
+  static async loginWithPhone(phone, userType) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.AUTH_PHONE, {
+        phone: phone,
+        user_type: userType
+      });
+      return result;
+    } catch (error) {
+      console.error('Phone login error:', error);
+      return {
+        success: false,
+        error: 'เกิดข้อผิดพลาด / An error occurred'
+      };
+    }
+  }
+  
+  // Register new user
   static async register(userData) {
     try {
       const result = await this.callBackend(CONFIG.API_ENDPOINTS.REGISTER, {
@@ -71,7 +113,10 @@ class API {
     }
   }
   
-  // Orders
+  // ========================================
+  // ORDERS
+  // ========================================
+  
   static async createOrder(orderData) {
     try {
       const result = await this.callBackend(CONFIG.API_ENDPOINTS.CREATE_ORDER, {
@@ -130,11 +175,8 @@ class API {
     }
   }
   
-  // FIXED: Backward compatible accept order
   static async acceptOrder(orderId, farmerId, fieldAddress = null, fieldLat = null, fieldLng = null) {
     try {
-      // If field location provided, embed it in the order update
-      // Otherwise, just use the old format
       const requestData = {
         order_id: orderId,
         farmer_id: farmerId
@@ -148,31 +190,6 @@ class API {
       }
       
       const result = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, requestData);
-      
-      // If backend doesn't support field location yet, save it as a note in the order
-      if (!result.success && fieldAddress) {
-        console.log('Backend does not support field location, trying alternative method...');
-        
-        // Try the old accept order format first
-        const basicResult = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, {
-          order_id: orderId,
-          farmer_id: farmerId
-        });
-        
-        if (basicResult.success) {
-          // Then update the notes with field location
-          const updateResult = await this.updateOrderNotes(orderId, 
-            `Field Location: ${fieldAddress}`
-          );
-          
-          return {
-            success: true,
-            order: basicResult.order,
-            note: 'Field location saved in notes (backend needs update for full support)'
-          };
-        }
-      }
-      
       return result;
     } catch (error) {
       console.error('Accept order error:', error);
@@ -180,21 +197,6 @@ class API {
         success: false,
         error: 'ไม่สามารถรับงานได้ / Cannot accept order'
       };
-    }
-  }
-  
-  // Helper method to update order notes (workaround for old backend)
-  static async updateOrderNotes(orderId, notes) {
-    try {
-      // This might not exist in old backend, but we try anyway
-      const result = await this.callBackend('/update_order_notes', {
-        order_id: orderId,
-        notes: notes
-      });
-      return result;
-    } catch (error) {
-      console.log('Update notes not supported:', error);
-      return { success: false };
     }
   }
   
@@ -234,7 +236,10 @@ class API {
     return this.updateOrderStatus(orderId, 'cancelled');
   }
   
-  // Get users (for farmer to see available balers)
+  // ========================================
+  // USERS
+  // ========================================
+  
   static async getUsers(userType) {
     try {
       const data = userType ? { user_type: userType } : {};
@@ -248,7 +253,70 @@ class API {
       };
     }
   }
+  
+  // ========================================
+  // RATINGS
+  // ========================================
+  
+  static async submitRating(ratingData) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.SUBMIT_RATING, {
+        rating: ratingData
+      });
+      return result;
+    } catch (error) {
+      console.error('Submit rating error:', error);
+      return {
+        success: false,
+        error: 'ไม่สามารถบันทึกคะแนนได้ / Cannot submit rating'
+      };
+    }
+  }
+  
+  static async getRatings(filters = {}) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_RATINGS, filters);
+      return result;
+    } catch (error) {
+      console.error('Get ratings error:', error);
+      return {
+        success: false,
+        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch ratings'
+      };
+    }
+  }
+  
+  static async getUserRatings(userId) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_USER_RATINGS, {
+        user_id: userId
+      });
+      return result;
+    } catch (error) {
+      console.error('Get user ratings error:', error);
+      return {
+        success: false,
+        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch user ratings'
+      };
+    }
+  }
+  
+  static async getOrderRatings(orderId) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_ORDER_RATINGS, {
+        order_id: orderId
+      });
+      return result;
+    } catch (error) {
+      console.error('Get order ratings error:', error);
+      return {
+        success: false,
+        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch order ratings'
+      };
+    }
+  }
 }
 
 // Export API
 window.API = API;
+window.CONFIG = CONFIG;
