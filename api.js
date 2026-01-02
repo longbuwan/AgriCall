@@ -2,7 +2,7 @@
 
 // Configuration
 const CONFIG = {
-  PYTHON_BACKEND: 'http://localhost:5000',
+  PYTHON_BACKEND: 'https://agricall.onrender.com',
   DEMO_MODE: true, // Set to false when backend is running
   API_ENDPOINTS: {
     AUTH: '/auth',
