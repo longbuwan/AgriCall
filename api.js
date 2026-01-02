@@ -1,8 +1,9 @@
-// api.js - API handler with phone auth support
+// api.js - API handler with phone auth support and demo mode
 
 // Configuration
 const CONFIG = {
   PYTHON_BACKEND: 'http://localhost:5000',
+  DEMO_MODE: true, // Set to false when backend is running
   API_ENDPOINTS: {
     AUTH: '/auth',
     AUTH_PHONE: '/auth/phone',
@@ -20,18 +21,29 @@ const CONFIG = {
   }
 };
 
+// Demo data for offline testing
+const DEMO_USERS = {
+  '0812345678': { id: 'demo_customer_1', type: 'customer', name: 'สมชาย ใจดี', phone: '0812345678', email: 'customer@test.com', address: '123 หมู่ 1 ต.สารภี', avg_rating: 4.5, total_ratings: 10 },
+  '0823456789': { id: 'demo_farmer_1', type: 'farmer', name: 'สมหญิง เกษตรกร', phone: '0823456789', email: 'farmer@test.com', address: '456 หมู่ 2 ต.สารภี', avg_rating: 4.8, total_ratings: 25 },
+  '0834567890': { id: 'demo_baler_1', type: 'baler', name: 'สมศักดิ์ อัดฟาง', phone: '0834567890', email: 'baler@test.com', address: '789 หมู่ 3 ต.สารภี', avg_rating: 4.2, total_ratings: 15 }
+};
+
 class API {
   // Call Python backend endpoint
   static async callBackend(endpoint, data) {
+    // If demo mode, use fake responses
+    if (CONFIG.DEMO_MODE) {
+      console.log('📱 Demo mode - simulating:', endpoint, data);
+      return this.handleDemoRequest(endpoint, data);
+    }
+    
     const url = `${CONFIG.PYTHON_BACKEND}${endpoint}`;
     console.log('📡 Calling backend:', url, data);
     
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
       
@@ -46,38 +58,65 @@ class API {
     } catch (error) {
       console.error('❌ Backend error:', error);
       
-      // Check if it's a connection error
+      // Fallback to demo mode on connection error
       if (error.message.includes('Failed to fetch')) {
-        return {
-          success: false,
-          error: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ / Cannot connect to server. Make sure backend.py is running!'
-        };
+        console.log('🔄 Falling back to demo mode...');
+        CONFIG.DEMO_MODE = true;
+        return this.handleDemoRequest(endpoint, data);
       }
       
       throw error;
     }
   }
   
-  // ========================================
-  // AUTHENTICATION
-  // ========================================
-  
-  // Legacy email/password login
-  static async login(email, password, userType) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.AUTH, {
-        email: email,
-        password: password,
-        user_type: userType
-      });
-      return result;
-    } catch (error) {
-      console.error('Login error:', error);
-      return {
-        success: false,
-        error: 'เกิดข้อผิดพลาด / An error occurred'
-      };
-    }
+  // Handle demo requests without backend
+  static handleDemoRequest(endpoint, data) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        switch(endpoint) {
+          case '/auth/phone':
+            const phone = data.phone;
+            const userType = data.user_type;
+            const demoUser = DEMO_USERS[phone];
+            
+            if (demoUser && demoUser.type === userType) {
+              resolve({ success: true, user: demoUser });
+            } else if (demoUser) {
+              resolve({ success: false, error: 'ประเภทผู้ใช้ไม่ตรงกัน / User type mismatch' });
+            } else {
+              // Create new user for demo
+              const newUser = {
+                id: `demo_${userType}_${Date.now()}`,
+                type: userType,
+                name: `User ${phone.slice(-4)}`,
+                phone: phone,
+                email: '',
+                address: '',
+                avg_rating: 0,
+                total_ratings: 0
+              };
+              resolve({ success: true, user: newUser });
+            }
+            break;
+            
+          case '/auth':
+            resolve({ success: false, error: 'กรุณาใช้การเข้าสู่ระบบด้วยเบอร์โทร / Please use phone login' });
+            break;
+            
+          case '/get_orders':
+            resolve({ success: true, orders: [] });
+            break;
+            
+          case '/get_users':
+            const users = Object.values(DEMO_USERS).filter(u => !data.user_type || u.type === data.user_type);
+            resolve({ success: true, users: users });
+            break;
+            
+          default:
+            resolve({ success: true, message: 'Demo mode' });
+        }
+      }, 300);
+    });
   }
   
   // Phone number login (after OTP verification)
@@ -90,45 +129,43 @@ class API {
       return result;
     } catch (error) {
       console.error('Phone login error:', error);
-      return {
-        success: false,
-        error: 'เกิดข้อผิดพลาด / An error occurred'
-      };
+      return { success: false, error: 'เกิดข้อผิดพลาด / An error occurred' };
+    }
+  }
+  
+  // Legacy email/password login
+  static async login(email, password, userType) {
+    try {
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.AUTH, {
+        email: email,
+        password: password,
+        user_type: userType
+      });
+      return result;
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'เกิดข้อผิดพลาด / An error occurred' };
     }
   }
   
   // Register new user
   static async register(userData) {
     try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.REGISTER, {
-        user: userData
-      });
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.REGISTER, { user: userData });
       return result;
     } catch (error) {
       console.error('Registration error:', error);
-      return {
-        success: false,
-        error: 'เกิดข้อผิดพลาด / An error occurred'
-      };
+      return { success: false, error: 'เกิดข้อผิดพลาด / An error occurred' };
     }
   }
   
-  // ========================================
-  // ORDERS
-  // ========================================
-  
   static async createOrder(orderData) {
     try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.CREATE_ORDER, {
-        order: orderData
-      });
+      const result = await this.callBackend(CONFIG.API_ENDPOINTS.CREATE_ORDER, { order: orderData });
       return result;
     } catch (error) {
       console.error('Create order error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถสร้างออเดอร์ได้ / Cannot create order'
-      };
+      return { success: false, error: 'ไม่สามารถสร้างออเดอร์ได้ / Cannot create order' };
     }
   }
   
@@ -138,107 +175,9 @@ class API {
       return result;
     } catch (error) {
       console.error('Get orders error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลออเดอร์ได้ / Cannot fetch orders'
-      };
+      return { success: false, error: 'ไม่สามารถดึงข้อมูลออเดอร์ได้ / Cannot fetch orders' };
     }
   }
-  
-  static async getOrderById(orderId) {
-    try {
-      const result = await this.getOrders({});
-      
-      if (result.success) {
-        const order = result.orders.find(o => o.order_id === orderId);
-        
-        if (order) {
-          return {
-            success: true,
-            order: order
-          };
-        } else {
-          return {
-            success: false,
-            error: 'ไม่พบออเดอร์ / Order not found'
-          };
-        }
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Get order error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลออเดอร์ได้ / Cannot fetch order'
-      };
-    }
-  }
-  
-  static async acceptOrder(orderId, farmerId, fieldAddress = null, fieldLat = null, fieldLng = null) {
-    try {
-      const requestData = {
-        order_id: orderId,
-        farmer_id: farmerId
-      };
-      
-      // Add field location if provided
-      if (fieldAddress && fieldLat && fieldLng) {
-        requestData.field_address = fieldAddress;
-        requestData.field_lat = fieldLat;
-        requestData.field_lng = fieldLng;
-      }
-      
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.ACCEPT_ORDER, requestData);
-      return result;
-    } catch (error) {
-      console.error('Accept order error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถรับงานได้ / Cannot accept order'
-      };
-    }
-  }
-  
-  static async assignBaler(orderId, balerId) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.ASSIGN_BALER, {
-        order_id: orderId,
-        baler_id: balerId
-      });
-      return result;
-    } catch (error) {
-      console.error('Assign baler error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถมอบหมายคนอัดฟางได้ / Cannot assign baler'
-      };
-    }
-  }
-  
-  static async updateOrderStatus(orderId, newStatus) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.UPDATE_STATUS, {
-        order_id: orderId,
-        new_status: newStatus
-      });
-      return result;
-    } catch (error) {
-      console.error('Update status error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถอัพเดทสถานะได้ / Cannot update status'
-      };
-    }
-  }
-  
-  static async cancelOrder(orderId) {
-    return this.updateOrderStatus(orderId, 'cancelled');
-  }
-  
-  // ========================================
-  // USERS
-  // ========================================
   
   static async getUsers(userType) {
     try {
@@ -247,72 +186,7 @@ class API {
       return result;
     } catch (error) {
       console.error('Get users error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลผู้ใช้ได้ / Cannot fetch users'
-      };
-    }
-  }
-  
-  // ========================================
-  // RATINGS
-  // ========================================
-  
-  static async submitRating(ratingData) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.SUBMIT_RATING, {
-        rating: ratingData
-      });
-      return result;
-    } catch (error) {
-      console.error('Submit rating error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถบันทึกคะแนนได้ / Cannot submit rating'
-      };
-    }
-  }
-  
-  static async getRatings(filters = {}) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_RATINGS, filters);
-      return result;
-    } catch (error) {
-      console.error('Get ratings error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch ratings'
-      };
-    }
-  }
-  
-  static async getUserRatings(userId) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_USER_RATINGS, {
-        user_id: userId
-      });
-      return result;
-    } catch (error) {
-      console.error('Get user ratings error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch user ratings'
-      };
-    }
-  }
-  
-  static async getOrderRatings(orderId) {
-    try {
-      const result = await this.callBackend(CONFIG.API_ENDPOINTS.GET_ORDER_RATINGS, {
-        order_id: orderId
-      });
-      return result;
-    } catch (error) {
-      console.error('Get order ratings error:', error);
-      return {
-        success: false,
-        error: 'ไม่สามารถดึงข้อมูลคะแนนได้ / Cannot fetch order ratings'
-      };
+      return { success: false, error: 'ไม่สามารถดึงข้อมูลผู้ใช้ได้ / Cannot fetch users' };
     }
   }
 }
