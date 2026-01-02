@@ -19,6 +19,7 @@ const Auth = {
   // Clear current user (logout)
   logout() {
     localStorage.removeItem('agricall_user');
+    window.location.href = 'index.html';
   },
   
   // Check if user is logged in
@@ -35,6 +36,29 @@ const Auth = {
   // Check if user has specific type
   isUserType(type) {
     return this.getUserType() === type;
+  },
+  
+  // Require authentication - redirect if not logged in or wrong type
+  requireAuth(allowedTypes = []) {
+    const user = this.getCurrentUser();
+    
+    if (!user) {
+      window.location.href = 'index.html';
+      return null;
+    }
+    
+    if (allowedTypes.length > 0 && !allowedTypes.includes(user.type)) {
+      // Redirect to correct dashboard
+      const dashboards = {
+        customer: 'customer-dashboard.html',
+        farmer: 'farmer-dashboard.html',
+        baler: 'baler-dashboard.html'
+      };
+      window.location.href = dashboards[user.type] || 'index.html';
+      return null;
+    }
+    
+    return user;
   }
 };
 
@@ -377,6 +401,33 @@ function throttle(func, limit) {
   };
 }
 
+// Format date short (for tables)
+function formatDateShort(dateString) {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'short'
+  });
+}
+
+// Get status badge HTML
+function getStatusBadge(status) {
+  const statusTexts = {
+    'pending': 'รอดำเนินการ',
+    'farmer_accepted': 'เกษตรกรรับงาน',
+    'accepted': 'รับงานแล้ว',
+    'baler_assigned': 'มอบหมายแล้ว',
+    'in_progress': 'กำลังดำเนินการ',
+    'delivered': 'ส่งแล้ว',
+    'completed': 'สำเร็จ',
+    'cancelled': 'ยกเลิก'
+  };
+  
+  const text = statusTexts[status] || status;
+  return `<span class="status-badge status-${status}">${text}</span>`;
+}
+
 // ========================================
 // EXPORTS
 // ========================================
@@ -390,10 +441,12 @@ window.isValidEmail = isValidEmail;
 window.formatPhone = formatPhone;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
+window.formatDateShort = formatDateShort;
 window.formatCurrency = formatCurrency;
 window.formatNumber = formatNumber;
 window.getStatusBadgeClass = getStatusBadgeClass;
 window.getStatusText = getStatusText;
+window.getStatusBadge = getStatusBadge;
 window.getBaleTypeText = getBaleTypeText;
 window.generateStarRating = generateStarRating;
 window.getUrlParam = getUrlParam;
