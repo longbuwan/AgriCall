@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AgriCall - หน้าหลัก</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Home Page Styles */
+    .home-container {
+      min-height: 100vh;
+      background: var(--light-cream);
+      padding-bottom: 2rem;
+    }
+    
+    /* Header */
+    .home-header {
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      color: var(--white);
+      padding: 1.5rem 1rem;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .header-logo-icon {
+      font-size: 2.5rem;
+    }
+    
+    .header-logo-text h1 {
+      font-family: 'Itim', 'Sriracha', cursive;
+      font-size: 1.5rem;
+      margin: 0;
+      line-height: 1.2;
+    }
+    
+    .header-logo-text p {
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.9;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: var(--white);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .header-btn:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Main Content */
+    .home-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    /* User Info Card */
+    .user-info-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .user-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+    
+    .user-details {
+      flex: 1;
+    }
+    
+    .user-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
+    
+    .user-type-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(127, 173, 107, 0.1);
+      color: var(--primary-green);
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .user-contact {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-medium);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    
+    .user-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+    
+    /* AgriCoin Section */
+    .agricoin-section {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .agricoin-section::before {
+      content: '🌾';
+      position: absolute;
+      font-size: 8rem;
+      opacity: 0.1;
+      right: -1rem;
+      top: -2rem;
+      pointer-events: none;
+    }
+    
+    .agricoin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .agricoin-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .agricoin-icon {
+      font-size: 1.5rem;
+    }
+    
+    .agricoin-balance {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .agricoin-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    
+    .agricoin-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+    
+    .agricoin-info {
+      font-size: 0.8125rem;
+      opacity: 0.9;
+      margin-top: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Navigation Cards */
+    .nav-section {
+      margin-bottom: 1rem;
+    }
+    
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+      padding: 0 0.25rem;
+    }
+    
+    .nav-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.875rem;
+    }
+    
+    .nav-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 2px solid transparent;
+    }
+    
+    .nav-card:active {
+      transform: scale(0.98);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .nav-card.primary {
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      color: var(--white);
+    }
+    
+    .nav-card-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    
+    .nav-card:not(.primary) .nav-card-icon {
+      background: rgba(127, 173, 107, 0.1);
+    }
+    
+    .nav-card-content {
+      flex: 1;
+    }
+    
+    .nav-card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .nav-card-description {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+    
+    .nav-card-arrow {
+      font-size: 1.5rem;
+      opacity: 0.6;
+    }
+    
+    /* Coming Soon Badge */
+    .coming-soon-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 0.125rem 0.5rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    
+    .nav-card:not(.primary) .coming-soon-badge {
+      background: rgba(127, 173, 107, 0.2);
+      color: var(--primary-green);
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    
+    .stat-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-green);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      font-size: 0.8125rem;
+      color: var(--text-medium);
+    }
+    
+    /* Tablet and Desktop */
+    @media (min-width: 768px) {
+      .nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .quick-stats {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    /* Mobile Optimizations */
+    @media (max-width: 480px) {
+      .home-header {
+        padding: 1rem 0.75rem;
+      }
+      
+      .header-logo-icon {
+        font-size: 2rem;
+      }
+      
+      .header-logo-text h1 {
+        font-size: 1.25rem;
+      }
+      
+      .header-logo-text p {
+        font-size: 0.6875rem;
+      }
+      
+      .user-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+      }
+      
+      .user-name {
+        font-size: 1.125rem;
+      }
+      
+      .agricoin-amount {
+        font-size: 1.75rem;
+      }
+      
+      .nav-card {
+        padding: 1rem;
+      }
+      
+      .nav-card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.75rem;
+      }
+      
+      .nav-card-title {
+        font-size: 1rem;
+      }
+      
+      .nav-card-description {
+        font-size: 0.8125rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="home-container">
+    <!-- Header -->
+    <header class="home-header">
+      <div class="header-content">
+        <div class="header-logo">
+          <div class="header-logo-icon">🌾</div>
+          <div class="header-logo-text">
+            <h1>AgriCall</h1>
+            <p>เชื่อมโยงเกษตรกรไทย</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="logout()" title="ออกจากระบบ">
+            🚪
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="home-content">
+      <!-- User Info Card -->
+      <div class="user-info-card">
+        <div class="user-profile">
+          <div class="user-avatar" id="userAvatar">👤</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-type-badge" id="userTypeBadge">Loading...</div>
+            <div class="user-contact">
+              <span>📱</span>
+              <span id="userPhone">-</span>
+            </div>
+            <div class="user-rating" id="userRating" style="display: none;">
+              <span>⭐</span>
+              <span id="ratingValue">0.0</span>
+              <span style="font-size: 0.75rem; opacity: 0.7;">(<span id="ratingCount">0</span>)</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- AgriCoin Section -->
+        <div class="agricoin-section">
+          <div class="agricoin-header">
+            <div class="agricoin-title">
+              <span class="agricoin-icon">🪙</span>
+              <span>AgriCoin Balance</span>
+            </div>
+          </div>
+          <div class="agricoin-balance">
+            <span class="agricoin-amount" id="agricoinBalance">0</span>
+            <span class="agricoin-label">AC</span>
+          </div>
+          <div class="agricoin-info">
+            💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม<br>
+            Use AgriCoin for discounts on the platform
+          </div>
+        </div>
+      </div>
+      
+      <!-- Baling System Navigation -->
+      <div class="nav-section">
+        <h2 class="section-title">🚜 ระบบการอัดฟาง / Baling System</h2>
+        <div class="nav-grid">
+          <a href="#" class="nav-card primary" id="dashboardLink">
+            <div class="nav-card-icon" id="dashboardIcon">📊</div>
+            <div class="nav-card-content">
+              <div class="nav-card-title" id="dashboardTitle">Dashboard</div>
+              <div class="nav-card-description" id="dashboardDescription">
+                จัดการงานของคุณ
+              </div>
+            </div>
+            <div class="nav-card-arrow">→</div>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Other Features -->
+      <div class="nav-section">
+        <h2 class="section-title">🌟 ฟีเจอร์เพิ่มเติม / Additional Features</h2>
+        <div class="nav-grid">
+          <a href="marketplace.html" class="nav-card">
+            <div class="nav-card-icon">🛒</div>
+            <div class="nav-card-content">
+              <div class="nav-card-title">
+                Marketplace
+                <span class="coming-soon-badge">เร็วๆ นี้</span>
+              </div>
+              <div class="nav-card-description">
+                ตลาดกลางซื้อขายฟาง<br>
+                Straw marketplace
+              </div>
+            </div>
+            <div class="nav-card-arrow">→</div>
+          </a>
+          
+          <a href="statistics.html" class="nav-card">
+            <div class="nav-card-icon">📈</div>
+            <div class="nav-card-content">
+              <div class="nav-card-title">
+                Web Statistics
+                <span class="coming-soon-badge">เร็วๆ นี้</span>
+              </div>
+              <div class="nav-card-description">
+                สถิติและข้อมูลเชิงลึก<br>
+                Platform analytics
+              </div>
+            </div>
+            <div class="nav-card-arrow">→</div>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="quick-stats" id="quickStats" style="display: none;">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-value" id="totalOrders">0</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="completedOrders">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" id="pendingOrders">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="avgRating">0.0</div>
+          <div class="stat-label">Avg Rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+  
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+  
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check authentication
+    const currentUser = Auth.getCurrentUser();
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+    
+    // User type configuration
+    const userTypeConfig = {
+      customer: {
+        icon: '👨‍💼',
+        label: 'ลูกค้า / Customer',
+        dashboardTitle: 'Customer Dashboard',
+        dashboardDescription: 'สั่งซื้อและติดตามงาน',
+        dashboardIcon: '👨‍💼',
+        dashboardUrl: 'customer-dashboard.html'
+      },
+      farmer: {
+        icon: '👨‍🌾',
+        label: 'เกษตรกร / Farmer',
+        dashboardTitle: 'Farmer Dashboard',
+        dashboardDescription: 'รับงานและจัดการนา',
+        dashboardIcon: '👨‍🌾',
+        dashboardUrl: 'farmer-dashboard.html'
+      },
+      baler: {
+        icon: '🚜',
+        label: 'คนอัดฟาง / Baler',
+        dashboardTitle: 'Baler Dashboard',
+        dashboardDescription: 'รับงานอัดฟาง',
+        dashboardIcon: '🚜',
+        dashboardUrl: 'baler-dashboard.html'
+      }
+    };
+    
+    // Initialize page
+    async function initializePage() {
+      const config = userTypeConfig[currentUser.type];
+      
+      // Update user info
+      document.getElementById('userAvatar').textContent = config.icon;
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userTypeBadge').textContent = config.label;
+      document.getElementById('userPhone').textContent = currentUser.phone;
+      
+      // Update AgriCoin balance
+      document.getElementById('agricoinBalance').textContent = currentUser.agricoin_balance?.toFixed(0) || '0';
+      
+      // Show rating for farmers and balers
+      if (currentUser.type === 'farmer' || currentUser.type === 'baler') {
+        const ratingElement = document.getElementById('userRating');
+        ratingElement.style.display = 'flex';
+        document.getElementById('ratingValue').textContent = currentUser.avg_rating?.toFixed(1) || '0.0';
+        document.getElementById('ratingCount').textContent = currentUser.total_ratings || '0';
+      }
+      
+      // Update dashboard link
+      const dashboardLink = document.getElementById('dashboardLink');
+      dashboardLink.href = config.dashboardUrl;
+      document.getElementById('dashboardIcon').textContent = config.dashboardIcon;
+      document.getElementById('dashboardTitle').textContent = config.dashboardTitle;
+      document.getElementById('dashboardDescription').textContent = config.dashboardDescription;
+      
+      // Load quick stats
+      await loadQuickStats();
+    }
+    
+    // Load quick statistics
+    async function loadQuickStats() {
+      try {
+        Loading.show();
+        
+        const filter = {};
+        if (currentUser.type === 'customer') {
+          filter.customer_id = currentUser.id;
+        } else if (currentUser.type === 'farmer') {
+          filter.farmer_id = currentUser.id;
+        } else if (currentUser.type === 'baler') {
+          filter.baler_id = currentUser.id;
+        }
+        
+        const result = await API.getOrders(filter);
+        
+        if (result.success) {
+          const orders = result.orders;
+          const total = orders.length;
+          const completed = orders.filter(o => o.status === 'delivered').length;
+          const pending = orders.filter(o => o.status === 'pending').length;
+          
+          document.getElementById('totalOrders').textContent = total;
+          document.getElementById('completedOrders').textContent = completed;
+          document.getElementById('pendingOrders').textContent = pending;
+          document.getElementById('avgRating').textContent = currentUser.avg_rating?.toFixed(1) || '0.0';
+          
+          document.getElementById('quickStats').style.display = 'grid';
+        }
+        
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Error loading stats:', error);
+      }
+    }
+    
+    // Logout function
+    function logout() {
+      if (confirm('คุณต้องการออกจากระบบหรือไม่?\nAre you sure you want to logout?')) {
+        Auth.logout();
+        Toast.success('ออกจากระบบสำเร็จ / Logged out successfully');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      }
+    }
+    
+    // Initialize on page load
+    initializePage();
+  </script>
+</body>
+</html>
