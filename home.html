@@ -5,78 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AgriCall - หน้าหลัก</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
   <style>
     /* Home Page Styles */
     .home-container {
       min-height: 100vh;
       background: var(--light-cream);
-      padding-bottom: 2rem;
-    }
-    
-    /* Header */
-    .home-header {
-      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
-      color: var(--white);
-      padding: 1.5rem 1rem;
-      box-shadow: var(--shadow-md);
-    }
-    
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .header-logo-icon {
-      font-size: 2.5rem;
-    }
-    
-    .header-logo-text h1 {
-      font-family: 'Itim', 'Sriracha', cursive;
-      font-size: 1.5rem;
-      margin: 0;
-      line-height: 1.2;
-    }
-    
-    .header-logo-text p {
-      font-size: 0.75rem;
-      margin: 0;
-      opacity: 0.9;
-    }
-    
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-    
-    .header-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: var(--white);
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--radius-md);
-      font-size: 1.25rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    
-    .header-btn:active {
-      background: rgba(255, 255, 255, 0.3);
+      flex-direction: column;
     }
     
     /* Main Content */
     .home-content {
+      flex: 1;
       max-width: 1200px;
       margin: 0 auto;
       padding: 1rem;
+      width: 100%;
     }
     
     /* User Info Card */
@@ -84,7 +29,7 @@
       background: var(--white);
       border-radius: var(--radius-xl);
       padding: 1.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       box-shadow: var(--shadow-lg);
     }
     
@@ -218,7 +163,7 @@
     
     /* Navigation Cards */
     .nav-section {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .section-title {
@@ -360,20 +305,8 @@
     
     /* Mobile Optimizations */
     @media (max-width: 480px) {
-      .home-header {
-        padding: 1rem 0.75rem;
-      }
-      
-      .header-logo-icon {
-        font-size: 2rem;
-      }
-      
-      .header-logo-text h1 {
-        font-size: 1.25rem;
-      }
-      
-      .header-logo-text p {
-        font-size: 0.6875rem;
+      .home-content {
+        padding: 0.75rem;
       }
       
       .user-avatar {
@@ -413,21 +346,24 @@
 <body>
   <div class="home-container">
     <!-- Header -->
-    <header class="home-header">
-      <div class="header-content">
-        <div class="header-logo">
-          <div class="header-logo-icon">🌾</div>
-          <div class="header-logo-text">
-            <h1>AgriCall</h1>
-            <p>เชื่อมโยงเกษตรกรไทย</p>
+    <header class="dashboard-header">
+      <nav class="dashboard-nav">
+        <a href="#" class="dashboard-logo">
+          <span class="logo-icon">🌾</span>
+          <span>AgriCall</span>
+        </a>
+        
+        <div class="dashboard-user">
+          <div class="user-info">
+            <div class="user-name" id="headerUserName">Loading...</div>
+            <div class="user-type" id="headerUserType">Loading...</div>
           </div>
-        </div>
-        <div class="header-actions">
-          <button class="header-btn" onclick="logout()" title="ออกจากระบบ">
-            🚪
+          
+          <button class="logout-btn" onclick="logout()">
+            🚪 ออกจากระบบ
           </button>
         </div>
-      </div>
+      </nav>
     </header>
     
     <!-- Main Content -->
@@ -574,6 +510,7 @@
       customer: {
         icon: '👨‍💼',
         label: 'ลูกค้า / Customer',
+        labelShort: 'ลูกค้า',
         dashboardTitle: 'Customer Dashboard',
         dashboardDescription: 'สั่งซื้อและติดตามงาน',
         dashboardIcon: '👨‍💼',
@@ -582,6 +519,7 @@
       farmer: {
         icon: '👨‍🌾',
         label: 'เกษตรกร / Farmer',
+        labelShort: 'เกษตรกร',
         dashboardTitle: 'Farmer Dashboard',
         dashboardDescription: 'รับงานและจัดการนา',
         dashboardIcon: '👨‍🌾',
@@ -590,6 +528,7 @@
       baler: {
         icon: '🚜',
         label: 'คนอัดฟาง / Baler',
+        labelShort: 'คนอัดฟาง',
         dashboardTitle: 'Baler Dashboard',
         dashboardDescription: 'รับงานอัดฟาง',
         dashboardIcon: '🚜',
@@ -601,7 +540,11 @@
     async function initializePage() {
       const config = userTypeConfig[currentUser.type];
       
-      // Update user info
+      // Update header user info
+      document.getElementById('headerUserName').textContent = currentUser.name;
+      document.getElementById('headerUserType').textContent = config.labelShort;
+      
+      // Update user info card
       document.getElementById('userAvatar').textContent = config.icon;
       document.getElementById('userName').textContent = currentUser.name;
       document.getElementById('userTypeBadge').textContent = config.label;
