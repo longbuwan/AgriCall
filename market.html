@@ -6,9 +6,9 @@
   <title>🌿 Eco Market - AgriCall</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Market-specific styles */
+    /* Market Header */
     .market-header {
-      background: linear-gradient(135deg, #7FAD6B 0%, #5B8AC8 100%);
+      background: var(--primary-green);
       color: white;
       padding: var(--space-lg);
       border-radius: 0 0 var(--radius-xl) var(--radius-xl);
@@ -36,6 +36,7 @@
       display: flex;
       align-items: center;
       gap: var(--space-xs);
+      color: var(--white);
     }
 
     .market-subtitle {
@@ -44,6 +45,7 @@
       margin-top: 0.25rem;
     }
 
+    /* AgriCoin Balance Widget */
     .agricoin-balance-widget {
       background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(10px);
@@ -109,126 +111,7 @@
       transform: scale(0.95);
     }
 
-    /* Shop Cards */
-    .shop-grid {
-      display: grid;
-      gap: var(--space-md);
-      margin-bottom: var(--space-xl);
-    }
-
-    .shop-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .shop-card:active {
-      transform: scale(0.98);
-    }
-
-    .shop-banner {
-      position: relative;
-      height: 120px;
-      background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      overflow: hidden;
-    }
-
-    .shop-banner::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 150px;
-      height: 150px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-    }
-
-    .eco-badge {
-      position: absolute;
-      top: var(--space-sm);
-      right: var(--space-sm);
-      background: rgba(255, 255, 255, 0.95);
-      color: #2E7D32;
-      padding: 0.375rem 0.75rem;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .shop-content {
-      padding: var(--space-md);
-    }
-
-    .shop-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: var(--space-sm);
-    }
-
-    .shop-name {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin: 0;
-    }
-
-    .shop-rating {
-      background: var(--accent-green);
-      color: var(--white);
-      padding: 0.25rem 0.625rem;
-      border-radius: var(--radius-full);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .shop-description {
-      font-size: 0.875rem;
-      color: var(--text-medium);
-      margin-bottom: var(--space-sm);
-      line-height: 1.5;
-    }
-
-    .shop-features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.375rem;
-      margin-bottom: var(--space-sm);
-    }
-
-    .feature-tag {
-      background: rgba(127, 173, 107, 0.1);
-      color: var(--primary-green);
-      padding: 0.25rem 0.625rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .shop-products-preview {
-      font-size: 0.8125rem;
-      color: var(--text-light);
-      margin-top: var(--space-sm);
-      padding-top: var(--space-sm);
-      border-top: 1px solid var(--border-light);
-    }
-
-    /* Product Grid */
+    /* Products Grid */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -243,6 +126,7 @@
       box-shadow: var(--shadow-sm);
       transition: all 0.3s ease;
       position: relative;
+      cursor: pointer;
     }
 
     .product-card:active {
@@ -355,27 +239,6 @@
       transform: scale(0.95);
     }
 
-    .btn-favorite {
-      background: var(--white);
-      border: 2px solid var(--border-light);
-      color: var(--text-light);
-      padding: var(--space-sm);
-      border-radius: var(--radius-md);
-      font-size: 1.25rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-favorite.active {
-      color: var(--status-cancelled);
-      border-color: var(--status-cancelled);
-    }
-
     /* Cart FAB */
     .cart-fab {
       position: fixed;
@@ -480,6 +343,11 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .qty-btn:active {
+      transform: scale(0.95);
     }
 
     .qty-display {
@@ -499,6 +367,7 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: var(--space-sm);
+      font-size: 0.9375rem;
     }
 
     .summary-row:last-child {
@@ -621,19 +490,9 @@
       </button>
     </div>
 
-    <!-- Eco Shops Section -->
-    <div class="section-header">
-      <h2 class="section-title">🏪 ร้านค้าเกษตรเพื่อสิ่งแวดล้อม</h2>
-    </div>
-
-    <div class="shop-grid" id="shopGrid">
-      <!-- Shops will be loaded here -->
-    </div>
-
     <!-- Featured Products -->
     <div class="section-header">
       <h2 class="section-title">⭐ สินค้าแนะนำ</h2>
-      <a href="#" class="section-subtitle">ดูทั้งหมด →</a>
     </div>
 
     <div class="products-grid" id="productsGrid">
@@ -726,50 +585,7 @@
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
-    // Mock Data
-    const shops = [
-      {
-        id: 1,
-        name: 'Green Earth Farm Supply',
-        emoji: '🌍',
-        rating: 4.9,
-        description: 'เชี่ยวชาญด้านปุ๋ยอินทรีย์และเมล็ดพันธุ์พืชผักปลอดสารพิษ',
-        features: ['ปลอดสาร', 'ออร์แกนิค', 'จัดส่งฟรี'],
-        products: '120+ สินค้า',
-        eco: true
-      },
-      {
-        id: 2,
-        name: 'Bio Solutions Thailand',
-        emoji: '🧪',
-        rating: 4.8,
-        description: 'ผู้เชี่ยวชาญด้านชีววิธีและการควบคุมศัตรูพืชแบบธรรมชาติ',
-        features: ['ชีวภาพ', 'ลด PM2.5', 'มีใบรับรอง'],
-        products: '85+ สินค้า',
-        eco: true
-      },
-      {
-        id: 3,
-        name: 'Eco Tools & Equipment',
-        emoji: '🛠️',
-        rating: 4.7,
-        description: 'เครื่องมือการเกษตรประหยัดพลังงานและเป็นมิตรกับสิ่งแวดล้อม',
-        features: ['ประหยัดพลังงาน', 'ทนทาน', 'รับประกัน 2 ปี'],
-        products: '65+ สินค้า',
-        eco: true
-      },
-      {
-        id: 4,
-        name: 'Organic Mulch Center',
-        emoji: '🌾',
-        rating: 4.9,
-        description: 'ศูนย์รวมวัสดุคลุมดินและฟางอินทรีย์คุณภาพสูง',
-        features: ['อินทรีย์ 100%', 'ราคาโรงงาน', 'ส่งถึงไร่'],
-        products: '45+ สินค้า',
-        eco: true
-      }
-    ];
-
+    // Mock Products Data
     const products = [
       {
         id: 1,
@@ -878,49 +694,40 @@
       }
 
       await loadUserBalance();
-      renderShops();
       renderProducts();
       setupFilters();
       setupSearch();
       updateCartBadge();
     }
 
-    // Load user balance
+    // Load user balance from API
     async function loadUserBalance() {
       try {
-        const result = await API.getAgriCoinBalance(currentUser.id);
+        Loading.show();
+        const result = await API.callBackend('/agricoin/balance', {
+          user_id: currentUser.id
+        });
+        
+        Loading.hide();
+        
         if (result.success) {
           userBalance = result.balance;
-          document.getElementById('balanceAmount').textContent = userBalance.toFixed(0);
-          document.getElementById('modalBalanceAmount').textContent = userBalance.toFixed(0);
+          updateBalanceDisplay();
+        } else {
+          console.error('Failed to load balance:', result.error);
+          Toast.error('ไม่สามารถโหลดยอด AgriCoin ได้');
         }
       } catch (error) {
+        Loading.hide();
         console.error('Failed to load balance:', error);
+        Toast.error('เกิดข้อผิดพลาดในการโหลดยอด AgriCoin');
       }
     }
 
-    // Render shops
-    function renderShops() {
-      const grid = document.getElementById('shopGrid');
-      grid.innerHTML = shops.map(shop => `
-        <div class="shop-card" onclick="Toast.info('🏪 ${shop.name}')">
-          <div class="shop-banner">
-            ${shop.emoji}
-            ${shop.eco ? '<div class="eco-badge">🌿 Eco</div>' : ''}
-          </div>
-          <div class="shop-content">
-            <div class="shop-header">
-              <h3 class="shop-name">${shop.name}</h3>
-              <div class="shop-rating">⭐ ${shop.rating}</div>
-            </div>
-            <p class="shop-description">${shop.description}</p>
-            <div class="shop-features">
-              ${shop.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
-            </div>
-            <div class="shop-products-preview">📦 ${shop.products}</div>
-          </div>
-        </div>
-      `).join('');
+    // Update balance display
+    function updateBalanceDisplay() {
+      document.getElementById('balanceAmount').textContent = userBalance.toFixed(0);
+      document.getElementById('modalBalanceAmount').textContent = userBalance.toFixed(0);
     }
 
     // Render products
@@ -941,7 +748,7 @@
       }
 
       grid.innerHTML = filtered.map(product => `
-        <div class="product-card">
+        <div class="product-card" onclick="viewProduct(${product.id})">
           <div class="product-image">
             ${product.emoji}
             ${product.discount > 0 ? `<div class="discount-badge">-${product.discount}%</div>` : ''}
@@ -957,11 +764,8 @@
               </div>
             </div>
             <div class="product-actions">
-              <button class="btn-add-cart" onclick="addToCart(${product.id})">
+              <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${product.id})">
                 🛒 เพิ่ม
-              </button>
-              <button class="btn-favorite" onclick="toggleFavorite(${product.id}, this)">
-                ♡
               </button>
             </div>
           </div>
@@ -984,12 +788,46 @@
     // Setup search
     function setupSearch() {
       const searchInput = document.getElementById('searchInput');
+      let searchTimeout;
+      
       searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
         const query = e.target.value.toLowerCase();
-        if (query) {
-          Toast.info(`🔍 ค้นหา: ${query}`);
-        }
+        
+        searchTimeout = setTimeout(() => {
+          if (query) {
+            const searchResults = products.filter(p => 
+              p.name.toLowerCase().includes(query) || 
+              p.shop.toLowerCase().includes(query)
+            );
+            
+            const grid = document.getElementById('productsGrid');
+            if (searchResults.length === 0) {
+              grid.innerHTML = `
+                <div style="grid-column: 1 / -1;" class="empty-state">
+                  <div class="empty-icon">🔍</div>
+                  <p>ไม่พบสินค้าที่ค้นหา "${query}"</p>
+                </div>
+              `;
+            } else {
+              currentFilter = 'all';
+              document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+              document.querySelector('[data-category="all"]').classList.add('active');
+              renderProducts();
+            }
+          } else {
+            renderProducts();
+          }
+        }, 300);
       });
+    }
+
+    // View product details
+    function viewProduct(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      
+      Toast.info(`📦 ${product.name}`);
     }
 
     // Add to cart
@@ -1006,17 +844,6 @@
 
       updateCartBadge();
       Toast.success(`✓ เพิ่ม ${product.name} ลงตะกร้าแล้ว`);
-    }
-
-    // Toggle favorite
-    function toggleFavorite(productId, button) {
-      button.classList.toggle('active');
-      if (button.classList.contains('active')) {
-        button.innerHTML = '♥';
-        Toast.success('♥ เพิ่มในรายการโปรด');
-      } else {
-        button.innerHTML = '♡';
-      }
     }
 
     // Update cart badge
@@ -1048,12 +875,16 @@
 
       // Set max coins
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      document.getElementById('coinsToUse').max = Math.min(userBalance, subtotal);
+      const maxCoins = Math.min(userBalance, subtotal);
+      document.getElementById('coinsToUse').max = maxCoins;
+      document.getElementById('coinsToUse').placeholder = `สูงสุด ${maxCoins.toFixed(0)}`;
     }
 
     // Close checkout
     function closeCheckout() {
       document.getElementById('checkoutModal').classList.remove('active');
+      document.getElementById('coinsToUse').value = '';
+      coinsUsed = 0;
     }
 
     // Render cart items
@@ -1106,6 +937,18 @@
       if (cart.length === 0) {
         coinsUsed = 0;
         closeCheckout();
+      } else {
+        // Recalculate max coins after quantity change
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const maxCoins = Math.min(userBalance, subtotal);
+        document.getElementById('coinsToUse').max = maxCoins;
+        
+        // Reset coins used if it exceeds new maximum
+        if (coinsUsed > maxCoins) {
+          coinsUsed = 0;
+          document.getElementById('coinsToUse').value = '';
+          updateCheckoutSummary();
+        }
       }
     }
 
@@ -1114,6 +957,11 @@
       const input = document.getElementById('coinsToUse');
       const coins = parseInt(input.value) || 0;
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      if (coins <= 0) {
+        Toast.error('❌ กรุณาระบุจำนวน AgriCoin');
+        return;
+      }
 
       if (coins > userBalance) {
         Toast.error('❌ AgriCoin ไม่เพียงพอ');
@@ -1144,48 +992,48 @@
     async function completePurchase() {
       if (cart.length === 0) return;
 
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal - coinsUsed;
+
       Loading.show();
 
       try {
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const total = subtotal - coinsUsed;
-
         // Spend AgriCoins if used
         if (coinsUsed > 0) {
-          const spendResult = await API.spendAgriCoin(
-            currentUser.id,
-            coinsUsed,
-            'Market purchase discount'
-          );
+          const spendResult = await API.callBackend('/agricoin/spend', {
+            user_id: currentUser.id,
+            amount: coinsUsed,
+            description: 'Market purchase discount'
+          });
 
           if (!spendResult.success) {
             Loading.hide();
-            Toast.error('❌ ไม่สามารถใช้ AgriCoin ได้');
+            Toast.error('❌ ไม่สามารถใช้ AgriCoin ได้: ' + spendResult.error);
             return;
           }
 
-          userBalance -= coinsUsed;
+          // Update local balance
+          userBalance = spendResult.transaction.new_balance;
+          updateBalanceDisplay();
         }
 
-        // Simulate purchase
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Simulate purchase delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         Loading.hide();
         closeCheckout();
 
-        Toast.success(`🎉 สั่งซื้อสำเร็จ! ชำระ ${total} ฿`);
+        // Show success message
+        Toast.success(`🎉 สั่งซื้อสำเร็จ! ชำระ ${total} ฿${coinsUsed > 0 ? ` (ประหยัด ${coinsUsed} ฿)` : ''}`);
         
         // Reset cart
         cart = [];
         coinsUsed = 0;
         updateCartBadge();
-        
-        // Reload balance
-        await loadUserBalance();
 
       } catch (error) {
         Loading.hide();
-        Toast.error('❌ เกิดข้อผิดพลาด');
+        Toast.error('❌ เกิดข้อผิดพลาด: ' + error.message);
         console.error('Purchase error:', error);
       }
     }
