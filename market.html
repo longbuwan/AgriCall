@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🌿 Eco Market - AgriCall</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Market-specific styles */
+    .market-header {
+      background: linear-gradient(135deg, #7FAD6B 0%, #5B8AC8 100%);
+      color: white;
+      padding: var(--space-lg);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .market-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .market-title-group {
+      flex: 1;
+    }
+
+    .market-title {
+      font-family: 'Itim', cursive;
+      font-size: 1.75rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .market-subtitle {
+      font-size: 0.875rem;
+      opacity: 0.95;
+      margin-top: 0.25rem;
+    }
+
+    .agricoin-balance-widget {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .coin-icon {
+      font-size: 1.5rem;
+      animation: coinSpin 3s linear infinite;
+    }
+
+    @keyframes coinSpin {
+      0%, 100% { transform: rotateY(0deg); }
+      50% { transform: rotateY(180deg); }
+    }
+
+    .balance-amount {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    /* Filter Pills */
+    .filter-pills {
+      display: flex;
+      gap: var(--space-sm);
+      overflow-x: auto;
+      padding: var(--space-md) 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .filter-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      background: var(--white);
+      border: 2px solid var(--border-light);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .filter-pill.active {
+      background: var(--primary-green);
+      color: var(--white);
+      border-color: var(--primary-green);
+    }
+
+    .filter-pill:active {
+      transform: scale(0.95);
+    }
+
+    /* Shop Cards */
+    .shop-grid {
+      display: grid;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .shop-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .shop-card:active {
+      transform: scale(0.98);
+    }
+
+    .shop-banner {
+      position: relative;
+      height: 120px;
+      background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      overflow: hidden;
+    }
+
+    .shop-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .eco-badge {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      background: rgba(255, 255, 255, 0.95);
+      color: #2E7D32;
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shop-content {
+      padding: var(--space-md);
+    }
+
+    .shop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-sm);
+    }
+
+    .shop-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .shop-rating {
+      background: var(--accent-green);
+      color: var(--white);
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .shop-description {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      margin-bottom: var(--space-sm);
+      line-height: 1.5;
+    }
+
+    .shop-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .feature-tag {
+      background: rgba(127, 173, 107, 0.1);
+      color: var(--primary-green);
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .shop-products-preview {
+      font-size: 0.8125rem;
+      color: var(--text-light);
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* Product Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .product-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .product-card:active {
+      transform: scale(0.98);
+    }
+
+    .product-image {
+      position: relative;
+      height: 140px;
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      overflow: hidden;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      background: var(--status-cancelled);
+      color: var(--white);
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .pm25-badge {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      background: rgba(91, 138, 200, 0.95);
+      color: var(--white);
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .product-content {
+      padding: var(--space-md);
+    }
+
+    .product-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+      height: 2.6em;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-shop {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: var(--space-sm);
+    }
+
+    .product-price-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .product-price {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary-green);
+    }
+
+    .product-price-old {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .btn-add-cart {
+      flex: 1;
+      background: var(--primary-green);
+      color: var(--white);
+      border: none;
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .btn-add-cart:active {
+      transform: scale(0.95);
+    }
+
+    .btn-favorite {
+      background: var(--white);
+      border: 2px solid var(--border-light);
+      color: var(--text-light);
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-favorite.active {
+      color: var(--status-cancelled);
+      border-color: var(--status-cancelled);
+    }
+
+    /* Cart FAB */
+    .cart-fab {
+      position: fixed;
+      bottom: 90px;
+      right: var(--space-md);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--white);
+      font-size: 1.75rem;
+      box-shadow: 0 4px 16px rgba(127, 173, 107, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .cart-fab:active {
+      transform: scale(0.95);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--status-cancelled);
+      color: var(--white);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 2px solid var(--white);
+    }
+
+    /* Checkout Modal */
+    .checkout-modal .modal-content {
+      max-height: 90vh;
+    }
+
+    .cart-items {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: var(--space-md);
+    }
+
+    .cart-item {
+      display: flex;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--light-cream);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .cart-item-image {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .cart-item-details {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .cart-item-price {
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+
+    .cart-item-qty {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+    }
+
+    .qty-btn {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .qty-display {
+      font-weight: 600;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .cart-summary {
+      background: var(--light-cream);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .summary-row:last-child {
+      margin-bottom: 0;
+      padding-top: var(--space-sm);
+      border-top: 2px solid var(--primary-green);
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .agricoin-discount-row {
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+
+    .agricoin-input-group {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .agricoin-input {
+      flex: 1;
+    }
+
+    .btn-apply-coins {
+      padding: var(--space-md) var(--space-lg);
+      white-space: nowrap;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-xl);
+      color: var(--text-medium);
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+      opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product-image {
+        height: 180px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .cart-fab {
+        bottom: var(--space-lg);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Market Header -->
+  <div class="market-header">
+    <div class="market-header-top">
+      <button class="back-btn" onclick="window.location.href='home.html'">
+        ←
+      </button>
+      
+      <div class="market-title-group">
+        <h1 class="market-title">
+          🌿 Eco Market
+        </h1>
+        <p class="market-subtitle">สินค้าเกษตรเพื่อสิ่งแวดล้อม · ลด PM2.5</p>
+      </div>
+      
+      <div class="agricoin-balance-widget" id="balanceWidget">
+        <span class="coin-icon">🪙</span>
+        <span class="balance-amount" id="balanceAmount">0</span>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-bar" placeholder="ค้นหาสินค้าเกษตรที่เป็นมิตรกับสิ่งแวดล้อม..." id="searchInput">
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filter Pills -->
+    <div class="filter-pills">
+      <button class="filter-pill active" data-category="all">
+        🌾 ทั้งหมด
+      </button>
+      <button class="filter-pill" data-category="seeds">
+        🌱 เมล็ดพันธุ์
+      </button>
+      <button class="filter-pill" data-category="fertilizer">
+        🧪 ปุ๋ย & ดิน
+      </button>
+      <button class="filter-pill" data-category="tools">
+        🛠️ เครื่องมือ
+      </button>
+      <button class="filter-pill" data-category="bio">
+        🐛 ชีววิธี
+      </button>
+      <button class="filter-pill" data-category="mulch">
+        🌾 วัสดุคลุมดิน
+      </button>
+    </div>
+
+    <!-- Eco Shops Section -->
+    <div class="section-header">
+      <h2 class="section-title">🏪 ร้านค้าเกษตรเพื่อสิ่งแวดล้อม</h2>
+    </div>
+
+    <div class="shop-grid" id="shopGrid">
+      <!-- Shops will be loaded here -->
+    </div>
+
+    <!-- Featured Products -->
+    <div class="section-header">
+      <h2 class="section-title">⭐ สินค้าแนะนำ</h2>
+      <a href="#" class="section-subtitle">ดูทั้งหมด →</a>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+      <!-- Products will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Cart FAB -->
+  <button class="cart-fab" id="cartFab" onclick="openCheckout()">
+    🛒
+    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+  </button>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav">
+    <a href="home.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">🏠</span>
+      <span class="mobile-nav-label">หน้าหลัก</span>
+    </a>
+    <a href="orders.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">📦</span>
+      <span class="mobile-nav-label">ออเดอร์</span>
+    </a>
+    <a href="market.html" class="mobile-nav-item active">
+      <span class="mobile-nav-icon">🛒</span>
+      <span class="mobile-nav-label">ตลาด</span>
+    </a>
+    <a href="profile.html" class="mobile-nav-item">
+      <span class="mobile-nav-icon">👤</span>
+      <span class="mobile-nav-label">โปรไฟล์</span>
+    </a>
+  </nav>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛒 ตะกร้าสินค้าของคุณ</h2>
+        <button class="close-modal" onclick="closeCheckout()">×</button>
+      </div>
+
+      <div class="cart-items" id="cartItems">
+        <!-- Cart items will be loaded here -->
+      </div>
+
+      <!-- AgriCoin Input -->
+      <div class="form-group">
+        <label>💰 ใช้ AgriCoin (1 Coin = 1 บาท)</label>
+        <div class="agricoin-input-group">
+          <input type="number" id="coinsToUse" class="agricoin-input" placeholder="0" min="0" max="0">
+          <button class="btn btn-secondary btn-apply-coins" onclick="applyCoins()">
+            ใช้เหรียญ
+          </button>
+        </div>
+        <small style="color: var(--text-light); font-size: 0.8125rem;">
+          ยอดคงเหลือ: <strong id="modalBalanceAmount">0</strong> Coins
+        </small>
+      </div>
+
+      <!-- Summary -->
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>ยอดรวม:</span>
+          <span id="summarySubtotal">0 ฿</span>
+        </div>
+        <div class="summary-row agricoin-discount-row">
+          <span>🪙 ส่วนลด AgriCoin:</span>
+          <span id="summaryDiscount">-0 ฿</span>
+        </div>
+        <div class="summary-row">
+          <span>ยอดชำระ:</span>
+          <span id="summaryTotal">0 ฿</span>
+        </div>
+      </div>
+
+      <button class="btn btn-success" style="width: 100%;" onclick="completePurchase()">
+        ✓ ยืนยันการสั่งซื้อ
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <!-- Loading -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Mock Data
+    const shops = [
+      {
+        id: 1,
+        name: 'Green Earth Farm Supply',
+        emoji: '🌍',
+        rating: 4.9,
+        description: 'เชี่ยวชาญด้านปุ๋ยอินทรีย์และเมล็ดพันธุ์พืชผักปลอดสารพิษ',
+        features: ['ปลอดสาร', 'ออร์แกนิค', 'จัดส่งฟรี'],
+        products: '120+ สินค้า',
+        eco: true
+      },
+      {
+        id: 2,
+        name: 'Bio Solutions Thailand',
+        emoji: '🧪',
+        rating: 4.8,
+        description: 'ผู้เชี่ยวชาญด้านชีววิธีและการควบคุมศัตรูพืชแบบธรรมชาติ',
+        features: ['ชีวภาพ', 'ลด PM2.5', 'มีใบรับรอง'],
+        products: '85+ สินค้า',
+        eco: true
+      },
+      {
+        id: 3,
+        name: 'Eco Tools & Equipment',
+        emoji: '🛠️',
+        rating: 4.7,
+        description: 'เครื่องมือการเกษตรประหยัดพลังงานและเป็นมิตรกับสิ่งแวดล้อม',
+        features: ['ประหยัดพลังงาน', 'ทนทาน', 'รับประกัน 2 ปี'],
+        products: '65+ สินค้า',
+        eco: true
+      },
+      {
+        id: 4,
+        name: 'Organic Mulch Center',
+        emoji: '🌾',
+        rating: 4.9,
+        description: 'ศูนย์รวมวัสดุคลุมดินและฟางอินทรีย์คุณภาพสูง',
+        features: ['อินทรีย์ 100%', 'ราคาโรงงาน', 'ส่งถึงไร่'],
+        products: '45+ สินค้า',
+        eco: true
+      }
+    ];
+
+    const products = [
+      {
+        id: 1,
+        name: 'ปุ๋ยหมักอินทรีย์พรีเมียม 20 กก.',
+        shop: 'Green Earth Farm Supply',
+        emoji: '🌱',
+        price: 450,
+        oldPrice: 600,
+        discount: 25,
+        pm25Reduction: 90,
+        category: 'fertilizer'
+      },
+      {
+        id: 2,
+        name: 'เมล็ดพันธุ์ผักออร์แกนิค (ชุด 10 ชนิด)',
+        shop: 'Green Earth Farm Supply',
+        emoji: '🌿',
+        price: 299,
+        oldPrice: 399,
+        discount: 25,
+        pm25Reduction: 95,
+        category: 'seeds'
+      },
+      {
+        id: 3,
+        name: 'สารชีวภัณฑ์ไล่แมลงธรรมชาติ 5 ลิตร',
+        shop: 'Bio Solutions Thailand',
+        emoji: '🐛',
+        price: 850,
+        oldPrice: 1100,
+        discount: 23,
+        pm25Reduction: 100,
+        category: 'bio'
+      },
+      {
+        id: 4,
+        name: 'พลั่วขุดดินอัจฉริยะ ประหยัดแรง 30%',
+        shop: 'Eco Tools & Equipment',
+        emoji: '⛏️',
+        price: 680,
+        oldPrice: null,
+        discount: 0,
+        pm25Reduction: 85,
+        category: 'tools'
+      },
+      {
+        id: 5,
+        name: 'ฟางคลุมดินออร์แกนิค 50 กก.',
+        shop: 'Organic Mulch Center',
+        emoji: '🌾',
+        price: 320,
+        oldPrice: 420,
+        discount: 24,
+        pm25Reduction: 98,
+        category: 'mulch'
+      },
+      {
+        id: 6,
+        name: 'ชุดปลูกผักสวนครัวออร์แกนิค',
+        shop: 'Green Earth Farm Supply',
+        emoji: '🥬',
+        price: 1200,
+        oldPrice: 1500,
+        discount: 20,
+        pm25Reduction: 92,
+        category: 'seeds'
+      },
+      {
+        id: 7,
+        name: 'น้ำหมักชีวภาพสำเร็จรูป 10 ลิตร',
+        shop: 'Bio Solutions Thailand',
+        emoji: '🧴',
+        price: 550,
+        oldPrice: 750,
+        discount: 27,
+        pm25Reduction: 100,
+        category: 'bio'
+      },
+      {
+        id: 8,
+        name: 'วัสดุคลุมดินจากเปลือกข้าว 100 กก.',
+        shop: 'Organic Mulch Center',
+        emoji: '🌾',
+        price: 480,
+        oldPrice: null,
+        discount: 0,
+        pm25Reduction: 95,
+        category: 'mulch'
+      }
+    ];
+
+    // State
+    let currentUser = null;
+    let userBalance = 0;
+    let cart = [];
+    let coinsUsed = 0;
+    let currentFilter = 'all';
+
+    // Initialize
+    async function init() {
+      currentUser = Auth.getCurrentUser();
+      
+      if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      await loadUserBalance();
+      renderShops();
+      renderProducts();
+      setupFilters();
+      setupSearch();
+      updateCartBadge();
+    }
+
+    // Load user balance
+    async function loadUserBalance() {
+      try {
+        const result = await API.getAgriCoinBalance(currentUser.id);
+        if (result.success) {
+          userBalance = result.balance;
+          document.getElementById('balanceAmount').textContent = userBalance.toFixed(0);
+          document.getElementById('modalBalanceAmount').textContent = userBalance.toFixed(0);
+        }
+      } catch (error) {
+        console.error('Failed to load balance:', error);
+      }
+    }
+
+    // Render shops
+    function renderShops() {
+      const grid = document.getElementById('shopGrid');
+      grid.innerHTML = shops.map(shop => `
+        <div class="shop-card" onclick="Toast.info('🏪 ${shop.name}')">
+          <div class="shop-banner">
+            ${shop.emoji}
+            ${shop.eco ? '<div class="eco-badge">🌿 Eco</div>' : ''}
+          </div>
+          <div class="shop-content">
+            <div class="shop-header">
+              <h3 class="shop-name">${shop.name}</h3>
+              <div class="shop-rating">⭐ ${shop.rating}</div>
+            </div>
+            <p class="shop-description">${shop.description}</p>
+            <div class="shop-features">
+              ${shop.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+            </div>
+            <div class="shop-products-preview">📦 ${shop.products}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render products
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const filtered = currentFilter === 'all' 
+        ? products 
+        : products.filter(p => p.category === currentFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1;" class="empty-state">
+            <div class="empty-icon">📦</div>
+            <p>ไม่พบสินค้าในหมวดนี้</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(product => `
+        <div class="product-card">
+          <div class="product-image">
+            ${product.emoji}
+            ${product.discount > 0 ? `<div class="discount-badge">-${product.discount}%</div>` : ''}
+            <div class="pm25-badge">🌿 -${product.pm25Reduction}% PM2.5</div>
+          </div>
+          <div class="product-content">
+            <h3 class="product-name">${product.name}</h3>
+            <p class="product-shop">🏪 ${product.shop}</p>
+            <div class="product-price-group">
+              <div>
+                <div class="product-price">${product.price} ฿</div>
+                ${product.oldPrice ? `<div class="product-price-old">${product.oldPrice} ฿</div>` : ''}
+              </div>
+            </div>
+            <div class="product-actions">
+              <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                🛒 เพิ่ม
+              </button>
+              <button class="btn-favorite" onclick="toggleFavorite(${product.id}, this)">
+                ♡
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Setup filters
+    function setupFilters() {
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentFilter = pill.dataset.category;
+          renderProducts();
+        });
+      });
+    }
+
+    // Setup search
+    function setupSearch() {
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query) {
+          Toast.info(`🔍 ค้นหา: ${query}`);
+        }
+      });
+    }
+
+    // Add to cart
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      const existingItem = cart.find(item => item.id === productId);
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+
+      updateCartBadge();
+      Toast.success(`✓ เพิ่ม ${product.name} ลงตะกร้าแล้ว`);
+    }
+
+    // Toggle favorite
+    function toggleFavorite(productId, button) {
+      button.classList.toggle('active');
+      if (button.classList.contains('active')) {
+        button.innerHTML = '♥';
+        Toast.success('♥ เพิ่มในรายการโปรด');
+      } else {
+        button.innerHTML = '♡';
+      }
+    }
+
+    // Update cart badge
+    function updateCartBadge() {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cartBadge');
+      
+      if (totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Open checkout
+    function openCheckout() {
+      if (cart.length === 0) {
+        Toast.info('ตะกร้าสินค้าว่างเปล่า');
+        return;
+      }
+
+      coinsUsed = 0;
+      renderCartItems();
+      updateCheckoutSummary();
+      
+      const modal = document.getElementById('checkoutModal');
+      modal.classList.add('active');
+
+      // Set max coins
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      document.getElementById('coinsToUse').max = Math.min(userBalance, subtotal);
+    }
+
+    // Close checkout
+    function closeCheckout() {
+      document.getElementById('checkoutModal').classList.remove('active');
+    }
+
+    // Render cart items
+    function renderCartItems() {
+      const container = document.getElementById('cartItems');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <p>ตะกร้าสินค้าว่างเปล่า</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-image">${item.emoji}</div>
+          <div class="cart-item-details">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${item.price} ฿</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <span class="qty-display">${item.quantity}</span>
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Update quantity
+    function updateQuantity(productId, change) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+
+      item.quantity += change;
+
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+        Toast.info('🗑️ ลบสินค้าออกจากตะกร้า');
+      }
+
+      updateCartBadge();
+      renderCartItems();
+      updateCheckoutSummary();
+
+      // Reset coins if cart is empty
+      if (cart.length === 0) {
+        coinsUsed = 0;
+        closeCheckout();
+      }
+    }
+
+    // Apply coins
+    function applyCoins() {
+      const input = document.getElementById('coinsToUse');
+      const coins = parseInt(input.value) || 0;
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      if (coins > userBalance) {
+        Toast.error('❌ AgriCoin ไม่เพียงพอ');
+        return;
+      }
+
+      if (coins > subtotal) {
+        Toast.error('❌ จำนวนเหรียญมากกว่ายอดชำระ');
+        return;
+      }
+
+      coinsUsed = coins;
+      updateCheckoutSummary();
+      Toast.success(`✓ ใช้ ${coins} AgriCoins (-${coins} ฿)`);
+    }
+
+    // Update checkout summary
+    function updateCheckoutSummary() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal - coinsUsed;
+
+      document.getElementById('summarySubtotal').textContent = `${subtotal} ฿`;
+      document.getElementById('summaryDiscount').textContent = `-${coinsUsed} ฿`;
+      document.getElementById('summaryTotal').textContent = `${total} ฿`;
+    }
+
+    // Complete purchase
+    async function completePurchase() {
+      if (cart.length === 0) return;
+
+      Loading.show();
+
+      try {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const total = subtotal - coinsUsed;
+
+        // Spend AgriCoins if used
+        if (coinsUsed > 0) {
+          const spendResult = await API.spendAgriCoin(
+            currentUser.id,
+            coinsUsed,
+            'Market purchase discount'
+          );
+
+          if (!spendResult.success) {
+            Loading.hide();
+            Toast.error('❌ ไม่สามารถใช้ AgriCoin ได้');
+            return;
+          }
+
+          userBalance -= coinsUsed;
+        }
+
+        // Simulate purchase
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        Loading.hide();
+        closeCheckout();
+
+        Toast.success(`🎉 สั่งซื้อสำเร็จ! ชำระ ${total} ฿`);
+        
+        // Reset cart
+        cart = [];
+        coinsUsed = 0;
+        updateCartBadge();
+        
+        // Reload balance
+        await loadUserBalance();
+
+      } catch (error) {
+        Loading.hide();
+        Toast.error('❌ เกิดข้อผิดพลาด');
+        console.error('Purchase error:', error);
+      }
+    }
+
+    // Close modal on outside click
+    document.getElementById('checkoutModal').addEventListener('click', (e) => {
+      if (e.target.id === 'checkoutModal') {
+        closeCheckout();
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
