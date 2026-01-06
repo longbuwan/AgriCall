@@ -101,6 +101,12 @@ h3 {
 /* =============================================
    MOBILE NAVIGATION BAR (Bottom)
    ============================================= */
+.emoji {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
 .mobile-nav {
   position: fixed;
   bottom: 0;
