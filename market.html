@@ -684,17 +684,14 @@
     // Initialize
     async function init() {
       currentUser = Auth.getCurrentUser();
-    const currentUser = Auth.requireAuth(['customer']);
-    if (!currentUser) {
-      throw new Error('Not authenticated');
-    }
+
     
-    document.getElementById('userName').textContent = currentUser.name;
+   
       if (!currentUser) {
         window.location.href = 'index.html';
         return;
       }
-
+ document.getElementById('userName').textContent = currentUser.name;
       await loadUserBalance();
       renderProducts();
       setupFilters();
