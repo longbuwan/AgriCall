@@ -581,6 +581,7 @@
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
+    
     // Mock Products Data
     const products = [
       {
@@ -683,7 +684,12 @@
     // Initialize
     async function init() {
       currentUser = Auth.getCurrentUser();
-      
+    const currentUser = Auth.requireAuth(['customer']);
+    if (!currentUser) {
+      throw new Error('Not authenticated');
+    }
+    
+    document.getElementById('userName').textContent = currentUser.name;
       if (!currentUser) {
         window.location.href = 'index.html';
         return;
