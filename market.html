@@ -439,33 +439,28 @@
     }
   </style>
 </head>
-<body>
-  <!-- Market Header -->
-  <div class="market-header">
-    <div class="market-header-top">
-      <button class="back-btn" onclick="window.location.href='home.html'">
-        ←
-      </button>
-      
-      <div class="market-title-group">
-        <h1 class="market-title">
-          🌿 Eco Market
-        </h1>
-        <p class="market-subtitle">สินค้าเกษตรเพื่อสิ่งแวดล้อม · ลด PM2.5</p>
-      </div>
-      
-      <div class="agricoin-balance-widget" id="balanceWidget">
-        <span class="coin-icon">🪙</span>
-        <span class="balance-amount" id="balanceAmount">0</span>
-      </div>
-    </div>
+<body class="dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <nav class="dashboard-nav">
+     <a href="home.html" class="dashboard-logo">
+  <span class="logo-icon">🌾</span>
+  <span>AgriCall</span>
+</a>
 
-    <!-- Search Bar -->
-    <div class="search-bar-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-bar" placeholder="ค้นหาสินค้าเกษตรที่เป็นมิตรกับสิ่งแวดล้อม..." id="searchInput">
-    </div>
-  </div>
+      
+      <div class="dashboard-user">
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-type">ลูกค้า / Customer</div>
+        </div>
+        
+        <button class="logout-btn" onclick="Auth.logout()">
+          ออกจากระบบ
+        </button>
+      </div>
+    </nav>
+  </header>
 
   <div class="container">
     <!-- Filter Pills -->
