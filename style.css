@@ -107,6 +107,12 @@ h3 {
   vertical-align: middle;
 }
 
+.coin {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
 .mobile-nav {
   position: fixed;
   bottom: 0;
