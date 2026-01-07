@@ -568,6 +568,7 @@
 
     // Initialize page
     async function initializePage() {
+      await loadUserBalance();
       const config = userTypeConfig[currentUser.type];
       
       // Update header user info
