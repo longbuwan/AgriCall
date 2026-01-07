@@ -397,7 +397,7 @@
           </div>
           <div class="agricoin-balance">
             <span class="agricoin-amount" id="agricoinBalance">0</span>
-            <span class="agricoin-label">AC</span>
+            <span class="agricoin-label">AgriCoins</span>
           </div>
           <div class="agricoin-info">
             💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม<br>
@@ -581,7 +581,7 @@
       document.getElementById('userPhone').textContent = currentUser.phone;
       
       // Update AgriCoin balance
-      document.getElementById('agricoinBalance').textContent = currentUser.agricoin_balance?.toFixed(0) || '0';
+    
       
       // Show rating for farmers and balers
       if (currentUser.type === 'farmer' || currentUser.type === 'baler') {
