@@ -484,6 +484,9 @@
           <div class="stat-value" id="avgRating">0.0</div>
           <div class="stat-label">Avg Rating</div>
         </div>
+          <div class="stat-card">
+          <div class="stat-label">Avg Rating</div>
+        </div>
       </div>
     </div>
   </div>
@@ -535,7 +538,34 @@
         dashboardUrl: 'baler-dashboard.html'
       }
     };
-    
+     async function loadUserBalance() {
+      try {
+        Loading.show();
+        const result = await API.callBackend('/agricoin/balance', {
+          user_id: currentUser.id
+        });
+        
+        Loading.hide();
+        
+        if (result.success) {
+          userBalance = result.balance;
+          updateBalanceDisplay();
+        } else {
+          console.error('Failed to load balance:', result.error);
+          Toast.error('ไม่สามารถโหลดยอด AgriCoin ได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        console.error('Failed to load balance:', error);
+        Toast.error('เกิดข้อผิดพลาดในการโหลดยอด AgriCoin');
+      }
+    }
+
+        function updateBalanceDisplay() {
+
+      document.getElementById('agricoinBalance').textContent = userBalance.toFixed(0);
+    }
+
     // Initialize page
     async function initializePage() {
       const config = userTypeConfig[currentUser.type];
