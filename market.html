@@ -485,7 +485,7 @@
       </div>
       
       <div class="agricoin-balance-widget" id="balanceWidget">
-        <span class="coin-icon">🪙</span>
+        <span class="coin-icon"><img src="Untitled_design-removebg-preview.png" class="coin"></span>
         <span class="balance-amount" id="balanceAmount">0</span>
       </div>
     </div>
@@ -601,7 +601,7 @@
           <span id="summarySubtotal">0 ฿</span>
         </div>
         <div class="summary-row agricoin-discount-row">
-          <span>🪙 ส่วนลด AgriCoin:</span>
+          <span><img src="Untitled_design-removebg-preview.png" class="coin"> ส่วนลด AgriCoin:</span>
           <span id="summaryDiscount">-0 ฿</span>
         </div>
         <div class="summary-row">
@@ -770,7 +770,7 @@
     function updateBalanceDisplay() {
       document.getElementById('balanceAmountLarge').textContent = userBalance.toFixed(0);
       document.getElementById('modalBalanceAmount').textContent = userBalance.toFixed(0);
-      document.getElementById('balanceWidget').textContent = userBalance.toFixed(0);
+      document.getElementById('balanceAmount').textContent = userBalance.toFixed(0);
     }
 
     // Render products
