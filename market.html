@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🌿 Eco Market - AgriCall</title>
+  <title><img src="Adobe Express - file.png" class="emoji"> Eco Market - AgriCall</title>
   <link rel="stylesheet" href="style.css">
   <style>
     /* Market Header */
     .market-header {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: var(--primary-green);
       color: white;
-      padding: 1rem;
-      border-radius: 0 0 1rem 1rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      padding: var(--space-lg);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      box-shadow: var(--shadow-lg);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -22,7 +22,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: var(--space-md);
     }
 
     .market-title-group {
@@ -30,13 +30,13 @@
     }
 
     .market-title {
+      font-family: 'Itim', cursive;
       font-size: 1.75rem;
       margin: 0;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      color: white;
-      font-weight: 700;
+      gap: var(--space-xs);
+      color: var(--white);
     }
 
     .market-subtitle {
@@ -45,30 +45,15 @@
       margin-top: 0.25rem;
     }
 
-    .back-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 1rem;
-    }
-
     /* AgriCoin Balance Widget */
     .agricoin-balance-widget {
       background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(10px);
-      padding: 0.5rem 1rem;
-      border-radius: 1rem;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-xs);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -87,27 +72,13 @@
       font-weight: 700;
     }
 
-    /* Search Bar */
-    .search-bar-container {
-      margin-top: 1rem;
-    }
-
-    .search-bar {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 0.9375rem;
-      box-sizing: border-box;
-    }
-
     /* AgriCoin Balance Card */
     .agricoin-balance-card {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      box-shadow: var(--shadow-lg);
       position: relative;
       overflow: hidden;
     }
@@ -125,7 +96,7 @@
     .agricoin-card-content {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: var(--space-lg);
       position: relative;
       z-index: 1;
     }
@@ -142,7 +113,7 @@
 
     .agricoin-info {
       flex: 1;
-      color: white;
+      color: var(--white);
     }
 
     .agricoin-label {
@@ -164,17 +135,12 @@
       opacity: 0.85;
     }
 
-    .container {
-      padding: 1rem;
-      padding-bottom: 100px;
-    }
-
     /* Filter Pills */
     .filter-pills {
       display: flex;
-      gap: 0.5rem;
+      gap: var(--space-sm);
       overflow-x: auto;
-      padding: 1rem 0;
+      padding: var(--space-md) 0;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
@@ -184,10 +150,10 @@
     }
 
     .filter-pill {
-      background: white;
-      border: 2px solid #e5e7eb;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
+      background: var(--white);
+      border: 2px solid var(--border-light);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-full);
       white-space: nowrap;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -199,35 +165,28 @@
     }
 
     .filter-pill.active {
-      background: #10b981;
-      color: white;
-      border-color: #10b981;
+      background: var(--primary-green);
+      color: var(--white);
+      border-color: var(--primary-green);
     }
 
-    /* Section Header */
-    .section-header {
-      margin: 1.5rem 0 1rem;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin: 0;
+    .filter-pill:active {
+      transform: scale(0.95);
     }
 
     /* Products Grid */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
     }
 
     .product-card {
-      background: white;
-      border-radius: 1rem;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-sm);
       transition: all 0.3s ease;
       position: relative;
       cursor: pointer;
@@ -249,13 +208,13 @@
     }
 
     .product-content {
-      padding: 1rem;
+      padding: var(--space-md);
     }
 
     .product-name {
       font-size: 0.9375rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--text-dark);
       margin-bottom: 0.25rem;
       line-height: 1.3;
       height: 2.6em;
@@ -267,35 +226,35 @@
 
     .product-shop {
       font-size: 0.75rem;
-      color: #6b7280;
-      margin-bottom: 0.5rem;
+      color: var(--text-light);
+      margin-bottom: var(--space-sm);
     }
 
     .product-price-group {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--space-sm);
     }
 
     .product-price {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #10b981;
+      color: var(--primary-green);
     }
 
     .product-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: var(--space-xs);
     }
 
     .btn-add-cart {
       flex: 1;
-      background: #10b981;
-      color: white;
+      background: var(--primary-green);
+      color: var(--white);
       border: none;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
       font-weight: 600;
       font-size: 0.8125rem;
       cursor: pointer;
@@ -314,15 +273,15 @@
     .cart-fab {
       position: fixed;
       bottom: 90px;
-      right: 1rem;
+      right: var(--space-md);
       width: 60px;
       height: 60px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
       border: none;
-      border-radius: 50%;
-      color: white;
+      border-radius: var(--radius-full);
+      color: var(--white);
       font-size: 1.75rem;
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 4px 16px rgba(127, 173, 107, 0.4);
       cursor: pointer;
       transition: all 0.3s ease;
       z-index: 999;
@@ -336,8 +295,8 @@
       position: absolute;
       top: -4px;
       right: -4px;
-      background: #ef4444;
-      color: white;
+      background: var(--status-cancelled);
+      color: var(--white);
       width: 24px;
       height: 24px;
       border-radius: 50%;
@@ -346,80 +305,34 @@
       justify-content: center;
       font-size: 0.75rem;
       font-weight: 700;
-      border: 2px solid white;
+      border: 2px solid var(--white);
     }
 
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      max-width: 500px;
-      width: 100%;
+    /* Checkout Modal */
+    .checkout-modal .modal-content {
       max-height: 90vh;
-      overflow-y: auto;
     }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-header h2 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      cursor: pointer;
-      color: #6b7280;
-      line-height: 1;
-    }
-
-    /* Cart Items */
     .cart-items {
       max-height: 300px;
       overflow-y: auto;
-      margin-bottom: 1rem;
+      margin-bottom: var(--space-md);
     }
 
     .cart-item {
       display: flex;
-      gap: 1rem;
-      padding: 1rem;
-      background: #f9fafb;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--light-cream);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
     }
 
     .cart-item-image {
       width: 60px;
       height: 60px;
       background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-      border-radius: 0.5rem;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -438,23 +351,23 @@
     }
 
     .cart-item-price {
-      color: #10b981;
+      color: var(--primary-green);
       font-weight: 600;
     }
 
     .cart-item-qty {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
     }
 
     .qty-btn {
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: var(--white);
+      border: 1px solid var(--border-light);
       width: 28px;
       height: 28px;
-      border-radius: 0.25rem;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -473,184 +386,59 @@
       text-align: center;
     }
 
-    /* Form Group */
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .agricoin-input-group {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .agricoin-input {
-      flex: 1;
-      padding: 0.75rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-    }
-
-    /* Cart Summary */
     .cart-summary {
-      background: #f9fafb;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
+      background: var(--light-cream);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
     }
 
     .summary-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--space-sm);
       font-size: 0.9375rem;
     }
 
     .summary-row:last-child {
       margin-bottom: 0;
-      padding-top: 0.5rem;
-      border-top: 2px solid #10b981;
+      padding-top: var(--space-sm);
+      border-top: 2px solid var(--primary-green);
       font-weight: 700;
       font-size: 1.125rem;
     }
 
     .agricoin-discount-row {
-      color: #10b981;
+      color: var(--primary-green);
       font-weight: 600;
     }
 
-    /* Buttons */
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .agricoin-input-group {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
     }
 
-    .btn-secondary {
-      background: #6b7280;
-      color: white;
-    }
-
-    .btn-success {
-      background: #10b981;
-      color: white;
+    .agricoin-input {
+      flex: 1;
     }
 
     .btn-apply-coins {
-      padding: 0.75rem 1.5rem;
+      padding: var(--space-md) var(--space-lg);
       white-space: nowrap;
     }
 
     /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 2rem;
-      color: #6b7280;
+      padding: var(--space-xl);
+      color: var(--text-medium);
     }
 
     .empty-icon {
       font-size: 4rem;
-      margin-bottom: 1rem;
+      margin-bottom: var(--space-md);
       opacity: 0.5;
-    }
-
-    /* Mobile Navigation */
-    .mobile-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-      z-index: 100;
-    }
-
-    .mobile-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #6b7280;
-      padding: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .mobile-nav-item.active {
-      color: #10b981;
-    }
-
-    .mobile-nav-icon {
-      font-size: 1.5rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .mobile-nav-label {
-      font-size: 0.75rem;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: 0.5rem;
-      z-index: 10000;
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-
-    /* Loading */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     /* Responsive */
@@ -670,7 +458,7 @@
       }
 
       .cart-fab {
-        bottom: 1.5rem;
+        bottom: var(--space-lg);
       }
     }
 
@@ -685,26 +473,29 @@
   <!-- Market Header -->
   <div class="market-header">
     <div class="market-header-top">
-      <button class="back-btn" onclick="goBack()">
+      <button class="back-btn" onclick="window.location.href='home.html'">
         ←
       </button>
       
       <div class="market-title-group">
         <h1 class="market-title">
-          🌿 Eco Market
+          <img src="Adobe Express - file.png" class="emoji"> Eco Market
         </h1>
         <p class="market-subtitle">สินค้าเกษตรเพื่อสิ่งแวดล้อม · ลด PM2.5</p>
       </div>
       
       <div class="agricoin-balance-widget" id="balanceWidget">
-        <span class="coin-icon">🪙</span>
+        <span class="coin-icon"><img src="Untitled_design-removebg-preview.png" class="coin"></span>
         <span class="balance-amount" id="balanceAmount">0</span>
       </div>
     </div>
 
     <!-- Search Bar -->
     <div class="search-bar-container">
+    
+   
       <input type="text" class="search-bar" placeholder="ค้นหาสินค้าเกษตรที่เป็นมิตรกับสิ่งแวดล้อม..." id="searchInput">
+             
     </div>
   </div>
 
@@ -712,7 +503,7 @@
     <!-- AgriCoin Balance Card -->
     <div class="agricoin-balance-card">
       <div class="agricoin-card-content">
-        <div class="agricoin-icon-large">🪙</div>
+        <div class="agricoin-icon-large"><img src="Untitled_design-removebg-preview.png" class="coin"></div>
         <div class="agricoin-info">
           <div class="agricoin-label">ยอด AgriCoin คงเหลือ</div>
           <div class="agricoin-balance-large" id="balanceAmountLarge">0</div>
@@ -761,19 +552,19 @@
 
   <!-- Mobile Navigation -->
   <nav class="mobile-nav">
-    <a href="#home" class="mobile-nav-item" onclick="showToast('กลับหน้าหลัก')">
+    <a href="home.html" class="mobile-nav-item">
       <span class="mobile-nav-icon">🏠</span>
       <span class="mobile-nav-label">หน้าหลัก</span>
     </a>
-    <a href="#orders" class="mobile-nav-item" onclick="showToast('หน้าออเดอร์')">
+    <a href="orders.html" class="mobile-nav-item">
       <span class="mobile-nav-icon">📦</span>
       <span class="mobile-nav-label">ออเดอร์</span>
     </a>
-    <a href="#market" class="mobile-nav-item active">
+    <a href="market.html" class="mobile-nav-item active">
       <span class="mobile-nav-icon">🛒</span>
       <span class="mobile-nav-label">ตลาด</span>
     </a>
-    <a href="#profile" class="mobile-nav-item" onclick="showToast('หน้าโปรไฟล์')">
+    <a href="profile.html" class="mobile-nav-item">
       <span class="mobile-nav-icon">👤</span>
       <span class="mobile-nav-label">โปรไฟล์</span>
     </a>
@@ -795,13 +586,13 @@
       <div class="form-group">
         <label>💰 ใช้ AgriCoin (1 Coin = 1 บาท)</label>
         <div class="agricoin-input-group">
-          <input type="number" id="coinsToUse" class="agricoin-input" placeholder="0" min="0">
+          <input type="number" id="coinsToUse" class="agricoin-input" placeholder="0" min="0" max="0">
           <button class="btn btn-secondary btn-apply-coins" onclick="applyCoins()">
             ใช้เหรียญ
           </button>
         </div>
-        <small style="color: #6b7280; font-size: 0.8125rem;">
-          ยอดคงเหลือ: <strong id="modalBalanceAmount">0</strong> Coins | สูงสุด: <strong id="maxCoinsDisplay">0</strong> Coins
+        <small style="color: var(--text-light); font-size: 0.8125rem;">
+          ยอดคงเหลือ: <strong id="modalBalanceAmount">0</strong> Coins
         </small>
       </div>
 
@@ -812,7 +603,7 @@
           <span id="summarySubtotal">0 ฿</span>
         </div>
         <div class="summary-row agricoin-discount-row">
-          <span>🪙 ส่วนลด AgriCoin:</span>
+          <span><img src="Untitled_design-removebg-preview.png" class="coin"> ส่วนลด AgriCoin:</span>
           <span id="summaryDiscount">-0 ฿</span>
         </div>
         <div class="summary-row">
@@ -835,15 +626,20 @@
     <div class="spinner"></div>
   </div>
 
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
   <script>
     // Mock Products Data
     const products = [
       {
         id: 1,
         name: 'ปุ๋ยหมักอินทรีย์พรีเมียม 20 กก.',
-        shop: 'Green Earth Farm Supply',
+        shop: 'Green Earth Farm Suppl',
         emoji: '🌱',
         price: 450,
+        oldPrice: 600,
+        discount: 25,
+        pm25Reduction: 90,
         category: 'fertilizer'
       },
       {
@@ -852,6 +648,9 @@
         shop: 'Green Earth Farm Supply',
         emoji: '🌿',
         price: 299,
+        oldPrice: 399,
+        discount: 25,
+        pm25Reduction: 95,
         category: 'seeds'
       },
       {
@@ -860,6 +659,9 @@
         shop: 'Bio Solutions Thailand',
         emoji: '🐛',
         price: 850,
+        oldPrice: 1100,
+        discount: 23,
+        pm25Reduction: 100,
         category: 'bio'
       },
       {
@@ -868,6 +670,9 @@
         shop: 'Eco Tools & Equipment',
         emoji: '⛏️',
         price: 680,
+        oldPrice: null,
+        discount: 0,
+        pm25Reduction: 85,
         category: 'tools'
       },
       {
@@ -876,6 +681,9 @@
         shop: 'Organic Mulch Center',
         emoji: '🌾',
         price: 320,
+        oldPrice: 420,
+        discount: 24,
+        pm25Reduction: 98,
         category: 'mulch'
       },
       {
@@ -884,6 +692,9 @@
         shop: 'Green Earth Farm Supply',
         emoji: '🥬',
         price: 1200,
+        oldPrice: 1500,
+        discount: 20,
+        pm25Reduction: 92,
         category: 'seeds'
       },
       {
@@ -892,31 +703,69 @@
         shop: 'Bio Solutions Thailand',
         emoji: '🧴',
         price: 550,
+        oldPrice: 750,
+        discount: 27,
+        pm25Reduction: 100,
         category: 'bio'
       },
       {
         id: 8,
         name: 'วัสดุคลุมดินจากเปลือกข้าว 100 กก.',
-        shop: 'Organic Mulch Center',
+        shop: 'Market of the farmers, by the farmers, for the farmers.',
         emoji: '🌾',
         price: 480,
+        oldPrice: null,
+        discount: 0,
+        pm25Reduction: 95,
         category: 'mulch'
       }
     ];
 
     // State
-    let userBalance = 1500; // Mock balance
+    let currentUser = null;
+    let userBalance = 0;
     let cart = [];
     let coinsUsed = 0;
     let currentFilter = 'all';
 
     // Initialize
-    function init() {
-      updateBalanceDisplay();
+    async function init() {
+      currentUser = Auth.getCurrentUser();
+      
+      if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      await loadUserBalance();
       renderProducts();
       setupFilters();
       setupSearch();
       updateCartBadge();
+    }
+
+    // Load user balance from API
+    async function loadUserBalance() {
+      try {
+        Loading.show();
+        const result = await API.callBackend('/agricoin/balance', {
+          user_id: currentUser.id
+        });
+        
+        Loading.hide();
+        
+        if (result.success) {
+          userBalance = result.balance;
+          updateBalanceDisplay();
+        } else {
+          console.error('Failed to load balance:', result.error);
+          Toast.error('ไม่สามารถโหลดยอด AgriCoin ได้');
+        }
+      } catch (error) {
+        Loading.hide();
+        console.error('Failed to load balance:', error);
+        Toast.error('เกิดข้อผิดพลาดในการโหลดยอด AgriCoin');
+      }
     }
 
     // Update balance display
@@ -947,4 +796,297 @@
         <div class="product-card" onclick="viewProduct(${product.id})">
           <div class="product-image">
             ${product.emoji}
-          </div
+          </div>
+          <div class="product-content">
+            <h3 class="product-name">${product.name}</h3>
+            <p class="product-shop">🏪 ${product.shop}</p>
+            <div class="product-price-group">
+              <div class="product-price">${product.price} ฿</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${product.id})">
+                🛒 เพิ่มลงตะกร้า
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Setup filters
+    function setupFilters() {
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentFilter = pill.dataset.category;
+          renderProducts();
+        });
+      });
+    }
+
+    // Setup search
+    function setupSearch() {
+      const searchInput = document.getElementById('searchInput');
+      let searchTimeout;
+      
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.toLowerCase();
+        
+        searchTimeout = setTimeout(() => {
+          if (query) {
+            const searchResults = products.filter(p => 
+              p.name.toLowerCase().includes(query) || 
+              p.shop.toLowerCase().includes(query)
+            );
+            
+            const grid = document.getElementById('productsGrid');
+            if (searchResults.length === 0) {
+              grid.innerHTML = `
+                <div style="grid-column: 1 / -1;" class="empty-state">
+                  <div class="empty-icon">🔍</div>
+                  <p>ไม่พบสินค้าที่ค้นหา "${query}"</p>
+                </div>
+              `;
+            } else {
+              currentFilter = 'all';
+              document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+              document.querySelector('[data-category="all"]').classList.add('active');
+              renderProducts();
+            }
+          } else {
+            renderProducts();
+          }
+        }, 300);
+      });
+    }
+
+    // View product details
+    function viewProduct(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      
+      Toast.info(`📦 ${product.name}`);
+    }
+
+    // Add to cart
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      const existingItem = cart.find(item => item.id === productId);
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+
+      updateCartBadge();
+      Toast.success(`✓ เพิ่ม ${product.name} ลงตะกร้าแล้ว`);
+    }
+
+    // Update cart badge
+    function updateCartBadge() {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cartBadge');
+      
+      if (totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Open checkout
+    function openCheckout() {
+      if (cart.length === 0) {
+        Toast.info('ตะกร้าสินค้าว่างเปล่า');
+        return;
+      }
+
+      coinsUsed = 0;
+      renderCartItems();
+      updateCheckoutSummary();
+      
+      const modal = document.getElementById('checkoutModal');
+      modal.classList.add('active');
+
+      // Set max coins
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const maxCoins = Math.min(userBalance, subtotal);
+      document.getElementById('coinsToUse').max = maxCoins;
+      document.getElementById('coinsToUse').placeholder = `สูงสุด ${maxCoins.toFixed(0)}`;
+    }
+
+    // Close checkout
+    function closeCheckout() {
+      document.getElementById('checkoutModal').classList.remove('active');
+      document.getElementById('coinsToUse').value = '';
+      coinsUsed = 0;
+    }
+
+    // Render cart items
+    function renderCartItems() {
+      const container = document.getElementById('cartItems');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <p>ตะกร้าสินค้าว่างเปล่า</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-image">${item.emoji}</div>
+          <div class="cart-item-details">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${item.price} ฿</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <span class="qty-display">${item.quantity}</span>
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Update quantity
+    function updateQuantity(productId, change) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+
+      item.quantity += change;
+
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+        Toast.info('🗑️ ลบสินค้าออกจากตะกร้า');
+      }
+
+      updateCartBadge();
+      renderCartItems();
+      updateCheckoutSummary();
+
+      // Reset coins if cart is empty
+      if (cart.length === 0) {
+        coinsUsed = 0;
+        closeCheckout();
+      } else {
+        // Recalculate max coins after quantity change
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const maxCoins = Math.min(userBalance, subtotal);
+        document.getElementById('coinsToUse').max = maxCoins;
+        
+        // Reset coins used if it exceeds new maximum
+        if (coinsUsed > maxCoins) {
+          coinsUsed = 0;
+          document.getElementById('coinsToUse').value = '';
+          updateCheckoutSummary();
+        }
+      }
+    }
+
+    // Apply coins
+    function applyCoins() {
+      const input = document.getElementById('coinsToUse');
+      const coins = parseInt(input.value) || 0;
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      if (coins <= 0) {
+        Toast.error('❌ กรุณาระบุจำนวน AgriCoin');
+        return;
+      }
+
+      if (coins > userBalance) {
+        Toast.error('❌ AgriCoin ไม่เพียงพอ');
+        return;
+      }
+
+      if (coins > subtotal) {
+        Toast.error('❌ จำนวนเหรียญมากกว่ายอดชำระ');
+        return;
+      }
+
+      coinsUsed = coins;
+      updateCheckoutSummary();
+      Toast.success(`✓ ใช้ ${coins} AgriCoins (-${coins} ฿)`);
+    }
+
+    // Update checkout summary
+    function updateCheckoutSummary() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal - coinsUsed;
+
+      document.getElementById('summarySubtotal').textContent = `${subtotal} ฿`;
+      document.getElementById('summaryDiscount').textContent = `-${coinsUsed} ฿`;
+      document.getElementById('summaryTotal').textContent = `${total} ฿`;
+    }
+
+    // Complete purchase
+    async function completePurchase() {
+      if (cart.length === 0) return;
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal - coinsUsed;
+
+      Loading.show();
+
+      try {
+        // Spend AgriCoins if used
+        if (coinsUsed > 0) {
+          const spendResult = await API.callBackend('/agricoin/spend', {
+            user_id: currentUser.id,
+            amount: coinsUsed,
+            description: 'Market purchase discount'
+          });
+
+          if (!spendResult.success) {
+            Loading.hide();
+            Toast.error('❌ ไม่สามารถใช้ AgriCoin ได้: ' + spendResult.error);
+            return;
+          }
+
+          // Update local balance
+          userBalance = spendResult.transaction.new_balance;
+          updateBalanceDisplay();
+        }
+
+        // Simulate purchase delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        Loading.hide();
+        closeCheckout();
+
+        // Show success message
+        Toast.success(`🎉 สั่งซื้อสำเร็จ! ชำระ ${total} ฿${coinsUsed > 0 ? ` (ประหยัด ${coinsUsed} ฿)` : ''}`);
+        
+        // Reset cart
+        cart = [];
+        coinsUsed = 0;
+        updateCartBadge();
+
+      } catch (error) {
+        Loading.hide();
+        Toast.error('❌ เกิดข้อผิดพลาด: ' + error.message);
+        console.error('Purchase error:', error);
+      }
+    }
+
+    // Close modal on outside click
+    document.getElementById('checkoutModal').addEventListener('click', (e) => {
+      if (e.target.id === 'checkoutModal') {
+        closeCheckout();
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
