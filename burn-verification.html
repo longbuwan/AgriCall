@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ตรวจสอบการเผา - AgriCall Burn Verification</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .verification-container {
+      min-height: 100vh;
+      background: var(--light-cream);
+      padding-bottom: 80px;
+    }
+
+    .verification-header {
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      color: var(--white);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-subtitle {
+      font-size: 0.9375rem;
+      opacity: 0.95;
+      line-height: 1.5;
+    }
+
+    .content-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    /* Mode Selection */
+    .mode-selector {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .mode-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .mode-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .mode-btn {
+      padding: 1.25rem;
+      border: 2px solid var(--border-light);
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .mode-btn:hover {
+      border-color: var(--primary-green);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mode-btn.active {
+      border-color: var(--primary-green);
+      background: linear-gradient(135deg, rgba(127, 173, 107, 0.1) 0%, rgba(107, 155, 90, 0.1) 100%);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mode-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .mode-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .mode-description {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      line-height: 1.4;
+    }
+
+    /* Map Section */
+    .map-section {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .map-controls {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .map-controls .btn {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    #verificationMap {
+      height: 500px;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--border-light);
+      margin-bottom: 1rem;
+    }
+
+    .map-info {
+      background: rgba(127, 173, 107, 0.1);
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--primary-green);
+    }
+
+    .map-info-title {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .map-info-text {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+
+    /* Field Info */
+    .field-info {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .field-info.show {
+      display: block;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: var(--text-medium);
+    }
+
+    .info-value {
+      font-weight: 600;
+      color: var(--text-dark);
+      text-align: right;
+    }
+
+    /* Results Section */
+    .results-section {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .results-section.show {
+      display: block;
+    }
+
+    .result-card {
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-card.success {
+      background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+      color: var(--white);
+    }
+
+    .result-card.warning {
+      background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%);
+      color: var(--white);
+    }
+
+    .result-icon {
+      font-size: 4rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .result-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-subtitle {
+      text-align: center;
+      font-size: 1rem;
+      opacity: 0.95;
+      margin-bottom: 1rem;
+    }
+
+    .result-stats {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      font-size: 0.9375rem;
+    }
+
+    .confidence-section {
+      background: var(--white);
+      color: var(--text-dark);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .confidence-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .confidence-bar {
+      height: 8px;
+      background: var(--border-light);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      transition: width 0.5s ease;
+    }
+
+    .confidence-text {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+
+    .reward-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .reward-amount {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .action-buttons .btn {
+      flex: 1;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+      .mode-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      #verificationMap {
+        height: 400px;
+      }
+
+      .map-controls {
+        flex-direction: column;
+      }
+
+      .map-controls .btn {
+        width: 100%;
+      }
+
+      .reward-amount {
+        font-size: 2rem;
+      }
+    }
+
+    /* Loading Animation */
+    .analyzing-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .analyzing-overlay.show {
+      display: flex;
+    }
+
+    .analyzing-content {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .analyzing-spinner {
+      width: 80px;
+      height: 80px;
+      border: 6px solid var(--border-light);
+      border-top-color: var(--primary-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    .analyzing-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .analyzing-subtext {
+      font-size: 0.9375rem;
+      color: var(--text-medium);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="verification-container">
+    <!-- Header -->
+    <div class="verification-header">
+      <div class="header-content">
+        <div class="header-title">
+          <span>🔥</span>
+          <span>ตรวจสอบการเผาไร่นา</span>
+        </div>
+        <div class="header-subtitle">
+          ตรวจสอบว่าไร่ของคุณไม่มีการเผาในช่วง 3 เดือนที่ผ่านมา<br>
+          รับ 100 AgriCoins เมื่อผ่านการตรวจสอบ!<br>
+          Verify your farm has no burning in the last 3 months and earn 100 AgriCoins!
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Mode Selection -->
+      <div class="mode-selector">
+        <div class="mode-title">เลือกวิธีการระบุแปลง / Select Field Method</div>
+        <div class="mode-buttons">
+          <div class="mode-btn active" data-mode="auto" onclick="selectMode('auto')">
+            <div class="mode-icon">🤖</div>
+            <div class="mode-name">ตรวจจับอัตโนมัติ</div>
+            <div class="mode-description">
+              Auto-Detect<br>
+              ระบบจะค้นหาแปลงเกษตรโดยอัตโนมัติ
+            </div>
+          </div>
+          <div class="mode-btn" data-mode="manual" onclick="selectMode('manual')">
+            <div class="mode-icon">✏️</div>
+            <div class="mode-name">วาดเอง</div>
+            <div class="mode-description">
+              Manual Draw<br>
+              วาดขอบเขตแปลงด้วยตนเอง
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Section -->
+      <div class="map-section">
+        <div class="map-controls">
+          <button class="btn btn-primary" onclick="useCurrentLocation()">
+            📍 ใช้ตำแหน่งปัจจุบัน
+          </button>
+          <button class="btn btn-secondary" id="drawPolygonBtn" onclick="enableDrawing()" style="display: none;">
+            ✏️ เริ่มวาดขอบเขต
+          </button>
+          <button class="btn btn-secondary" id="clearPolygonBtn" onclick="clearPolygon()">
+            🗑️ ลบขอบเขต
+          </button>
+        </div>
+
+        <div id="verificationMap"></div>
+
+        <div class="map-info" id="mapInstructions">
+          <div class="map-info-title">
+            <span>💡</span>
+            <span>วิธีใช้งาน</span>
+          </div>
+          <div class="map-info-text" id="instructionText">
+            <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
+            1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่<br>
+            2. ระบบจะค้นหาขอบเขตแปลงเกษตรโดยอัตโนมัติ<br>
+            3. ตรวจสอบขอบเขตและกดปุ่ม "ตรวจสอบการเผา"
+          </div>
+        </div>
+      </div>
+
+      <!-- Field Info -->
+      <div class="field-info" id="fieldInfo">
+        <h3 style="margin-bottom: 1rem;">ข้อมูลแปลง / Field Information</h3>
+        <div class="info-row">
+          <div class="info-label">📏 ขนาดพื้นที่</div>
+          <div class="info-value" id="fieldArea">- ไร่</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">📅 ช่วงเวลาตรวจสอบ</div>
+          <div class="info-value">3 เดือนที่ผ่านมา (90 วัน)</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">🛰️ ข้อมูลดาวเทียม</div>
+          <div class="info-value">NASA MODIS (500m)</div>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="analyzeBurnScar()">
+          🔍 เริ่มตรวจสอบการเผา
+        </button>
+      </div>
+
+      <!-- Results Section -->
+      <div class="results-section" id="resultsSection">
+        <div class="result-card" id="resultCard">
+          <div class="result-icon" id="resultIcon">✅</div>
+          <div class="result-title" id="resultTitle">ผ่านการตรวจสอบ!</div>
+          <div class="result-subtitle" id="resultSubtitle">
+            ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา
+          </div>
+
+          <div class="result-stats">
+            <div class="stat-row">
+              <span>ขนาดพื้นที่:</span>
+              <span id="resultArea">-</span>
+            </div>
+            <div class="stat-row">
+              <span>พื้นที่เผา:</span>
+              <span id="resultBurnedArea">0 ไร่</span>
+            </div>
+            <div class="stat-row">
+              <span>เปอร์เซ็นต์การเผา:</span>
+              <span id="resultBurnPercentage">0%</span>
+            </div>
+            <div class="stat-row">
+              <span>วันที่ตรวจสอบ:</span>
+              <span id="resultDate">-</span>
+            </div>
+          </div>
+
+          <div class="confidence-section">
+            <div class="confidence-title">
+              <span>📊</span>
+              <span>ความเชื่อมั่นในผลตรวจสอบ</span>
+            </div>
+            <div class="confidence-bar">
+              <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+            </div>
+            <div class="confidence-text" id="confidenceReason">-</div>
+          </div>
+
+          <div class="reward-banner" id="rewardBanner" style="display: none;">
+            <div>🎉 ยินดีด้วย! คุณได้รับ</div>
+            <div class="reward-amount">
+              <img src="Untitled_design-removebg-preview.png" class="coin" style="width: 40px; height: 40px;">
+              <span>+100</span>
+            </div>
+            <div>AgriCoins เข้าบัญชีแล้ว!</div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="resetVerification()">
+            🔄 ตรวจสอบใหม่
+          </button>
+          <button class="btn btn-primary" onclick="viewHistory()">
+            📜 ดูประวัติ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="mobile-nav">
+      <a href="home.html" class="mobile-nav-item">
+        <div class="mobile-nav-icon">🏠</div>
+        <div class="mobile-nav-label">หน้าหลัก</div>
+      </a>
+      <a href="burn-verification.html" class="mobile-nav-item active">
+        <div class="mobile-nav-icon">🔥</div>
+        <div class="mobile-nav-label">ตรวจสอบ</div>
+      </a>
+      <a href="market.html" class="mobile-nav-item">
+        <div class="mobile-nav-icon">🛒</div>
+        <div class="mobile-nav-label">ตลาด</div>
+      </a>
+      <a href="#" class="mobile-nav-item" onclick="logout()">
+        <div class="mobile-nav-icon">🚪</div>
+        <div class="mobile-nav-label">ออก</div>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Analyzing Overlay -->
+  <div class="analyzing-overlay" id="analyzingOverlay">
+    <div class="analyzing-content">
+      <div class="analyzing-spinner"></div>
+      <div class="analyzing-text">กำลังวิเคราะห์ข้อมูลดาวเทียม...</div>
+      <div class="analyzing-subtext">
+        Analyzing satellite data from NASA MODIS<br>
+        This may take 10-30 seconds
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check authentication
+    const currentUser = Auth.getCurrentUser();
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+
+    // Global variables
+    let verificationMap = null;
+    let currentMode = 'auto';
+    let selectedPolygon = null;
+    let currentMarker = null;
+    let drawnItems = null;
+    let drawControl = null;
+
+    // Initialize map
+    function initMap() {
+      // Create map centered on Thailand
+      verificationMap = L.map('verificationMap').setView([18.7883, 98.9853], 13);
+
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(verificationMap);
+
+      // Initialize drawing layer
+      drawnItems = new L.FeatureGroup();
+      verificationMap.addLayer(drawnItems);
+
+      // Click handler for auto mode
+      verificationMap.on('click', async function(e) {
+        if (currentMode === 'auto') {
+          await handleAutoDetect(e.latlng.lat, e.latlng.lng);
+        }
+      });
+    }
+
+    // Select mode
+    function selectMode(mode) {
+      currentMode = mode;
+      
+      // Update button states
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+      // Clear existing polygon
+      clearPolygon();
+
+      // Update instructions and controls
+      if (mode === 'auto') {
+        document.getElementById('drawPolygonBtn').style.display = 'none';
+        document.getElementById('instructionText').innerHTML = `
+          <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
+          1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่<br>
+          2. ระบบจะค้นหาขอบเขตแปลงเกษตรโดยอัตโนมัติ<br>
+          3. ตรวจสอบขอบเขตและกดปุ่ม "ตรวจสอบการเผา"
+        `;
+      } else {
+        document.getElementById('drawPolygonBtn').style.display = 'block';
+        document.getElementById('instructionText').innerHTML = `
+          <strong>โหมดวาดเอง:</strong><br>
+          1. กดปุ่ม "เริ่มวาดขอบเขต"<br>
+          2. คลิกบนแผนที่เพื่อวาดรูปหลายเหลี่ยมตามขอบเขตแปลง<br>
+          3. คลิกที่จุดแรกอีกครั้งเพื่อปิดรูป<br>
+          4. กดปุ่ม "ตรวจสอบการเผา"
+        `;
+      }
+    }
+
+    // Use current location
+    async function useCurrentLocation() {
+      try {
+        Loading.show();
+        Toast.show('กำลังค้นหาตำแหน่งของคุณ...', 'info');
+
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          });
+        });
+
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        // Move map to location
+        verificationMap.setView([lat, lng], 16);
+
+        if (currentMode === 'auto') {
+          await handleAutoDetect(lat, lng);
+        } else {
+          // Just add marker for manual mode
+          if (currentMarker) {
+            verificationMap.removeLayer(currentMarker);
+          }
+          currentMarker = L.marker([lat, lng]).addTo(verificationMap);
+          Toast.success('พบตำแหน่งของคุณแล้ว กรุณาวาดขอบเขตแปลง');
+        }
+
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        Toast.error('ไม่สามารถระบุตำแหน่งได้ กรุณาอนุญาตให้เข้าถึงตำแหน่ง');
+        console.error('Location error:', error);
+      }
+    }
+
+    // Handle auto-detect
+    async function handleAutoDetect(lat, lng) {
+      try {
+        Loading.show();
+        Toast.show('กำลังตรวจจับขอบเขตแปลง...', 'info');
+
+        // Clear previous
+        clearPolygon();
+
+        // Add marker
+        if (currentMarker) {
+          verificationMap.removeLayer(currentMarker);
+        }
+        currentMarker = L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(verificationMap);
+
+        // Call backend to detect farmland (auto mode will return polygon)
+        const result = await API.callBackend('/api/burn-scar/analyze', {
+          mode: 'auto',
+          lat: lat,
+          lng: lng,
+          radius_m: 500,
+          days_back: 1, // Just to get polygon, actual analysis later
+          user_id: currentUser.id
+        });
+
+        Loading.hide();
+
+        if (result.success && result.polygon) {
+          selectedPolygon = result.polygon;
+          
+          // Draw polygon on map
+          const layer = L.geoJSON(selectedPolygon, {
+            style: {
+              color: '#7FAD6B',
+              weight: 3,
+              fillOpacity: 0.2
+            }
+          }).addTo(drawnItems);
+
+          // Fit bounds
+          verificationMap.fitBounds(layer.getBounds());
+
+          // Show field info
+          const areaHa = result.farm_area_ha;
+          const areaRai = (areaHa * 0.625).toFixed(2); // Convert to rai
+          document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa.toFixed(2)} hectares)`;
+          document.getElementById('fieldInfo').classList.add('show');
+
+          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ!');
+        } else {
+          Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาดในการตรวจจับแปลง');
+        console.error('Auto-detect error:', error);
+      }
+    }
+
+    // Enable manual drawing
+    function enableDrawing() {
+      if (drawControl) {
+        verificationMap.removeControl(drawControl);
+      }
+
+      drawControl = new L.Control.Draw({
+        draw: {
+          polygon: {
+            allowIntersection: false,
+            showArea: true,
+            metric: true
+          },
+          polyline: false,
+          rectangle: false,
+          circle: false,
+          marker: false,
+          circlemarker: false
+        },
+        edit: {
+          featureGroup: drawnItems,
+          remove: true
+        }
+      });
+
+      verificationMap.addControl(drawControl);
+
+      // Handle draw created
+      verificationMap.on(L.Draw.Event.CREATED, function(e) {
+        const layer = e.layer;
+        drawnItems.addLayer(layer);
+
+        // Get polygon coordinates
+        const latlngs = layer.getLatLngs()[0];
+        const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
+        coordinates.push(coordinates[0]); // Close polygon
+
+        selectedPolygon = {
+          type: 'Polygon',
+          coordinates: [coordinates]
+        };
+
+        // Calculate area (rough estimate)
+        const area = L.GeometryUtil.geodesicArea(latlngs);
+        const areaHa = (area / 10000).toFixed(2);
+        const areaRai = (areaHa * 0.625).toFixed(2);
+
+        document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa} hectares)`;
+        document.getElementById('fieldInfo').classList.add('show');
+
+        Toast.success('วาดขอบเขตแปลงเรียบร้อยแล้ว!');
+      });
+
+      Toast.info('คลิกบนแผนที่เพื่อเริ่มวาด');
+    }
+
+    // Clear polygon
+    function clearPolygon() {
+      drawnItems.clearLayers();
+      selectedPolygon = null;
+      document.getElementById('fieldInfo').classList.remove('show');
+      document.getElementById('resultsSection').classList.remove('show');
+      
+      if (currentMarker) {
+        verificationMap.removeLayer(currentMarker);
+        currentMarker = null;
+      }
+    }
+
+    // Analyze burn scar
+    async function analyzeBurnScar() {
+      if (!selectedPolygon) {
+        Toast.error('กรุณาระบุขอบเขตแปลงก่อน');
+        return;
+      }
+
+      try {
+        // Show analyzing overlay
+        document.getElementById('analyzingOverlay').classList.add('show');
+
+        // Prepare request
+        const requestData = {
+          user_id: currentUser.id,
+          days_back: 90 // 3 months
+        };
+
+        if (currentMode === 'auto') {
+          // For auto mode, send the polygon we got from auto-detect
+          requestData.mode = 'custom';
+          requestData.polygon = selectedPolygon;
+        } else {
+          // For manual mode, send the drawn polygon
+          requestData.mode = 'custom';
+          requestData.polygon = selectedPolygon;
+        }
+
+        // Call backend
+        const result = await API.callBackend('/api/burn-scar/analyze', requestData);
+
+        // Hide analyzing overlay
+        document.getElementById('analyzingOverlay').classList.remove('hide');
+
+        if (result.success) {
+          await displayResults(result);
+        } else {
+          Toast.error(result.error || 'เกิดข้อผิดพลาดในการวิเคราะห์');
+        }
+      } catch (error) {
+        document.getElementById('analyzingOverlay').classList.remove('show');
+        Toast.error('เกิดข้อผิดพลาดในการวิเคราะห์');
+        console.error('Analysis error:', error);
+      }
+    }
+
+    // Display results
+    async function displayResults(result) {
+      const resultCard = document.getElementById('resultCard');
+      const areaHa = result.farm_area_ha;
+      const areaRai = (areaHa * 0.625).toFixed(2);
+      const burnedRai = (result.burned_area_ha * 0.625).toFixed(2);
+
+      // Update area
+      document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
+      document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
+      document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
+      document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
+
+      // Update confidence
+      const confidencePercent = (result.confidence_score * 100).toFixed(0);
+      document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
+      document.getElementById('confidenceReason').textContent = result.confidence_reason;
+
+      if (!result.burn_detected) {
+        // SUCCESS - No burning detected
+        resultCard.className = 'result-card success';
+        document.getElementById('resultIcon').textContent = '✅';
+        document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
+        document.getElementById('resultSubtitle').textContent = 
+          'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา / No burning detected in the last 3 months';
+
+        // Show reward banner
+        document.getElementById('rewardBanner').style.display = 'block';
+
+        // Award AgriCoins
+        try {
+          const rewardResult = await API.callBackend('/agricoin/add', {
+            user_id: currentUser.id,
+            amount: 100,
+            description: 'Burn-free verification reward'
+          });
+
+          if (rewardResult.success) {
+            Toast.success('คุณได้รับ 100 AgriCoins!', 3000);
+            
+            // Update user balance in localStorage
+            currentUser.agricoin_balance = rewardResult.transaction.new_balance;
+            Auth.setCurrentUser(currentUser);
+          }
+        } catch (error) {
+          console.error('Reward error:', error);
+        }
+
+      } else {
+        // WARNING - Burning detected
+        resultCard.className = 'result-card warning';
+        document.getElementById('resultIcon').textContent = '⚠️';
+        document.getElementById('resultTitle').textContent = 'พบการเผา!';
+        document.getElementById('resultSubtitle').textContent = 
+          `พบการเผา ${result.burn_percentage}% ของพื้นที่ / Burning detected on ${result.burn_percentage}% of area`;
+
+        // Hide reward banner
+        document.getElementById('rewardBanner').style.display = 'none';
+
+        Toast.warning('พบการเผาในแปลงของคุณ', 3000);
+      }
+
+      // Show results
+      document.getElementById('resultsSection').classList.add('show');
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Reset verification
+    function resetVerification() {
+      clearPolygon();
+      document.getElementById('resultsSection').classList.remove('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // View history
+    function viewHistory() {
+      // TODO: Create history page
+      Toast.info('กำลังพัฒนาหน้าประวัติ');
+    }
+
+    // Logout
+    function logout() {
+      if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+        Auth.logout();
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('load', function() {
+      initMap();
+      Toast.success('ยินดีต้อนรับสู่ระบบตรวจสอบการเผา!');
+    });
+  </script>
+</body>
+</html>
