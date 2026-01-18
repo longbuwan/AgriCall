@@ -482,7 +482,7 @@
         </div>
         <div class="info-row">
           <div class="info-label">🛰️ ข้อมูลดาวเทียม</div>
-          <div class="info-value">NASA MODIS (500m)</div>
+          <div class="info-value" id="dataSource">NASA MODIS/VIIRS</div>
         </div>
 
         <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="analyzeBurnScar()">
@@ -707,8 +707,9 @@
         document.getElementById('instructionText').innerHTML = `
           <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
           1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่ดาวเทียม<br>
-          2. ระบบจะค้นหาขอบเขตแปลงเกษตรโดยอัตโนมัติจากข้อมูล ESA WorldCover<br>
-          3. ตรวจสอบขอบเขตและกดปุ่ม "ตรวจสอบการเผา"
+          2. ระบบจะค้นหาขอบเขตแปลงเกษตรแบบแปลงเดี่ยวโดยอัตโนมัติ<br>
+          3. คุณสามารถแก้ไขขอบเขตได้โดยคลิกปุ่ม ✏️ ที่มุมบนขวาแผนที่<br>
+          4. เมื่อพอใจแล้ว กดปุ่ม "ตรวจสอบการเผา"
         `;
       } else {
         document.getElementById('drawPolygonBtn').style.display = 'block';
@@ -830,23 +831,63 @@
         if (result.success && result.polygon) {
           selectedPolygon = result.polygon;
           
-          // Draw polygon on map with highlighted style
-          const layer = L.geoJSON(selectedPolygon, {
-            style: {
-              color: '#4CAF50',
-              weight: 3,
-              opacity: 0.8,
-              fillColor: '#7FAD6B',
-              fillOpacity: 0.3,
-              dashArray: '5, 5'
-            }
-          }).addTo(drawnItems);
+          // Convert GeoJSON to Leaflet polygon for editing
+          const coordinates = result.polygon.coordinates[0];
+          const latlngs = coordinates.map(coord => [coord[1], coord[0]]); // [lng, lat] -> [lat, lng]
+          
+          // Create editable polygon
+          const editablePolygon = L.polygon(latlngs, {
+            color: '#4CAF50',
+            weight: 3,
+            opacity: 0.8,
+            fillColor: '#7FAD6B',
+            fillOpacity: 0.3,
+            dashArray: '5, 5'
+          });
+          
+          drawnItems.addLayer(editablePolygon);
+
+          // Enable editing for this polygon
+          if (!drawControl) {
+            drawControl = new L.Control.Draw({
+              draw: false,
+              edit: {
+                featureGroup: drawnItems,
+                edit: true,
+                remove: true
+              }
+            });
+            verificationMap.addControl(drawControl);
+          }
+
+          // Listen for edits
+          verificationMap.on(L.Draw.Event.EDITED, function(e) {
+            const layers = e.layers;
+            layers.eachLayer(function(layer) {
+              const latlngs = layer.getLatLngs()[0];
+              const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
+              coordinates.push(coordinates[0]); // Close polygon
+              
+              selectedPolygon = {
+                type: 'Polygon',
+                coordinates: [coordinates]
+              };
+              
+              // Recalculate area
+              const area = L.GeometryUtil.geodesicArea(latlngs);
+              const areaHa = (area / 10000).toFixed(2);
+              const areaRai = (areaHa * 0.625).toFixed(2);
+              
+              document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa} hectares)`;
+              Toast.success('ปรับแก้ขอบเขตแปลงเรียบร้อย!');
+            });
+          });
 
           // Update marker popup
-          currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร<br>Farmland detected');
+          currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร<br>Farmland detected<br><small>คุณสามารถแก้ไขขอบเขตได้</small>');
 
           // Fit bounds to show entire polygon
-          const bounds = layer.getBounds();
+          const bounds = editablePolygon.getBounds();
           verificationMap.fitBounds(bounds, { padding: [50, 50] });
 
           // Show field info
@@ -855,7 +896,7 @@
           document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa.toFixed(2)} hectares)`;
           document.getElementById('fieldInfo').classList.add('show');
 
-          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ! คุณสามารถตรวจสอบความถูกต้องจากภาพดาวเทียม');
+          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ! คุณสามารถแก้ไขขอบเขตได้โดยคลิกปุ่ม Edit ที่มุมบนขวา');
         } else {
           Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น หรือใช้โหมดวาดเอง');
         }
@@ -1031,6 +1072,11 @@
       document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
       document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
       document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
+      
+      // Update data source if available
+      if (result.source) {
+        document.getElementById('dataSource').textContent = result.source;
+      }
 
       // Update confidence
       const confidencePercent = (result.confidence_score * 100).toFixed(0);
