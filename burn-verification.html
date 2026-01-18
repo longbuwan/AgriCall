@@ -591,7 +591,7 @@
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
   <script src="utils.js"></script>
   <script src="api.js"></script>
-<script>
+  <script>
     // Check authentication
     const currentUser = Auth.getCurrentUser();
     if (!currentUser) {
@@ -607,6 +607,10 @@
     let drawControl = null;
     let baseLayers = {};
     let currentBaseLayer = null;
+    
+    // AUTO MODE FIX: Store coordinates for auto-detected fields
+    let autoDetectLat = null;
+    let autoDetectLng = null;
 
     // Initialize map with realistic satellite imagery
     function initMap() {
@@ -781,105 +785,86 @@
       }
     }
 
-    // Handle auto-detect
-let autoDetectLat = null;
-let autoDetectLng = null;
+    // Handle auto-detect - FIXED VERSION
+    async function handleAutoDetect(lat, lng) {
+      try {
+        Loading.show();
+        Toast.show('กำลังตรวจจับขอบเขตแปลงจากดาวเทียม...', 'info');
 
-// FIX 2: In handleAutoDetect function (around line 542), 
-// store the coordinates:
-async function handleAutoDetect(lat, lng) {
-  try {
-    // ... existing code ...
-    
-    // ADD THESE LINES AFTER lat/lng are confirmed valid:
-    autoDetectLat = lat;
-    autoDetectLng = lng;
-    
-    // Call backend to detect farmland
-    const result = await API.callBackend('/api/burn-scar/analyze', {
-      mode: 'auto',
-      lat: lat,
-      lng: lng,
-      radius_m: 500,  // Changed from 2000
-      days_back: 90,  // Use full period
-      user_id: currentUser.id
-    });
-    
-    // ... rest of existing code ...
+        // Clear previous
+        clearPolygon();
 
-// FIX 3: Update analyzeBurnScar function (around line 701):
-async function analyzeBurnScar() {
-  if (!selectedPolygon) {
-    Toast.error('กรุณาระบุขอบเขตแปลงก่อน');
-    return;
-  }
+        // AUTO MODE FIX: Save coordinates for later use in analyzeBurnScar
+        autoDetectLat = lat;
+        autoDetectLng = lng;
 
-  try {
-    // Show analyzing overlay
-    document.getElementById('analyzingOverlay').classList.add('show');
+        // Add marker with custom icon
+        if (currentMarker) {
+          verificationMap.removeLayer(currentMarker);
+        }
+        currentMarker = L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(verificationMap)
+          .bindPopup('🌾 กำลังวิเคราะห์แปลง...<br>Analyzing farmland...')
+          .openPopup();
 
-    // Prepare request based on current mode
-    let requestData;
-    
-    if (currentMode === 'auto' && autoDetectLat && autoDetectLng) {
-      // AUTO MODE - Use lat/lng
-      requestData = {
-        mode: 'auto',
-        lat: autoDetectLat,
-        lng: autoDetectLng,
-        radius_m: 500,
-        days_back: 90,
-        user_id: currentUser.id
-      };
-    } else {
-      // MANUAL MODE - Use polygon
-      requestData = {
-        mode: 'custom',
-        polygon: selectedPolygon,
-        days_back: 90,
-        user_id: currentUser.id
-      };
+        // Call backend to detect farmland (auto mode will return polygon)
+        const result = await API.callBackend('/api/burn-scar/analyze', {
+          mode: 'auto',
+          lat: lat,
+          lng: lng,
+          radius_m: 500,
+          days_back: 90,
+          user_id: currentUser.id
+        });
+
+        Loading.hide();
+
+        if (result.success && result.polygon) {
+          selectedPolygon = result.polygon;
+          
+          // Draw polygon on map with highlighted style
+          const layer = L.geoJSON(selectedPolygon, {
+            style: {
+              color: '#4CAF50',
+              weight: 3,
+              opacity: 0.8,
+              fillColor: '#7FAD6B',
+              fillOpacity: 0.3,
+              dashArray: '5, 5'
+            }
+          }).addTo(drawnItems);
+
+          // Update marker popup
+          currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร<br>Farmland detected');
+
+          // Fit bounds to show entire polygon
+          const bounds = layer.getBounds();
+          verificationMap.fitBounds(bounds, { padding: [50, 50] });
+
+          // Show field info
+          const areaHa = result.farm_area_ha;
+          const areaRai = (areaHa * 0.625).toFixed(2); // Convert to rai
+          document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa.toFixed(2)} hectares)`;
+          document.getElementById('fieldInfo').classList.add('show');
+
+          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ! คุณสามารถตรวจสอบความถูกต้องจากภาพดาวเทียม');
+        } else {
+          Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น หรือใช้โหมดวาดเอง');
+        }
+      } catch (error) {
+        Loading.hide();
+        Toast.error('เกิดข้อผิดพลาดในการตรวจจับแปลง');
+        console.error('Auto-detect error:', error);
+      }
     }
-
-    console.log('🔥 Analyzing with mode:', currentMode, requestData);
-
-    // Call backend
-    const result = await API.callBackend('/api/burn-scar/analyze', requestData);
-
-    // Hide analyzing overlay
-    document.getElementById('analyzingOverlay').classList.remove('show');
-
-    if (result.success) {
-      await displayResults(result);
-    } else {
-      Toast.error(result.error || 'เกิดข้อผิดพลาดในการวิเคราะห์');
-    }
-  } catch (error) {
-    document.getElementById('analyzingOverlay').classList.remove('show');
-    Toast.error('เกิดข้อผิดพลาดในการวิเคราะห์');
-    console.error('Analysis error:', error);
-  }
-}
-
-// FIX 4: Clear auto-detect coordinates when switching modes or clearing:
-function clearPolygon() {
-  drawnItems.clearLayers();
-  selectedPolygon = null;
-  autoDetectLat = null;  // ADD THIS
-  autoDetectLng = null;  // ADD THIS
-  document.getElementById('fieldInfo').classList.remove('show');
-  document.getElementById('resultsSection').classList.remove('show');
-  
-  if (currentMarker) {
-    verificationMap.removeLayer(currentMarker);
-    currentMarker = null;
-  }
-  
-  if (drawControl) {
-    verificationMap.removeControl(drawControl);
-    drawControl = null;
-  }
-}
 
     // Enable manual drawing with enhanced visual feedback
     function enableDrawing() {
@@ -956,10 +941,15 @@ function clearPolygon() {
       Toast.info('คลิกบนแผนที่ดาวเทียมเพื่อเริ่มวาดขอบเขต ใช้ภาพถ่ายจากดาวเทียมเป็นแนวทาง');
     }
 
-    // Clear polygon
+    // Clear polygon - FIXED VERSION
     function clearPolygon() {
       drawnItems.clearLayers();
       selectedPolygon = null;
+      
+      // AUTO MODE FIX: Clear saved coordinates
+      autoDetectLat = null;
+      autoDetectLng = null;
+      
       document.getElementById('fieldInfo').classList.remove('show');
       document.getElementById('resultsSection').classList.remove('show');
       
@@ -974,9 +964,9 @@ function clearPolygon() {
       }
     }
 
-    // Analyze burn scar
+    // Analyze burn scar - FIXED VERSION
     async function analyzeBurnScar() {
-      if (!selectedPolygon) {
+      if (!selectedPolygon && !autoDetectLat) {
         Toast.error('กรุณาระบุขอบเขตแปลงก่อน');
         return;
       }
@@ -985,13 +975,30 @@ function clearPolygon() {
         // Show analyzing overlay
         document.getElementById('analyzingOverlay').classList.add('show');
 
-        // Prepare request
-        const requestData = {
-          user_id: currentUser.id,
-          days_back: 90, // 3 months
-          mode: 'custom',
-          polygon: selectedPolygon
-        };
+        // AUTO MODE FIX: Prepare request based on current mode
+        let requestData;
+        
+        if (currentMode === 'auto' && autoDetectLat && autoDetectLng) {
+          // AUTO MODE - Use lat/lng
+          requestData = {
+            mode: 'auto',
+            lat: autoDetectLat,
+            lng: autoDetectLng,
+            radius_m: 500,
+            days_back: 90,
+            user_id: currentUser.id
+          };
+          console.log('🤖 AUTO MODE Analysis:', requestData);
+        } else {
+          // MANUAL MODE - Use polygon
+          requestData = {
+            mode: 'custom',
+            polygon: selectedPolygon,
+            days_back: 90,
+            user_id: currentUser.id
+          };
+          console.log('✏️ MANUAL MODE Analysis:', requestData);
+        }
 
         // Call backend
         const result = await API.callBackend('/api/burn-scar/analyze', requestData);
@@ -1003,6 +1010,7 @@ function clearPolygon() {
           await displayResults(result);
         } else {
           Toast.error(result.error || 'เกิดข้อผิดพลาดในการวิเคราะห์');
+          console.error('Backend error:', result);
         }
       } catch (error) {
         document.getElementById('analyzingOverlay').classList.remove('show');
