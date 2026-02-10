@@ -975,7 +975,7 @@
       }
     }
     
-    // Load personal statistics
+    // Load personal statistics - REAL DATA ONLY
     async function loadPersonalStats() {
       try {
         const result = await API.callBackend('/api/stats/personal', {
@@ -984,110 +984,67 @@
         
         if (result.success) {
           personalData = result.stats;
+          console.log('📊 Personal stats loaded:', personalData);
+          
+          // Check if this is real data
+          if (result.is_real_data) {
+            console.log('✅ Using REAL verification data');
+          }
         } else {
-          // Use mock data if API fails
-          personalData = generateMockPersonalData();
+          // No mock data - show empty state
+          personalData = createEmptyStats();
+          console.log('ℹ️ No personal stats available yet');
         }
       } catch (error) {
         console.error('Error loading personal stats:', error);
-        personalData = generateMockPersonalData();
+        personalData = createEmptyStats();
       }
     }
     
-    // Load platform statistics
+    // Load platform statistics - REAL DATA ONLY
     async function loadPlatformStats() {
       try {
         const result = await API.callBackend('/api/stats/platform', {});
         
         if (result.success) {
           platformData = result.stats;
+          console.log('📊 Platform stats loaded:', platformData);
+          
+          if (result.is_real_data) {
+            console.log('✅ Using REAL platform data');
+          }
         } else {
-          // Use mock data if API fails
-          platformData = generateMockPlatformData();
+          // No mock data - show empty state
+          platformData = createEmptyStats();
+          console.log('ℹ️ No platform stats available yet');
         }
       } catch (error) {
         console.error('Error loading platform stats:', error);
-        platformData = generateMockPlatformData();
+        platformData = createEmptyStats();
       }
     }
     
-    // Generate mock personal data for demo
-    function generateMockPersonalData() {
-      const totalRai = Math.floor(Math.random() * 100) + 20;
-      const noBurnCount = Math.floor(Math.random() * 10) + 3;
-      const totalVerifications = noBurnCount + Math.floor(Math.random() * 3);
-      
+    // Create empty stats structure (no fake data)
+    function createEmptyStats() {
       return {
-        total_verifications: totalVerifications,
-        no_burn_count: noBurnCount,
-        burn_detected_count: totalVerifications - noBurnCount,
-        total_area_rai: totalRai,
-        verified_no_burn_area_rai: totalRai * 0.85,
-        pm25_prevented: totalRai * 0.85 * PM25_PER_RAI,
-        co2_prevented: totalRai * 0.85 * CO2_PER_RAI,
-        monthly_data: generateMockMonthlyData(),
-        success_rate: (noBurnCount / totalVerifications * 100).toFixed(1)
+        total_verifications: 0,
+        no_burn_count: 0,
+        burn_detected_count: 0,
+        total_area_rai: 0,
+        verified_no_burn_area_rai: 0,
+        pm25_prevented: 0,
+        co2_prevented: 0,
+        success_rate: "0",
+        monthly_data: [],
+        province_data: [],
+        leaderboard: [],
+        recent_verifications: []
       };
     }
     
-    // Generate mock platform data for demo
-    function generateMockPlatformData() {
-      const totalRai = Math.floor(Math.random() * 5000) + 2000;
-      const noBurnCount = Math.floor(Math.random() * 200) + 100;
-      const totalVerifications = noBurnCount + Math.floor(Math.random() * 50);
-      
-      return {
-        total_users: Math.floor(Math.random() * 100) + 50,
-        total_verifications: totalVerifications,
-        no_burn_count: noBurnCount,
-        burn_detected_count: totalVerifications - noBurnCount,
-        total_area_rai: totalRai,
-        verified_no_burn_area_rai: totalRai * 0.82,
-        pm25_prevented: totalRai * 0.82 * PM25_PER_RAI,
-        co2_prevented: totalRai * 0.82 * CO2_PER_RAI,
-        monthly_data: generateMockMonthlyData(true),
-        province_data: generateMockProvinceData(),
-        leaderboard: generateMockLeaderboard(),
-        success_rate: (noBurnCount / totalVerifications * 100).toFixed(1)
-      };
-    }
-    
-    // Generate mock monthly data
-    function generateMockMonthlyData(isplatform = false) {
-      const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'];
-      const multiplier = isplatform ? 50 : 1;
-      
-      return months.map((month, i) => ({
-        month: month,
-        area_rai: Math.floor(Math.random() * 30 + 10) * multiplier,
-        pm25_prevented: Math.floor(Math.random() * 100 + 50) * multiplier,
-        co2_prevented: Math.floor(Math.random() * 10000 + 5000) * multiplier,
-        verifications: Math.floor(Math.random() * 5 + 2) * multiplier
-      }));
-    }
-    
-    // Generate mock province data
-    function generateMockProvinceData() {
-      return [
-        { province: 'เชียงใหม่', area_rai: 850, verifications: 45 },
-        { province: 'เชียงราย', area_rai: 620, verifications: 32 },
-        { province: 'ลำพูน', area_rai: 480, verifications: 28 },
-        { province: 'ลำปาง', area_rai: 350, verifications: 20 },
-        { province: 'อื่นๆ', area_rai: 200, verifications: 15 }
-      ];
-    }
-    
-    // Generate mock leaderboard
-    function generateMockLeaderboard() {
-      const names = ['สมชาย ใจดี', 'วิภา รักนา', 'อนันต์ เขียวขจี', 'จันทร์ สว่างฟ้า', 'มานะ ทำดี'];
-      return names.map((name, i) => ({
-        rank: i + 1,
-        name: name,
-        area_rai: Math.floor(Math.random() * 200 + 100) - i * 20,
-        co2_prevented: Math.floor(Math.random() * 50000 + 30000) - i * 5000,
-        verifications: Math.floor(Math.random() * 20 + 10) - i * 2
-      }));
-    }
+    // Note: Mock data generators removed - using REAL data only
+    // Data comes from /api/stats/personal and /api/stats/platform endpoints
+    // which pull from the verified_fields database table
     
     // Switch between personal and platform view
     function switchView(view) {
