@@ -8,92 +8,23 @@
   <link rel="stylesheet" href="dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Itim&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --eco-green: #10B981;
-      --eco-green-dark: #059669;
-      --eco-green-light: #D1FAE5;
-      --sky-blue: #0EA5E9;
-      --sky-blue-dark: #0284C7;
-      --sky-blue-light: #E0F2FE;
-      --warning-orange: #F59E0B;
-      --danger-red: #EF4444;
-      --purple-accent: #8B5CF6;
-      --dark-bg: #0F172A;
-      --dark-card: #1E293B;
-      --dark-border: #334155;
-      --text-primary: #F8FAFC;
-      --text-secondary: #94A3B8;
-      --gradient-eco: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
-      --gradient-sky: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #0369A1 100%);
-      --gradient-sunset: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-      --gradient-purple: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-      --gradient-dark: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
+    /* Additional stats-specific styles with AgriCall theme */
     body {
-      font-family: 'Outfit', 'Kanit', sans-serif;
-      background: var(--gradient-dark);
-      min-height: 100vh;
-      color: var(--text-primary);
-      overflow-x: hidden;
+      background: var(--light-cream);
+      font-family: 'Prompt', 'Kanit', sans-serif;
     }
     
-    /* Animated Background */
-    .bg-pattern {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    
-    .bg-pattern::before {
-      content: '';
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
-      top: -200px;
-      right: -200px;
-      animation: pulse 8s ease-in-out infinite;
-    }
-    
-    .bg-pattern::after {
-      content: '';
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
-      bottom: -150px;
-      left: -150px;
-      animation: pulse 10s ease-in-out infinite reverse;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-    }
-    
-    /* Header */
+    /* Stats Header */
     .stats-header {
-      background: rgba(30, 41, 59, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--dark-border);
-      padding: 1rem 1.5rem;
+      background: var(--primary-green);
+      padding: 1.5rem;
+      box-shadow: 0 4px 16px var(--shadow-color);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
     }
     
     .header-content {
@@ -111,42 +42,42 @@
     }
     
     .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--gradient-eco);
-      border-radius: 12px;
+      width: 45px;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
     }
     
     .logo-text {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 700;
-      background: var(--gradient-eco);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--white);
+      font-family: 'Itim', cursive;
     }
     
     .back-btn {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.625rem 1.25rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--dark-border);
-      border-radius: 10px;
-      color: var(--text-secondary);
+      padding: 0.75rem 1.25rem;
+      background: var(--white);
+      border: none;
+      border-radius: var(--radius-lg);
+      color: var(--primary-green);
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
       transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
     .back-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     
     /* Main Container */
@@ -154,8 +85,6 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
-      position: relative;
-      z-index: 1;
     }
     
     /* Page Title */
@@ -165,18 +94,49 @@
     }
     
     .page-title h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
+      font-size: 2rem;
+      font-weight: 700;
       margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--eco-green) 0%, var(--sky-blue) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary-green);
+      font-family: 'Itim', cursive;
     }
     
     .page-title p {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
+      color: var(--text-medium);
+      font-size: 1rem;
+    }
+    
+    /* View Toggle */
+    .view-toggle {
+      display: flex;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 6px;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .view-toggle-btn {
+      flex: 1;
+      padding: 0.875rem 1.5rem;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--text-medium);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Prompt', sans-serif;
+    }
+    
+    .view-toggle-btn.active {
+      background: var(--gradient-eco);
+      color: white;
+      box-shadow: 0 4px 12px rgba(127, 173, 107, 0.3);
     }
     
     /* Hero Stats Cards */
@@ -188,41 +148,33 @@
     }
     
     .hero-card {
-      background: var(--dark-card);
-      border-radius: 24px;
+      background: var(--white);
+      border-radius: var(--radius-xl);
       padding: 2rem;
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--dark-border);
+      box-shadow: var(--shadow-sm);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 2px solid transparent;
     }
     
     .hero-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-md);
     }
     
-    .hero-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
+    .hero-card.pm25 {
+      border-top: 4px solid var(--sky-blue);
     }
     
-    .hero-card.pm25::before {
-      background: var(--gradient-sky);
-    }
-    
-    .hero-card.co2::before {
-      background: var(--gradient-eco);
+    .hero-card.co2 {
+      border-top: 4px solid var(--primary-green);
     }
     
     .hero-card-icon {
       width: 64px;
       height: 64px;
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -231,19 +183,20 @@
     }
     
     .hero-card.pm25 .hero-card-icon {
-      background: rgba(14, 165, 233, 0.15);
+      background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
     }
     
     .hero-card.co2 .hero-card-icon {
-      background: rgba(16, 185, 129, 0.15);
+      background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
     }
     
     .hero-card-label {
       font-size: 0.875rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 0.5rem;
+      font-weight: 600;
     }
     
     .hero-card-value {
@@ -254,29 +207,23 @@
     }
     
     .hero-card.pm25 .hero-card-value {
-      background: var(--gradient-sky);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--sky-blue);
     }
     
     .hero-card.co2 .hero-card-value {
-      background: var(--gradient-eco);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary-green);
     }
     
     .hero-card-unit {
       font-size: 1rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
       font-weight: 500;
     }
     
     .hero-card-sub {
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px solid var(--dark-border);
+      border-top: 2px solid var(--border-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -284,12 +231,12 @@
     
     .hero-card-sub span {
       font-size: 0.8125rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
     }
     
     .hero-card-sub strong {
       font-size: 1rem;
-      color: var(--text-primary);
+      color: var(--text-dark);
     }
     
     /* Info Cards Grid */
@@ -301,17 +248,19 @@
     }
     
     .info-card {
-      background: var(--dark-card);
-      border-radius: 16px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
-      border: 1px solid var(--dark-border);
+      border: 2px solid var(--border-light);
       text-align: center;
       transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
     }
     
     .info-card:hover {
-      border-color: var(--eco-green);
-      background: rgba(16, 185, 129, 0.05);
+      border-color: var(--primary-green);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
     
     .info-card-icon {
@@ -322,13 +271,14 @@
     .info-card-value {
       font-size: 1.75rem;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--primary-green);
       margin-bottom: 0.25rem;
     }
     
     .info-card-label {
       font-size: 0.8125rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
+      line-height: 1.4;
     }
     
     /* Section Title */
@@ -338,20 +288,23 @@
       gap: 0.75rem;
       margin-bottom: 1.5rem;
       padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--dark-border);
+      border-bottom: 3px solid var(--primary-green);
     }
     
     .section-title h2 {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 600;
+      color: var(--text-dark);
+      margin: 0;
     }
     
     .section-badge {
       background: var(--gradient-eco);
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
+      padding: 0.35rem 0.875rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
       font-weight: 600;
+      color: white;
     }
     
     /* Charts Section */
@@ -363,10 +316,11 @@
     }
     
     .chart-card {
-      background: var(--dark-card);
-      border-radius: 20px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
-      border: 1px solid var(--dark-border);
+      border: 2px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
     }
     
     .chart-card.full-width {
@@ -378,53 +332,22 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-light);
     }
     
     .chart-title {
-      font-size: 1rem;
+      font-size: 1.125rem;
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: var(--text-dark);
     }
     
     .chart-canvas-container {
       position: relative;
       height: 280px;
-    }
-    
-    /* Personal vs Platform Toggle */
-    .view-toggle {
-      display: flex;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 2rem;
-    }
-    
-    .view-toggle-btn {
-      flex: 1;
-      padding: 0.875rem 1.5rem;
-      background: transparent;
-      border: none;
-      border-radius: 10px;
-      color: var(--text-secondary);
-      font-size: 0.9375rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: inherit;
-    }
-    
-    .view-toggle-btn.active {
-      background: var(--gradient-eco);
-      color: white;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
-    
-    .view-toggle-btn:not(.active):hover {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.05);
     }
     
     /* Equivalency Cards */
@@ -439,17 +362,19 @@
     }
     
     .equiv-card {
-      background: var(--dark-card);
-      border-radius: 16px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
-      border: 1px solid var(--dark-border);
+      border: 2px solid var(--border-light);
       text-align: center;
       transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
     }
     
     .equiv-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-green);
     }
     
     .equiv-icon {
@@ -460,35 +385,43 @@
     .equiv-value {
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--eco-green);
+      color: var(--primary-green);
       margin-bottom: 0.25rem;
     }
     
     .equiv-label {
       font-size: 0.8125rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
       line-height: 1.4;
     }
     
     /* Leaderboard */
     .leaderboard-card {
-      background: var(--dark-card);
-      border-radius: 20px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       padding: 1.5rem;
-      border: 1px solid var(--dark-border);
+      border: 2px solid var(--border-light);
       margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
     }
     
     .leaderboard-list {
       list-style: none;
+      padding: 0;
+      margin: 0;
     }
     
     .leaderboard-item {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid var(--dark-border);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-light);
+      transition: background 0.2s;
+    }
+    
+    .leaderboard-item:hover {
+      background: rgba(127, 173, 107, 0.05);
     }
     
     .leaderboard-item:last-child {
@@ -496,14 +429,15 @@
     }
     
     .leaderboard-rank {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: 1rem;
+      flex-shrink: 0;
     }
     
     .leaderboard-rank.gold {
@@ -522,8 +456,8 @@
     }
     
     .leaderboard-rank.normal {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-secondary);
+      background: var(--border-light);
+      color: var(--text-medium);
     }
     
     .leaderboard-info {
@@ -533,11 +467,12 @@
     .leaderboard-name {
       font-weight: 600;
       margin-bottom: 0.25rem;
+      color: var(--text-dark);
     }
     
     .leaderboard-stats {
       font-size: 0.8125rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
     }
     
     .leaderboard-value {
@@ -547,12 +482,12 @@
     .leaderboard-primary {
       font-size: 1.125rem;
       font-weight: 700;
-      color: var(--eco-green);
+      color: var(--primary-green);
     }
     
     .leaderboard-secondary {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
     }
     
     /* Achievement Section */
@@ -564,23 +499,25 @@
     }
     
     .achievement-card {
-      background: var(--dark-card);
-      border-radius: 16px;
+      background: var(--white);
+      border-radius: var(--radius-lg);
       padding: 1.25rem;
-      border: 1px solid var(--dark-border);
+      border: 2px solid var(--border-light);
       text-align: center;
       opacity: 0.5;
       transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
     }
     
     .achievement-card.unlocked {
       opacity: 1;
-      border-color: var(--eco-green);
-      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--primary-green);
+      background: linear-gradient(135deg, #F1F8ED, #E8F5E9);
     }
     
     .achievement-card.unlocked:hover {
       transform: scale(1.05);
+      box-shadow: var(--shadow-md);
     }
     
     .achievement-icon {
@@ -592,19 +529,20 @@
       font-size: 0.8125rem;
       font-weight: 600;
       margin-bottom: 0.25rem;
+      color: var(--text-dark);
     }
     
     .achievement-desc {
       font-size: 0.6875rem;
-      color: var(--text-secondary);
+      color: var(--text-medium);
     }
     
     /* Loading State */
     .loading-skeleton {
-      background: linear-gradient(90deg, var(--dark-card) 25%, rgba(255,255,255,0.1) 50%, var(--dark-card) 75%);
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
     }
     
     @keyframes shimmer {
@@ -640,8 +578,12 @@
     }
     
     @media (max-width: 640px) {
+      .stats-container {
+        padding: 1rem;
+      }
+      
       .page-title h1 {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
       }
       
       .hero-card {
@@ -681,6 +623,7 @@
     /* Animations */
     .fade-in {
       animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
     }
     
     @keyframes fadeIn {
@@ -702,8 +645,6 @@
   </style>
 </head>
 <body>
-  <div class="bg-pattern"></div>
-  
   <!-- Header -->
   <header class="stats-header">
     <div class="header-content">
@@ -946,10 +887,10 @@
     let platformData = null;
     let charts = {};
     
-    // Chart.js default configuration
-    Chart.defaults.color = '#94A3B8';
-    Chart.defaults.borderColor = '#334155';
-    Chart.defaults.font.family = "'Outfit', 'Kanit', sans-serif";
+    // Chart.js default configuration with AgriCall colors
+    Chart.defaults.color = '#5A6C5B';
+    Chart.defaults.borderColor = '#E5EBE2';
+    Chart.defaults.font.family = "'Prompt', 'Kanit', sans-serif";
     
     // Initialize
     async function initializeStats() {
@@ -986,12 +927,10 @@
           personalData = result.stats;
           console.log('📊 Personal stats loaded:', personalData);
           
-          // Check if this is real data
           if (result.is_real_data) {
             console.log('✅ Using REAL verification data');
           }
         } else {
-          // No mock data - show empty state
           personalData = createEmptyStats();
           console.log('ℹ️ No personal stats available yet');
         }
@@ -1014,7 +953,6 @@
             console.log('✅ Using REAL platform data');
           }
         } else {
-          // No mock data - show empty state
           platformData = createEmptyStats();
           console.log('ℹ️ No platform stats available yet');
         }
@@ -1024,7 +962,7 @@
       }
     }
     
-    // Create empty stats structure (no fake data)
+    // Create empty stats structure
     function createEmptyStats() {
       return {
         total_verifications: 0,
@@ -1041,10 +979,6 @@
         recent_verifications: []
       };
     }
-    
-    // Note: Mock data generators removed - using REAL data only
-    // Data comes from /api/stats/personal and /api/stats/platform endpoints
-    // which pull from the verified_fields database table
     
     // Switch between personal and platform view
     function switchView(view) {
@@ -1133,11 +1067,11 @@
           datasets: [{
             label: 'PM2.5 Prevented (kg)',
             data: data.monthly_data.map(d => d.pm25_prevented),
-            borderColor: '#0EA5E9',
-            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            borderColor: '#5B8AC8',
+            backgroundColor: 'rgba(91, 138, 200, 0.1)',
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: '#0EA5E9',
+            pointBackgroundColor: '#5B8AC8',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5
@@ -1152,7 +1086,7 @@
           scales: {
             y: {
               beginAtZero: true,
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              grid: { color: '#E5EBE2' }
             },
             x: {
               grid: { display: false }
@@ -1170,8 +1104,8 @@
           datasets: [{
             label: 'CO₂ Prevented (kg)',
             data: data.monthly_data.map(d => d.co2_prevented),
-            backgroundColor: 'rgba(16, 185, 129, 0.7)',
-            borderColor: '#10B981',
+            backgroundColor: 'rgba(127, 173, 107, 0.8)',
+            borderColor: '#7FAD6B',
             borderWidth: 2,
             borderRadius: 8
           }]
@@ -1185,7 +1119,7 @@
           scales: {
             y: {
               beginAtZero: true,
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              grid: { color: '#E5EBE2' }
             },
             x: {
               grid: { display: false }
@@ -1202,7 +1136,7 @@
           labels: ['ไม่พบการเผา', 'พบการเผา'],
           datasets: [{
             data: [data.no_burn_count, data.burn_detected_count],
-            backgroundColor: ['#10B981', '#EF4444'],
+            backgroundColor: ['#7FAD6B', '#EF5350'],
             borderWidth: 0,
             cutout: '70%'
           }]
@@ -1222,7 +1156,7 @@
         }
       });
       
-      // Province Chart (platform only)
+      // Province Chart
       const provinceData = platformData?.province_data || [
         { province: 'เชียงใหม่', area_rai: 100 },
         { province: 'เชียงราย', area_rai: 80 },
@@ -1239,11 +1173,11 @@
           datasets: [{
             data: provinceData.map(d => d.area_rai),
             backgroundColor: [
-              'rgba(16, 185, 129, 0.7)',
-              'rgba(14, 165, 233, 0.7)',
-              'rgba(139, 92, 246, 0.7)',
-              'rgba(245, 158, 11, 0.7)',
-              'rgba(239, 68, 68, 0.7)'
+              'rgba(127, 173, 107, 0.7)',
+              'rgba(91, 138, 200, 0.7)',
+              'rgba(165, 201, 149, 0.7)',
+              'rgba(255, 167, 38, 0.7)',
+              'rgba(239, 83, 80, 0.7)'
             ],
             borderWidth: 0
           }]
@@ -1273,8 +1207,8 @@
             {
               label: 'พื้นที่ (ไร่)',
               data: data.monthly_data.map(d => d.area_rai),
-              borderColor: '#10B981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderColor: '#7FAD6B',
+              backgroundColor: 'rgba(127, 173, 107, 0.1)',
               fill: true,
               tension: 0.4,
               yAxisID: 'y'
@@ -1282,8 +1216,8 @@
             {
               label: 'การตรวจสอบ',
               data: data.monthly_data.map(d => d.verifications),
-              borderColor: '#8B5CF6',
-              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              borderColor: '#5B8AC8',
+              backgroundColor: 'rgba(91, 138, 200, 0.1)',
               fill: true,
               tension: 0.4,
               yAxisID: 'y1'
@@ -1311,7 +1245,7 @@
               type: 'linear',
               display: true,
               position: 'left',
-              grid: { color: 'rgba(255,255,255,0.05)' }
+              grid: { color: '#E5EBE2' }
             },
             y1: {
               type: 'linear',
