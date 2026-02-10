@@ -295,6 +295,46 @@
       color: var(--text-medium);
       line-height: 1.5;
     }
+    
+    /* Environmental Impact Banner */
+    .environmental-impact {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .impact-title {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .impact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    
+    .impact-item {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      text-align: center;
+    }
+    
+    .impact-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    
+    .impact-label {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
 
     .reward-banner {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -468,6 +508,10 @@
 
       .reward-amount {
         font-size: 2rem;
+      }
+      
+      .impact-grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -684,6 +728,24 @@
             </div>
             <div class="confidence-text" id="confidenceReason">-</div>
           </div>
+          
+          <!-- Environmental Impact (shown for successful verifications) -->
+          <div class="environmental-impact" id="environmentalImpact" style="display: none;">
+            <div class="impact-title">
+              <span>🌍</span>
+              <span>ผลกระทบเชิงบวกต่อสิ่งแวดล้อม</span>
+            </div>
+            <div class="impact-grid">
+              <div class="impact-item">
+                <div class="impact-value" id="impactPM25">0 kg</div>
+                <div class="impact-label">PM2.5 ที่ลดได้</div>
+              </div>
+              <div class="impact-item">
+                <div class="impact-value" id="impactCO2">0 kg</div>
+                <div class="impact-label">CO₂ ที่ลดได้</div>
+              </div>
+            </div>
+          </div>
 
           <div class="reward-banner" id="rewardBanner" style="display: none;">
             <div>🎉 ยินดีด้วย! คุณได้รับ</div>
@@ -699,8 +761,8 @@
           <button class="btn btn-secondary" onclick="resetVerification()">
             🔄 ตรวจสอบใหม่
           </button>
-          <button class="btn btn-primary" onclick="viewHistory()">
-            📜 ดูประวัติ
+          <button class="btn btn-primary" onclick="viewStatistics()">
+            📊 ดูสถิติ
           </button>
         </div>
       </div>
@@ -716,9 +778,9 @@
         <div class="mobile-nav-icon">🔥</div>
         <div class="mobile-nav-label">ตรวจสอบ</div>
       </a>
-      <a href="market.html" class="mobile-nav-item">
-        <div class="mobile-nav-icon">🛒</div>
-        <div class="mobile-nav-label">ตลาด</div>
+      <a href="statistics.html" class="mobile-nav-item">
+        <div class="mobile-nav-icon">📊</div>
+        <div class="mobile-nav-label">สถิติ</div>
       </a>
       <a href="#" class="mobile-nav-item" onclick="logout()">
         <div class="mobile-nav-icon">🚪</div>
@@ -759,6 +821,13 @@
       window.location.href = 'index.html';
     }
 
+    // ========================================
+    // CONSTANTS FOR ENVIRONMENTAL CALCULATIONS
+    // ========================================
+    const PM25_PER_RAI = 4.18;      // kg PM2.5 prevented per rai
+    const CO2_PER_RAI = 446.11;     // kg CO2 prevented per rai  
+    const HA_TO_RAI = 6.25;         // 1 hectare = 6.25 rai
+
     // Global variables
     let verificationMap = null;
     let currentMode = 'auto';
@@ -769,7 +838,7 @@
     let baseLayers = {};
     let currentBaseLayer = null;
     
-    // AUTO MODE FIX: Store coordinates for auto-detected fields
+    // AUTO MODE: Store coordinates for auto-detected fields
     let autoDetectLat = null;
     let autoDetectLng = null;
 
@@ -787,31 +856,17 @@
       try {
         console.log('🔥 Loading burn scar GeoTIFF:', BURN_SCAR_TIF_PATH);
         
-        // Fetch the GeoTIFF file
         const response = await fetch(BURN_SCAR_TIF_PATH);
         if (!response.ok) {
-          throw new Error(`Failed to load GeoTIFF: ${response.status}`);
+          console.log('GeoTIFF not found, skipping visualization');
+          return false;
         }
         
         const arrayBuffer = await response.arrayBuffer();
-        
-        // Parse GeoTIFF using georaster library
         burnScarGeoRaster = await parseGeoraster(arrayBuffer);
         
-        console.log('📊 GeoTIFF metadata:', {
-          width: burnScarGeoRaster.width,
-          height: burnScarGeoRaster.height,
-          numberOfRasters: burnScarGeoRaster.numberOfRasters,
-          xmin: burnScarGeoRaster.xmin,
-          xmax: burnScarGeoRaster.xmax,
-          ymin: burnScarGeoRaster.ymin,
-          ymax: burnScarGeoRaster.ymax,
-          pixelWidth: burnScarGeoRaster.pixelWidth,
-          pixelHeight: burnScarGeoRaster.pixelHeight,
-          projection: burnScarGeoRaster.projection
-        });
+        console.log('📊 GeoTIFF loaded successfully');
 
-        // Create the layer with custom color rendering
         burnScarLayer = new GeoRasterLayer({
           georaster: burnScarGeoRaster,
           opacity: 0.7,
@@ -819,88 +874,54 @@
           pixelValuesToColorFn: function(values) {
             const value = values[0];
             
-            // Handle NoData values (typically 0, -9999, or NaN)
             if (value === null || value === undefined || isNaN(value) || value === 0 || value === -9999) {
-              return null; // Transparent
+              return null;
             }
             
-            // Color scale for burn intensity
-            // Adjust these thresholds based on your actual data range
             if (value >= 0.8 || value >= 3) {
-              // High burn intensity - Red
               return 'rgba(255, 0, 0, 0.85)';
             } else if (value >= 0.5 || value >= 2) {
-              // Medium burn intensity - Orange
               return 'rgba(255, 140, 0, 0.75)';
             } else if (value >= 0.2 || value >= 1) {
-              // Low burn intensity - Yellow
               return 'rgba(255, 200, 0, 0.65)';
             } else if (value > 0) {
-              // Very low / trace - Light yellow
               return 'rgba(255, 255, 100, 0.5)';
             }
             
-            return null; // Transparent for non-burn areas
+            return null;
           }
         });
 
-        // Add to map
         burnScarLayer.addTo(verificationMap);
-        
-        // Show the toggle control
         document.getElementById('burnLayerToggle').classList.remove('hidden');
         
-        // Optionally fit map to the GeoTIFF bounds
-        const bounds = [
-          [burnScarGeoRaster.ymin, burnScarGeoRaster.xmin],
-          [burnScarGeoRaster.ymax, burnScarGeoRaster.xmax]
-        ];
-        
-        console.log('✅ Burn scar layer loaded successfully');
-        console.log('📍 GeoTIFF bounds:', bounds);
-        
         Toast.success('โหลดข้อมูลการเผาจากดาวเทียมสำเร็จ!');
-        
         return true;
         
       } catch (error) {
-        console.error('❌ Error loading burn scar GeoTIFF:', error);
-        Toast.error('ไม่สามารถโหลดข้อมูลการเผาได้: ' + error.message);
+        console.log('Burn scar GeoTIFF not available:', error.message);
         return false;
       }
     }
 
-    /**
-     * Toggle burn scar layer visibility
-     */
     function toggleBurnLayer() {
       const checkbox = document.getElementById('burnLayerCheckbox');
-      
       if (burnScarLayer) {
         if (checkbox.checked) {
           burnScarLayer.addTo(verificationMap);
-          Toast.info('เปิดแสดงข้อมูลการเผา');
         } else {
           verificationMap.removeLayer(burnScarLayer);
-          Toast.info('ปิดแสดงข้อมูลการเผา');
         }
       }
     }
 
-    /**
-     * Update burn layer opacity
-     */
     function updateBurnLayerOpacity(value) {
       document.getElementById('opacityValue').textContent = value + '%';
-      
       if (burnScarLayer) {
         burnScarLayer.setOpacity(value / 100);
       }
     }
 
-    /**
-     * Remove burn scar layer
-     */
     function removeBurnScarLayer() {
       if (burnScarLayer && verificationMap.hasLayer(burnScarLayer)) {
         verificationMap.removeLayer(burnScarLayer);
@@ -911,121 +932,85 @@
     }
 
     // ========================================
-    // END BURN SCAR LAYER CODE
+    // MAP INITIALIZATION
     // ========================================
-
-    // Initialize map with realistic satellite imagery
     function initMap() {
-      // Create map centered on Thailand
       verificationMap = L.map('verificationMap').setView([18.7883, 98.9853], 13);
 
-      // ========================================
-      // SATELLITE IMAGERY LAYERS
-      // ========================================
-
-      // Esri World Imagery (High-quality satellite)
       const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 19,
-        minZoom: 1
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
       });
 
-      // Google Satellite (Alternative - requires no API key for tiles)
-      const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        attribution: 'Map data &copy; Google',
-        maxZoom: 20,
-        minZoom: 1
-      });
-
-      // Google Hybrid (Satellite + Labels)
       const googleHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
         attribution: 'Map data &copy; Google',
-        maxZoom: 20,
-        minZoom: 1
+        maxZoom: 20
       });
 
-      // OpenStreetMap (Backup)
       const osmMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
       });
 
-      // Add default layer (Google Hybrid - best for farmland)
       googleHybrid.addTo(verificationMap);
       currentBaseLayer = googleHybrid;
 
-      // Store layers for switching
       baseLayers = {
         "ดาวเทียม + ป้าย (Google Hybrid)": googleHybrid,
-        "ดาวเทียม (Google Satellite)": googleSatellite,
         "ดาวเทียม (Esri)": esriSatellite,
         "แผนที่ถนน (OpenStreetMap)": osmMap
       };
 
-      // Add layer control
       L.control.layers(baseLayers, null, {
         position: 'topright',
         collapsed: true
       }).addTo(verificationMap);
 
-      // Add scale control
       L.control.scale({
         metric: true,
         imperial: false,
         position: 'bottomleft'
       }).addTo(verificationMap);
 
-      // Initialize drawing layer
       drawnItems = new L.FeatureGroup();
       verificationMap.addLayer(drawnItems);
 
-      // Click handler for auto mode
       verificationMap.on('click', async function(e) {
         if (currentMode === 'auto') {
           await handleAutoDetect(e.latlng.lat, e.latlng.lng);
         }
       });
-
-      // Add custom zoom control with better styling
-      verificationMap.zoomControl.setPosition('topright');
     }
 
-    // Select mode
     function selectMode(mode) {
       currentMode = mode;
       
-      // Update button states
       document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.classList.remove('active');
       });
       document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
 
-      // Clear existing polygon
       clearPolygon();
 
-      // Update instructions and controls
       if (mode === 'auto') {
         document.getElementById('drawPolygonBtn').style.display = 'none';
         document.getElementById('instructionText').innerHTML = `
           <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
           1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่ดาวเทียม<br>
           2. ระบบจะค้นหาขอบเขตแปลงเกษตรแบบแปลงเดี่ยวโดยอัตโนมัติ<br>
-          3. คุณสามารถแก้ไขขอบเขตได้โดยคลิกปุ่ม ✏️ ที่มุมบนขวาแผนที่<br>
-          4. เมื่อพอใจแล้ว กดปุ่ม "ตรวจสอบการเผา"
+          3. เมื่อพอใจแล้ว กดปุ่ม "ตรวจสอบการเผา"
         `;
       } else {
         document.getElementById('drawPolygonBtn').style.display = 'block';
         document.getElementById('instructionText').innerHTML = `
           <strong>โหมดวาดเอง:</strong><br>
           1. กดปุ่ม "เริ่มวาดขอบเขต"<br>
-          2. ใช้แผนที่ดาวเทียมเพื่อมองเห็นขอบเขตแปลงที่แท้จริง<br>
-          3. คลิกบนแผนที่เพื่อวาดรูปหลายเหลี่ยมตามขอบเขตแปลง<br>
-          4. คลิกที่จุดแรกอีกครั้งเพื่อปิดรูป แล้วกดปุ่ม "ตรวจสอบการเผา"
+          2. คลิกบนแผนที่เพื่อวาดรูปหลายเหลี่ยมตามขอบเขตแปลง<br>
+          3. คลิกที่จุดแรกอีกครั้งเพื่อปิดรูป แล้วกดปุ่ม "ตรวจสอบการเผา"
         `;
       }
     }
 
-    // Use current location
     async function useCurrentLocation() {
       try {
         Loading.show();
@@ -1042,29 +1027,17 @@
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
-        // Move map to location with higher zoom for satellite view
         verificationMap.setView([lat, lng], 17);
 
         if (currentMode === 'auto') {
           await handleAutoDetect(lat, lng);
         } else {
-          // Just add marker for manual mode
           if (currentMarker) {
             verificationMap.removeLayer(currentMarker);
           }
           
-          // Custom icon for current location
-          currentMarker = L.marker([lat, lng], {
-            icon: L.icon({
-              iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-              shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -34],
-              shadowSize: [41, 41]
-            })
-          }).addTo(verificationMap)
-            .bindPopup('📍 ตำแหน่งปัจจุบันของคุณ<br>Your current location')
+          currentMarker = L.marker([lat, lng]).addTo(verificationMap)
+            .bindPopup('📍 ตำแหน่งปัจจุบันของคุณ')
             .openPopup();
           
           Toast.success('พบตำแหน่งของคุณแล้ว กรุณาวาดขอบเขตแปลง');
@@ -1073,52 +1046,29 @@
         Loading.hide();
       } catch (error) {
         Loading.hide();
-        
-        let errorMsg = 'ไม่สามารถระบุตำแหน่งได้';
-        if (error.code === 1) {
-          errorMsg = 'กรุณาอนุญาตให้เข้าถึงตำแหน่ง';
-        } else if (error.code === 2) {
-          errorMsg = 'ไม่สามารถหาตำแหน่งได้ กรุณาเปิด GPS';
-        } else if (error.code === 3) {
-          errorMsg = 'หมดเวลาในการค้นหาตำแหน่ง';
-        }
-        
-        Toast.error(errorMsg);
+        Toast.error('ไม่สามารถระบุตำแหน่งได้');
         console.error('Location error:', error);
       }
     }
 
-    // Handle auto-detect - FIXED VERSION
     async function handleAutoDetect(lat, lng) {
       try {
         Loading.show();
         Toast.show('กำลังตรวจจับขอบเขตแปลงจากดาวเทียม...', 'info');
 
-        // Clear previous
         clearPolygon();
 
-        // AUTO MODE FIX: Save coordinates for later use in analyzeBurnScar
+        // Save coordinates for later use
         autoDetectLat = lat;
         autoDetectLng = lng;
 
-        // Add marker with custom icon
         if (currentMarker) {
           verificationMap.removeLayer(currentMarker);
         }
-        currentMarker = L.marker([lat, lng], {
-          icon: L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          })
-        }).addTo(verificationMap)
-          .bindPopup('🌾 กำลังวิเคราะห์แปลง...<br>Analyzing farmland...')
+        currentMarker = L.marker([lat, lng]).addTo(verificationMap)
+          .bindPopup('🌾 กำลังวิเคราะห์แปลง...')
           .openPopup();
 
-        // Call backend to detect farmland (auto mode will return polygon)
         const result = await API.callBackend('/api/burn-scar/analyze', {
           mode: 'auto',
           lat: lat,
@@ -1133,11 +1083,9 @@
         if (result.success && result.polygon) {
           selectedPolygon = result.polygon;
           
-          // Convert GeoJSON to Leaflet polygon for editing
           const coordinates = result.polygon.coordinates[0];
-          const latlngs = coordinates.map(coord => [coord[1], coord[0]]); // [lng, lat] -> [lat, lng]
+          const latlngs = coordinates.map(coord => [coord[1], coord[0]]);
           
-          // Create editable polygon
           const editablePolygon = L.polygon(latlngs, {
             color: '#4CAF50',
             weight: 3,
@@ -1149,58 +1097,19 @@
           
           drawnItems.addLayer(editablePolygon);
 
-          // Enable editing for this polygon
-          if (!drawControl) {
-            drawControl = new L.Control.Draw({
-              draw: false,
-              edit: {
-                featureGroup: drawnItems,
-                edit: true,
-                remove: true
-              }
-            });
-            verificationMap.addControl(drawControl);
-          }
+          currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร');
 
-          // Listen for edits
-          verificationMap.on(L.Draw.Event.EDITED, function(e) {
-            const layers = e.layers;
-            layers.eachLayer(function(layer) {
-              const latlngs = layer.getLatLngs()[0];
-              const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
-              coordinates.push(coordinates[0]); // Close polygon
-              
-              selectedPolygon = {
-                type: 'Polygon',
-                coordinates: [coordinates]
-              };
-              
-              // Recalculate area
-              const area = L.GeometryUtil.geodesicArea(latlngs);
-              const areaHa = (area / 10000).toFixed(2);
-              const areaRai = (areaHa * 0.625).toFixed(2);
-              
-              document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa} hectares)`;
-              Toast.success('ปรับแก้ขอบเขตแปลงเรียบร้อย!');
-            });
-          });
-
-          // Update marker popup
-          currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร<br>Farmland detected<br><small>คุณสามารถแก้ไขขอบเขตได้</small>');
-
-          // Fit bounds to show entire polygon
           const bounds = editablePolygon.getBounds();
           verificationMap.fitBounds(bounds, { padding: [50, 50] });
 
-          // Show field info
           const areaHa = result.farm_area_ha;
-          const areaRai = (areaHa * 0.625).toFixed(2); // Convert to rai
+          const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
           document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa.toFixed(2)} hectares)`;
           document.getElementById('fieldInfo').classList.add('show');
 
-          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ! คุณสามารถแก้ไขขอบเขตได้โดยคลิกปุ่ม Edit ที่มุมบนขวา');
+          Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ!');
         } else {
-          Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น หรือใช้โหมดวาดเอง');
+          Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น');
         }
       } catch (error) {
         Loading.hide();
@@ -1209,7 +1118,6 @@
       }
     }
 
-    // Enable manual drawing with enhanced visual feedback
     function enableDrawing() {
       if (drawControl) {
         verificationMap.removeControl(drawControl);
@@ -1224,7 +1132,6 @@
             shapeOptions: {
               color: '#4CAF50',
               weight: 3,
-              opacity: 0.8,
               fillColor: '#7FAD6B',
               fillOpacity: 0.3
             }
@@ -1243,53 +1150,36 @@
 
       verificationMap.addControl(drawControl);
 
-      // Handle draw created
       verificationMap.on(L.Draw.Event.CREATED, function(e) {
         const layer = e.layer;
-        
-        // Clear previous drawings
         drawnItems.clearLayers();
-        
-        // Add new layer
         drawnItems.addLayer(layer);
 
-        // Get polygon coordinates
         const latlngs = layer.getLatLngs()[0];
         const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
-        coordinates.push(coordinates[0]); // Close polygon
+        coordinates.push(coordinates[0]);
 
         selectedPolygon = {
           type: 'Polygon',
           coordinates: [coordinates]
         };
 
-        // Calculate area using Leaflet's geodesic calculation
         const area = L.GeometryUtil.geodesicArea(latlngs);
         const areaHa = (area / 10000).toFixed(2);
-        const areaRai = (areaHa * 0.625).toFixed(2);
+        const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
 
         document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa} hectares)`;
         document.getElementById('fieldInfo').classList.add('show');
 
-        // Add popup to polygon
-        layer.bindPopup(`
-          <strong>🌾 แปลงของคุณ</strong><br>
-          พื้นที่: ${areaRai} ไร่<br>
-          (${areaHa} hectares)
-        `).openPopup();
-
-        Toast.success('วาดขอบเขตแปลงเรียบร้อยแล้ว! ตรวจสอบจากภาพดาวเทียมว่าถูกต้อง');
+        Toast.success('วาดขอบเขตแปลงเรียบร้อยแล้ว!');
       });
 
-      Toast.info('คลิกบนแผนที่ดาวเทียมเพื่อเริ่มวาดขอบเขต ใช้ภาพถ่ายจากดาวเทียมเป็นแนวทาง');
+      Toast.info('คลิกบนแผนที่เพื่อเริ่มวาดขอบเขต');
     }
 
-    // Clear polygon - FIXED VERSION
     function clearPolygon() {
       drawnItems.clearLayers();
       selectedPolygon = null;
-      
-      // AUTO MODE FIX: Clear saved coordinates
       autoDetectLat = null;
       autoDetectLng = null;
       
@@ -1306,11 +1196,12 @@
         drawControl = null;
       }
 
-      // Also remove burn scar layer when clearing
       removeBurnScarLayer();
     }
 
-    // Analyze burn scar - FIXED VERSION
+    // ========================================
+    // ANALYZE BURN SCAR - SAVES REAL DATA
+    // ========================================
     async function analyzeBurnScar() {
       if (!selectedPolygon && !autoDetectLat) {
         Toast.error('กรุณาระบุขอบเขตแปลงก่อน');
@@ -1318,14 +1209,11 @@
       }
 
       try {
-        // Show analyzing overlay
         document.getElementById('analyzingOverlay').classList.add('show');
 
-        // AUTO MODE FIX: Prepare request based on current mode
         let requestData;
         
         if (currentMode === 'auto' && autoDetectLat && autoDetectLng) {
-          // AUTO MODE - Use lat/lng
           requestData = {
             mode: 'auto',
             lat: autoDetectLat,
@@ -1334,29 +1222,23 @@
             days_back: 90,
             user_id: currentUser.id
           };
-          console.log('🤖 AUTO MODE Analysis:', requestData);
         } else {
-          // MANUAL MODE - Use polygon
           requestData = {
             mode: 'custom',
             polygon: selectedPolygon,
             days_back: 90,
             user_id: currentUser.id
           };
-          console.log('✏️ MANUAL MODE Analysis:', requestData);
         }
 
-        // Call backend
         const result = await API.callBackend('/api/burn-scar/analyze', requestData);
 
-        // Hide analyzing overlay
         document.getElementById('analyzingOverlay').classList.remove('show');
 
         if (result.success) {
           await displayResults(result);
         } else {
           Toast.error(result.error || 'เกิดข้อผิดพลาดในการวิเคราะห์');
-          console.error('Backend error:', result);
         }
       } catch (error) {
         document.getElementById('analyzingOverlay').classList.remove('show');
@@ -1365,33 +1247,63 @@
       }
     }
 
-    // Display results - UPDATED to load burn scar GeoTIFF
+    // ========================================
+    // DISPLAY RESULTS - SAVES REAL DATA TO DATABASE
+    // ========================================
     async function displayResults(result) {
       const resultCard = document.getElementById('resultCard');
       const areaHa = result.farm_area_ha;
-      const areaRai = (areaHa * 0.625).toFixed(2);
-      const burnedRai = (result.burned_area_ha * 0.625).toFixed(2);
+      const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
+      const burnedRai = (result.burned_area_ha * HA_TO_RAI).toFixed(2);
 
-      // Update area
+      // Calculate environmental impact
+      const pm25Prevented = (parseFloat(areaRai) * PM25_PER_RAI).toFixed(2);
+      const co2Prevented = (parseFloat(areaRai) * CO2_PER_RAI).toFixed(2);
+
+      // Update UI
       document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
       document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
       document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
       document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
       
-      // Update data source if available
       if (result.source) {
         document.getElementById('dataSource').textContent = result.source;
       }
 
-      // Update confidence
       const confidencePercent = (result.confidence_score * 100).toFixed(0);
       document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
       document.getElementById('confidenceReason').textContent = result.confidence_reason;
 
       // ========================================
-      // LOAD BURN SCAR GEOTIFF VISUALIZATION
+      // 💾 SAVE VERIFIED FIELD DATA (REAL DATA)
       // ========================================
-      console.log('🗺️ Loading burn scar visualization...');
+      console.log('💾 Saving verification data to database...');
+      try {
+        const saveResult = await API.callBackend('/api/stats/record-verification', {
+          user_id: currentUser.id,
+          analysis_id: result.analysis_id,
+          area_rai: parseFloat(areaRai),
+          area_ha: areaHa,
+          burn_detected: result.burn_detected,
+          burn_percentage: result.burn_percentage,
+          confidence_score: result.confidence_score,
+          lat: autoDetectLat || (selectedPolygon ? selectedPolygon.coordinates[0][0][1] : null),
+          lng: autoDetectLng || (selectedPolygon ? selectedPolygon.coordinates[0][0][0] : null),
+          province: 'เชียงใหม่',
+          field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
+        });
+        
+        if (saveResult.success) {
+          console.log('✅ Verification data saved:', saveResult);
+          console.log(`📊 Environmental Impact: PM2.5=${saveResult.environmental_impact.pm25_prevented_kg}kg, CO2=${saveResult.environmental_impact.co2_prevented_kg}kg`);
+        } else {
+          console.error('❌ Failed to save verification:', saveResult.error);
+        }
+      } catch (error) {
+        console.error('❌ Error saving verification data:', error);
+      }
+
+      // Load burn scar visualization
       await loadBurnScarLayer();
 
       if (!result.burn_detected) {
@@ -1400,38 +1312,39 @@
         document.getElementById('resultIcon').textContent = '✅';
         document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
         document.getElementById('resultSubtitle').textContent = 
-          'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา / No burning detected in the last 3 months';
+          'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
+
+        // Show environmental impact
+        document.getElementById('environmentalImpact').style.display = 'block';
+        document.getElementById('impactPM25').textContent = `${pm25Prevented} kg`;
+        document.getElementById('impactCO2').textContent = `${co2Prevented} kg`;
 
         // Show reward banner
         document.getElementById('rewardBanner').style.display = 'block';
 
-        // Award AgriCoins
+        Toast.success('🎉 คุณได้รับ 100 AgriCoins เข้าบัญชีแล้ว!', 3000);
+        
+        // Update user balance
         try {
-          const rewardResult = await API.callBackend('/agricoin/add', {
-            user_id: currentUser.id,
-            amount: 100,
-            description: 'Burn-free verification reward (3 months)'
+          const balanceResult = await API.callBackend('/agricoin/balance', {
+            user_id: currentUser.id
           });
-
-          if (rewardResult.success) {
-            Toast.success('🎉 คุณได้รับ 100 AgriCoins เข้าบัญชีแล้ว!', 3000);
-            
-            // Update user balance in localStorage
-            currentUser.agricoin_balance = rewardResult.transaction.new_balance;
+          if (balanceResult.success) {
+            currentUser.agricoin_balance = balanceResult.balance;
             Auth.setCurrentUser(currentUser);
           }
-        } catch (error) {
-          console.error('Reward error:', error);
+        } catch (e) {
+          console.error('Error fetching balance:', e);
         }
 
-        // Add green overlay to polygon on map
+        // Green overlay on map
         drawnItems.eachLayer(function(layer) {
           layer.setStyle({
             color: '#4CAF50',
             fillColor: '#66BB6A',
             fillOpacity: 0.4
           });
-          layer.bindPopup('✅ ผ่านการตรวจสอบ<br>No burning detected').openPopup();
+          layer.bindPopup(`✅ ผ่านการตรวจสอบ<br><strong>${areaRai} ไร่</strong><br>PM2.5: -${pm25Prevented}kg | CO₂: -${co2Prevented}kg`).openPopup();
         });
 
       } else {
@@ -1440,30 +1353,30 @@
         document.getElementById('resultIcon').textContent = '⚠️';
         document.getElementById('resultTitle').textContent = 'พบการเผา!';
         document.getElementById('resultSubtitle').textContent = 
-          `พบการเผา ${result.burn_percentage}% ของพื้นที่ / Burning detected on ${result.burn_percentage}% of area`;
+          `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
 
-        // Hide reward banner
+        // Hide environmental impact and reward
+        document.getElementById('environmentalImpact').style.display = 'none';
         document.getElementById('rewardBanner').style.display = 'none';
 
         Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
 
-        // Add red overlay to polygon on map
+        // Red overlay on map
         drawnItems.eachLayer(function(layer) {
           layer.setStyle({
             color: '#EF5350',
             fillColor: '#E57373',
             fillOpacity: 0.4
           });
-          layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br>Burning detected`).openPopup();
+          layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
         });
       }
 
-      // Show results
+      // Show results section
       document.getElementById('resultsSection').classList.add('show');
       document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Reset verification
     function resetVerification() {
       clearPolygon();
       document.getElementById('resultsSection').classList.remove('show');
@@ -1471,13 +1384,10 @@
       Toast.info('เริ่มการตรวจสอบใหม่');
     }
 
-    // View history
-    function viewHistory() {
-      // Navigate to home and show stats
-      window.location.href = 'home.html';
+    function viewStatistics() {
+      window.location.href = 'statistics.html';
     }
 
-    // Logout
     function logout() {
       if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
         Auth.logout();
