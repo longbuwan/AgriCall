@@ -325,6 +325,129 @@
       flex: 1;
     }
 
+    /* Burn Scar Layer Toggle */
+    .burn-layer-toggle {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 2px solid #EF5350;
+    }
+
+    .burn-layer-toggle.hidden {
+      display: none;
+    }
+
+    .toggle-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .toggle-title {
+      font-weight: 600;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #EF5350;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    .opacity-control {
+      margin-top: 0.75rem;
+    }
+
+    .opacity-label {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      margin-bottom: 0.25rem;
+    }
+
+    .opacity-slider {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: linear-gradient(to right, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 1));
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .opacity-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #EF5350;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Legend */
+    .burn-legend {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-medium);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+
     /* Mobile Responsive */
     @media (max-width: 480px) {
       .mode-buttons {
@@ -454,6 +577,39 @@
         </div>
 
         <div id="verificationMap"></div>
+
+        <!-- Burn Scar Layer Toggle (shown after verification) -->
+        <div class="burn-layer-toggle hidden" id="burnLayerToggle">
+          <div class="toggle-header">
+            <div class="toggle-title">
+              <span>🔥</span>
+              <span>แสดงข้อมูลการเผาจากดาวเทียม</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="burnLayerCheckbox" checked onchange="toggleBurnLayer()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="opacity-control">
+            <div class="opacity-label">ความโปร่งใส: <span id="opacityValue">70%</span></div>
+            <input type="range" class="opacity-slider" id="burnOpacitySlider" 
+                   min="10" max="100" value="70" oninput="updateBurnLayerOpacity(this.value)">
+          </div>
+          <div class="burn-legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background: rgba(255, 0, 0, 0.8);"></div>
+              <span>พื้นที่เผาสูง</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: rgba(255, 165, 0, 0.8);"></div>
+              <span>พื้นที่เผาปานกลาง</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: rgba(255, 255, 0, 0.8);"></div>
+              <span>พื้นที่เผาต่ำ</span>
+            </div>
+          </div>
+        </div>
 
         <div class="map-info" id="mapInstructions">
           <div class="map-info-title">
@@ -589,6 +745,11 @@
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  
+  <!-- GeoTIFF Libraries for burn scar visualization -->
+  <script src="https://unpkg.com/georaster"></script>
+  <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+  
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
@@ -611,6 +772,147 @@
     // AUTO MODE FIX: Store coordinates for auto-detected fields
     let autoDetectLat = null;
     let autoDetectLng = null;
+
+    // ========================================
+    // BURN SCAR GEOTIFF LAYER
+    // ========================================
+    let burnScarLayer = null;
+    let burnScarGeoRaster = null;
+    const BURN_SCAR_TIF_PATH = 'strict_burn_tier1_chiangmai.tif';
+
+    /**
+     * Load and display burn scar GeoTIFF overlay
+     */
+    async function loadBurnScarLayer() {
+      try {
+        console.log('🔥 Loading burn scar GeoTIFF:', BURN_SCAR_TIF_PATH);
+        
+        // Fetch the GeoTIFF file
+        const response = await fetch(BURN_SCAR_TIF_PATH);
+        if (!response.ok) {
+          throw new Error(`Failed to load GeoTIFF: ${response.status}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        
+        // Parse GeoTIFF using georaster library
+        burnScarGeoRaster = await parseGeoraster(arrayBuffer);
+        
+        console.log('📊 GeoTIFF metadata:', {
+          width: burnScarGeoRaster.width,
+          height: burnScarGeoRaster.height,
+          numberOfRasters: burnScarGeoRaster.numberOfRasters,
+          xmin: burnScarGeoRaster.xmin,
+          xmax: burnScarGeoRaster.xmax,
+          ymin: burnScarGeoRaster.ymin,
+          ymax: burnScarGeoRaster.ymax,
+          pixelWidth: burnScarGeoRaster.pixelWidth,
+          pixelHeight: burnScarGeoRaster.pixelHeight,
+          projection: burnScarGeoRaster.projection
+        });
+
+        // Create the layer with custom color rendering
+        burnScarLayer = new GeoRasterLayer({
+          georaster: burnScarGeoRaster,
+          opacity: 0.7,
+          resolution: 256,
+          pixelValuesToColorFn: function(values) {
+            const value = values[0];
+            
+            // Handle NoData values (typically 0, -9999, or NaN)
+            if (value === null || value === undefined || isNaN(value) || value === 0 || value === -9999) {
+              return null; // Transparent
+            }
+            
+            // Color scale for burn intensity
+            // Adjust these thresholds based on your actual data range
+            if (value >= 0.8 || value >= 3) {
+              // High burn intensity - Red
+              return 'rgba(255, 0, 0, 0.85)';
+            } else if (value >= 0.5 || value >= 2) {
+              // Medium burn intensity - Orange
+              return 'rgba(255, 140, 0, 0.75)';
+            } else if (value >= 0.2 || value >= 1) {
+              // Low burn intensity - Yellow
+              return 'rgba(255, 200, 0, 0.65)';
+            } else if (value > 0) {
+              // Very low / trace - Light yellow
+              return 'rgba(255, 255, 100, 0.5)';
+            }
+            
+            return null; // Transparent for non-burn areas
+          }
+        });
+
+        // Add to map
+        burnScarLayer.addTo(verificationMap);
+        
+        // Show the toggle control
+        document.getElementById('burnLayerToggle').classList.remove('hidden');
+        
+        // Optionally fit map to the GeoTIFF bounds
+        const bounds = [
+          [burnScarGeoRaster.ymin, burnScarGeoRaster.xmin],
+          [burnScarGeoRaster.ymax, burnScarGeoRaster.xmax]
+        ];
+        
+        console.log('✅ Burn scar layer loaded successfully');
+        console.log('📍 GeoTIFF bounds:', bounds);
+        
+        Toast.success('โหลดข้อมูลการเผาจากดาวเทียมสำเร็จ!');
+        
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Error loading burn scar GeoTIFF:', error);
+        Toast.error('ไม่สามารถโหลดข้อมูลการเผาได้: ' + error.message);
+        return false;
+      }
+    }
+
+    /**
+     * Toggle burn scar layer visibility
+     */
+    function toggleBurnLayer() {
+      const checkbox = document.getElementById('burnLayerCheckbox');
+      
+      if (burnScarLayer) {
+        if (checkbox.checked) {
+          burnScarLayer.addTo(verificationMap);
+          Toast.info('เปิดแสดงข้อมูลการเผา');
+        } else {
+          verificationMap.removeLayer(burnScarLayer);
+          Toast.info('ปิดแสดงข้อมูลการเผา');
+        }
+      }
+    }
+
+    /**
+     * Update burn layer opacity
+     */
+    function updateBurnLayerOpacity(value) {
+      document.getElementById('opacityValue').textContent = value + '%';
+      
+      if (burnScarLayer) {
+        burnScarLayer.setOpacity(value / 100);
+      }
+    }
+
+    /**
+     * Remove burn scar layer
+     */
+    function removeBurnScarLayer() {
+      if (burnScarLayer && verificationMap.hasLayer(burnScarLayer)) {
+        verificationMap.removeLayer(burnScarLayer);
+      }
+      burnScarLayer = null;
+      burnScarGeoRaster = null;
+      document.getElementById('burnLayerToggle').classList.add('hidden');
+    }
+
+    // ========================================
+    // END BURN SCAR LAYER CODE
+    // ========================================
 
     // Initialize map with realistic satellite imagery
     function initMap() {
@@ -1003,6 +1305,9 @@
         verificationMap.removeControl(drawControl);
         drawControl = null;
       }
+
+      // Also remove burn scar layer when clearing
+      removeBurnScarLayer();
     }
 
     // Analyze burn scar - FIXED VERSION
@@ -1060,7 +1365,7 @@
       }
     }
 
-    // Display results
+    // Display results - UPDATED to load burn scar GeoTIFF
     async function displayResults(result) {
       const resultCard = document.getElementById('resultCard');
       const areaHa = result.farm_area_ha;
@@ -1082,6 +1387,12 @@
       const confidencePercent = (result.confidence_score * 100).toFixed(0);
       document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
       document.getElementById('confidenceReason').textContent = result.confidence_reason;
+
+      // ========================================
+      // LOAD BURN SCAR GEOTIFF VISUALIZATION
+      // ========================================
+      console.log('🗺️ Loading burn scar visualization...');
+      await loadBurnScarLayer();
 
       if (!result.burn_detected) {
         // SUCCESS - No burning detected
