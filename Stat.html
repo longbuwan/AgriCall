@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AgriCall - Environmental Impact Statistics</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-green: #10B981;
+      --eco-green-dark: #059669;
+      --eco-green-light: #D1FAE5;
+      --sky-blue: #0EA5E9;
+      --sky-blue-dark: #0284C7;
+      --sky-blue-light: #E0F2FE;
+      --warning-orange: #F59E0B;
+      --danger-red: #EF4444;
+      --purple-accent: #8B5CF6;
+      --dark-bg: #0F172A;
+      --dark-card: #1E293B;
+      --dark-border: #334155;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --gradient-eco: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
+      --gradient-sky: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #0369A1 100%);
+      --gradient-sunset: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      --gradient-purple: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+      --gradient-dark: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Outfit', 'Kanit', sans-serif;
+      background: var(--gradient-dark);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+    
+    /* Animated Background */
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .bg-pattern::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation: pulse 8s ease-in-out infinite;
+    }
+    
+    .bg-pattern::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation: pulse 10s ease-in-out infinite reverse;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+    
+    /* Header */
+    .stats-header {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--dark-border);
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-eco);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: var(--gradient-eco);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--dark-border);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+    
+    /* Main Container */
+    .stats-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    .page-title h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--eco-green) 0%, var(--sky-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-title p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    /* Hero Stats Cards */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .hero-card {
+      background: var(--dark-card);
+      border-radius: 24px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--dark-border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hero-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    
+    .hero-card.pm25::before {
+      background: var(--gradient-sky);
+    }
+    
+    .hero-card.co2::before {
+      background: var(--gradient-eco);
+    }
+    
+    .hero-card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1.25rem;
+    }
+    
+    .hero-card.pm25 .hero-card-icon {
+      background: rgba(14, 165, 233, 0.15);
+    }
+    
+    .hero-card.co2 .hero-card-icon {
+      background: rgba(16, 185, 129, 0.15);
+    }
+    
+    .hero-card-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hero-card-value {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    
+    .hero-card.pm25 .hero-card-value {
+      background: var(--gradient-sky);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-card.co2 .hero-card-value {
+      background: var(--gradient-eco);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-card-unit {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .hero-card-sub {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--dark-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .hero-card-sub span {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    
+    .hero-card-sub strong {
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+    
+    /* Info Cards Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .info-card {
+      background: var(--dark-card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--dark-border);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+      border-color: var(--eco-green);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    
+    .info-card-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .info-card-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-card-label {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Section Title */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    
+    .section-title h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .section-badge {
+      background: var(--gradient-eco);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    /* Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .chart-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px solid var(--dark-border);
+    }
+    
+    .chart-card.full-width {
+      grid-column: span 2;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .chart-canvas-container {
+      position: relative;
+      height: 280px;
+    }
+    
+    /* Personal vs Platform Toggle */
+    .view-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 2rem;
+    }
+    
+    .view-toggle-btn {
+      flex: 1;
+      padding: 0.875rem 1.5rem;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .view-toggle-btn.active {
+      background: var(--gradient-eco);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .view-toggle-btn:not(.active):hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Equivalency Cards */
+    .equivalency-section {
+      margin-bottom: 2rem;
+    }
+    
+    .equivalency-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    
+    .equiv-card {
+      background: var(--dark-card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--dark-border);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .equiv-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .equiv-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .equiv-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--eco-green);
+      margin-bottom: 0.25rem;
+    }
+    
+    .equiv-label {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    
+    /* Leaderboard */
+    .leaderboard-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px solid var(--dark-border);
+      margin-bottom: 2rem;
+    }
+    
+    .leaderboard-list {
+      list-style: none;
+    }
+    
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+    
+    .leaderboard-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+    
+    .leaderboard-rank.gold {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      color: #000;
+    }
+    
+    .leaderboard-rank.silver {
+      background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+      color: #000;
+    }
+    
+    .leaderboard-rank.bronze {
+      background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+      color: #fff;
+    }
+    
+    .leaderboard-rank.normal {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+    }
+    
+    .leaderboard-info {
+      flex: 1;
+    }
+    
+    .leaderboard-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .leaderboard-stats {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    
+    .leaderboard-value {
+      text-align: right;
+    }
+    
+    .leaderboard-primary {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--eco-green);
+    }
+    
+    .leaderboard-secondary {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Achievement Section */
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .achievement-card {
+      background: var(--dark-card);
+      border-radius: 16px;
+      padding: 1.25rem;
+      border: 1px solid var(--dark-border);
+      text-align: center;
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+    
+    .achievement-card.unlocked {
+      opacity: 1;
+      border-color: var(--eco-green);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .achievement-card.unlocked:hover {
+      transform: scale(1.05);
+    }
+    
+    .achievement-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .achievement-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .achievement-desc {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Loading State */
+    .loading-skeleton {
+      background: linear-gradient(90deg, var(--dark-card) 25%, rgba(255,255,255,0.1) 50%, var(--dark-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-card.full-width {
+        grid-column: span 1;
+      }
+      
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .equivalency-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .achievement-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .page-title h1 {
+        font-size: 1.75rem;
+      }
+      
+      .hero-card {
+        padding: 1.5rem;
+      }
+      
+      .hero-card-value {
+        font-size: 2.25rem;
+      }
+      
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+      
+      .info-card {
+        padding: 1rem;
+      }
+      
+      .info-card-value {
+        font-size: 1.5rem;
+      }
+      
+      .equivalency-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .view-toggle {
+        flex-direction: column;
+      }
+      
+      .chart-canvas-container {
+        height: 220px;
+      }
+    }
+    
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  
+  <!-- Header -->
+  <header class="stats-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🌾</div>
+        <span class="logo-text">AgriCall Stats</span>
+      </div>
+      <a href="home.html" class="back-btn">
+        ← กลับหน้าหลัก / Back
+      </a>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="stats-container">
+    <!-- Page Title -->
+    <div class="page-title fade-in">
+      <h1>🌍 Environmental Impact Dashboard</h1>
+      <p>ติดตามผลกระทบเชิงบวกต่อสิ่งแวดล้อมจากการไม่เผาตอซัง / Track your positive environmental impact from no-burn farming</p>
+    </div>
+    
+    <!-- View Toggle -->
+    <div class="view-toggle fade-in stagger-1">
+      <button class="view-toggle-btn active" onclick="switchView('personal')" id="personalBtn">
+        👤 ข้อมูลของฉัน / My Stats
+      </button>
+      <button class="view-toggle-btn" onclick="switchView('platform')" id="platformBtn">
+        🌐 ข้อมูลทั้งแพลตฟอร์ม / Platform Stats
+      </button>
+    </div>
+    
+    <!-- Hero Stats -->
+    <div class="hero-stats fade-in stagger-2">
+      <div class="hero-card pm25">
+        <div class="hero-card-icon">💨</div>
+        <div class="hero-card-label">PM2.5 Prevented</div>
+        <div class="hero-card-value" id="pm25Value">0</div>
+        <div class="hero-card-unit">กิโลกรัม / kilograms</div>
+        <div class="hero-card-sub">
+          <span>พื้นที่ที่ไม่เผา</span>
+          <strong id="pm25Area">0 ไร่</strong>
+        </div>
+      </div>
+      
+      <div class="hero-card co2">
+        <div class="hero-card-icon">🌱</div>
+        <div class="hero-card-label">CO₂ Prevented</div>
+        <div class="hero-card-value" id="co2Value">0</div>
+        <div class="hero-card-unit">กิโลกรัม / kilograms</div>
+        <div class="hero-card-sub">
+          <span>เทียบเท่าต้นไม้ดูดซับ</span>
+          <strong id="treesEquiv">0 ต้น/ปี</strong>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Info Cards -->
+    <div class="info-grid fade-in stagger-3">
+      <div class="info-card">
+        <div class="info-card-icon">📊</div>
+        <div class="info-card-value" id="totalVerifications">0</div>
+        <div class="info-card-label">การตรวจสอบทั้งหมด<br>Total Verifications</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">✅</div>
+        <div class="info-card-value" id="noBurnCount">0</div>
+        <div class="info-card-label">ไม่พบการเผา<br>No Burn Detected</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🌾</div>
+        <div class="info-card-value" id="totalRai">0</div>
+        <div class="info-card-label">พื้นที่รวม (ไร่)<br>Total Area (Rai)</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">⭐</div>
+        <div class="info-card-value" id="successRate">0%</div>
+        <div class="info-card-label">อัตราความสำเร็จ<br>Success Rate</div>
+      </div>
+    </div>
+    
+    <!-- Environmental Equivalency -->
+    <div class="equivalency-section fade-in stagger-4">
+      <div class="section-title">
+        <h2>🌍 ผลกระทบเทียบเท่า / Environmental Equivalency</h2>
+      </div>
+      <div class="equivalency-grid">
+        <div class="equiv-card">
+          <div class="equiv-icon">🚗</div>
+          <div class="equiv-value" id="carKm">0</div>
+          <div class="equiv-label">กิโลเมตรการขับรถ<br>km of car driving avoided</div>
+        </div>
+        <div class="equiv-card">
+          <div class="equiv-icon">🏠</div>
+          <div class="equiv-value" id="homeEnergy">0</div>
+          <div class="equiv-label">วันใช้ไฟฟ้าบ้าน<br>days of home electricity</div>
+        </div>
+        <div class="equiv-card">
+          <div class="equiv-icon">🌳</div>
+          <div class="equiv-value" id="treesPlanted">0</div>
+          <div class="equiv-label">ต้นไม้ที่ต้องปลูก<br>trees needed to absorb</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="charts-grid fade-in stagger-5">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📈 PM2.5 Prevention Trend</div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="pm25Chart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📊 CO₂ Prevention Trend</div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="co2Chart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">🥧 Verification Results</div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="verificationPieChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📍 Area by Province</div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="provinceChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-card full-width">
+        <div class="chart-header">
+          <div class="chart-title">📅 Monthly Impact Summary</div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Achievements Section -->
+    <div class="section-title">
+      <h2>🏆 ความสำเร็จ / Achievements</h2>
+      <span class="section-badge" id="achievementCount">0/8</span>
+    </div>
+    <div class="achievement-grid">
+      <div class="achievement-card" id="achieve1">
+        <div class="achievement-icon">🌱</div>
+        <div class="achievement-name">First Step</div>
+        <div class="achievement-desc">ตรวจสอบครั้งแรก</div>
+      </div>
+      <div class="achievement-card" id="achieve2">
+        <div class="achievement-icon">🌿</div>
+        <div class="achievement-name">Green Guardian</div>
+        <div class="achievement-desc">5 ครั้งไม่พบการเผา</div>
+      </div>
+      <div class="achievement-card" id="achieve3">
+        <div class="achievement-icon">🌳</div>
+        <div class="achievement-name">Forest Saver</div>
+        <div class="achievement-desc">ป้องกัน CO₂ 1,000 kg</div>
+      </div>
+      <div class="achievement-card" id="achieve4">
+        <div class="achievement-icon">💨</div>
+        <div class="achievement-name">Air Protector</div>
+        <div class="achievement-desc">ป้องกัน PM2.5 100 kg</div>
+      </div>
+      <div class="achievement-card" id="achieve5">
+        <div class="achievement-icon">🏅</div>
+        <div class="achievement-name">Area Master</div>
+        <div class="achievement-desc">ตรวจสอบ 100 ไร่</div>
+      </div>
+      <div class="achievement-card" id="achieve6">
+        <div class="achievement-icon">⭐</div>
+        <div class="achievement-name">Consistency King</div>
+        <div class="achievement-desc">100% ไม่พบการเผา</div>
+      </div>
+      <div class="achievement-card" id="achieve7">
+        <div class="achievement-icon">🚀</div>
+        <div class="achievement-name">Super Farmer</div>
+        <div class="achievement-desc">ป้องกัน CO₂ 10,000 kg</div>
+      </div>
+      <div class="achievement-card" id="achieve8">
+        <div class="achievement-icon">👑</div>
+        <div class="achievement-name">Eco Champion</div>
+        <div class="achievement-desc">Top 10 ของแพลตฟอร์ม</div>
+      </div>
+    </div>
+    
+    <!-- Leaderboard (Platform View Only) -->
+    <div class="leaderboard-card" id="leaderboardSection" style="display: none;">
+      <div class="section-title">
+        <h2>🏆 Top Environmental Heroes</h2>
+      </div>
+      <ul class="leaderboard-list" id="leaderboardList">
+        <!-- Populated by JavaScript -->
+      </ul>
+    </div>
+  </main>
+  
+  <!-- Toast -->
+  <div id="toast" class="toast" style="display: none;"></div>
+  
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+  
+  <script src="utils.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Check authentication
+    const currentUser = Auth.getCurrentUser();
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+    
+    // Constants for calculations
+    const PM25_PER_RAI = 4.18;  // kg PM2.5 per rai
+    const CO2_PER_RAI = 446.11; // kg CO2 per rai
+    const HA_TO_RAI = 6.25;     // 1 hectare = 6.25 rai
+    const CO2_PER_TREE_YEAR = 21; // kg CO2 absorbed per tree per year
+    const CO2_PER_CAR_KM = 0.21;  // kg CO2 per km driven
+    const CO2_PER_HOME_DAY = 15;  // kg CO2 per day home electricity
+    
+    // State
+    let currentView = 'personal';
+    let personalData = null;
+    let platformData = null;
+    let charts = {};
+    
+    // Chart.js default configuration
+    Chart.defaults.color = '#94A3B8';
+    Chart.defaults.borderColor = '#334155';
+    Chart.defaults.font.family = "'Outfit', 'Kanit', sans-serif";
+    
+    // Initialize
+    async function initializeStats() {
+      try {
+        Loading.show();
+        
+        // Load both personal and platform data
+        await Promise.all([
+          loadPersonalStats(),
+          loadPlatformStats()
+        ]);
+        
+        // Display personal stats by default
+        updateDisplay();
+        initializeCharts();
+        updateAchievements();
+        
+        Loading.hide();
+      } catch (error) {
+        Loading.hide();
+        console.error('Error initializing stats:', error);
+        Toast.error('ไม่สามารถโหลดข้อมูลได้ / Failed to load statistics');
+      }
+    }
+    
+    // Load personal statistics
+    async function loadPersonalStats() {
+      try {
+        const result = await API.callBackend('/api/stats/personal', {
+          user_id: currentUser.id
+        });
+        
+        if (result.success) {
+          personalData = result.stats;
+        } else {
+          // Use mock data if API fails
+          personalData = generateMockPersonalData();
+        }
+      } catch (error) {
+        console.error('Error loading personal stats:', error);
+        personalData = generateMockPersonalData();
+      }
+    }
+    
+    // Load platform statistics
+    async function loadPlatformStats() {
+      try {
+        const result = await API.callBackend('/api/stats/platform', {});
+        
+        if (result.success) {
+          platformData = result.stats;
+        } else {
+          // Use mock data if API fails
+          platformData = generateMockPlatformData();
+        }
+      } catch (error) {
+        console.error('Error loading platform stats:', error);
+        platformData = generateMockPlatformData();
+      }
+    }
+    
+    // Generate mock personal data for demo
+    function generateMockPersonalData() {
+      const totalRai = Math.floor(Math.random() * 100) + 20;
+      const noBurnCount = Math.floor(Math.random() * 10) + 3;
+      const totalVerifications = noBurnCount + Math.floor(Math.random() * 3);
+      
+      return {
+        total_verifications: totalVerifications,
+        no_burn_count: noBurnCount,
+        burn_detected_count: totalVerifications - noBurnCount,
+        total_area_rai: totalRai,
+        verified_no_burn_area_rai: totalRai * 0.85,
+        pm25_prevented: totalRai * 0.85 * PM25_PER_RAI,
+        co2_prevented: totalRai * 0.85 * CO2_PER_RAI,
+        monthly_data: generateMockMonthlyData(),
+        success_rate: (noBurnCount / totalVerifications * 100).toFixed(1)
+      };
+    }
+    
+    // Generate mock platform data for demo
+    function generateMockPlatformData() {
+      const totalRai = Math.floor(Math.random() * 5000) + 2000;
+      const noBurnCount = Math.floor(Math.random() * 200) + 100;
+      const totalVerifications = noBurnCount + Math.floor(Math.random() * 50);
+      
+      return {
+        total_users: Math.floor(Math.random() * 100) + 50,
+        total_verifications: totalVerifications,
+        no_burn_count: noBurnCount,
+        burn_detected_count: totalVerifications - noBurnCount,
+        total_area_rai: totalRai,
+        verified_no_burn_area_rai: totalRai * 0.82,
+        pm25_prevented: totalRai * 0.82 * PM25_PER_RAI,
+        co2_prevented: totalRai * 0.82 * CO2_PER_RAI,
+        monthly_data: generateMockMonthlyData(true),
+        province_data: generateMockProvinceData(),
+        leaderboard: generateMockLeaderboard(),
+        success_rate: (noBurnCount / totalVerifications * 100).toFixed(1)
+      };
+    }
+    
+    // Generate mock monthly data
+    function generateMockMonthlyData(isplatform = false) {
+      const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'];
+      const multiplier = isplatform ? 50 : 1;
+      
+      return months.map((month, i) => ({
+        month: month,
+        area_rai: Math.floor(Math.random() * 30 + 10) * multiplier,
+        pm25_prevented: Math.floor(Math.random() * 100 + 50) * multiplier,
+        co2_prevented: Math.floor(Math.random() * 10000 + 5000) * multiplier,
+        verifications: Math.floor(Math.random() * 5 + 2) * multiplier
+      }));
+    }
+    
+    // Generate mock province data
+    function generateMockProvinceData() {
+      return [
+        { province: 'เชียงใหม่', area_rai: 850, verifications: 45 },
+        { province: 'เชียงราย', area_rai: 620, verifications: 32 },
+        { province: 'ลำพูน', area_rai: 480, verifications: 28 },
+        { province: 'ลำปาง', area_rai: 350, verifications: 20 },
+        { province: 'อื่นๆ', area_rai: 200, verifications: 15 }
+      ];
+    }
+    
+    // Generate mock leaderboard
+    function generateMockLeaderboard() {
+      const names = ['สมชาย ใจดี', 'วิภา รักนา', 'อนันต์ เขียวขจี', 'จันทร์ สว่างฟ้า', 'มานะ ทำดี'];
+      return names.map((name, i) => ({
+        rank: i + 1,
+        name: name,
+        area_rai: Math.floor(Math.random() * 200 + 100) - i * 20,
+        co2_prevented: Math.floor(Math.random() * 50000 + 30000) - i * 5000,
+        verifications: Math.floor(Math.random() * 20 + 10) - i * 2
+      }));
+    }
+    
+    // Switch between personal and platform view
+    function switchView(view) {
+      currentView = view;
+      
+      document.getElementById('personalBtn').classList.toggle('active', view === 'personal');
+      document.getElementById('platformBtn').classList.toggle('active', view === 'platform');
+      document.getElementById('leaderboardSection').style.display = view === 'platform' ? 'block' : 'none';
+      
+      updateDisplay();
+      updateCharts();
+      updateAchievements();
+    }
+    
+    // Update display with current data
+    function updateDisplay() {
+      const data = currentView === 'personal' ? personalData : platformData;
+      if (!data) return;
+      
+      // Animate number updates
+      animateNumber('pm25Value', data.pm25_prevented, 1);
+      animateNumber('co2Value', data.co2_prevented, 0);
+      animateNumber('totalVerifications', data.total_verifications, 0);
+      animateNumber('noBurnCount', data.no_burn_count, 0);
+      animateNumber('totalRai', data.total_area_rai, 0);
+      
+      document.getElementById('pm25Area').textContent = `${data.verified_no_burn_area_rai.toFixed(1)} ไร่`;
+      document.getElementById('successRate').textContent = `${data.success_rate}%`;
+      
+      // Calculate equivalencies
+      const treesEquiv = Math.round(data.co2_prevented / CO2_PER_TREE_YEAR);
+      const carKm = Math.round(data.co2_prevented / CO2_PER_CAR_KM);
+      const homeDays = Math.round(data.co2_prevented / CO2_PER_HOME_DAY);
+      
+      document.getElementById('treesEquiv').textContent = `${treesEquiv.toLocaleString()} ต้น/ปี`;
+      animateNumber('carKm', carKm, 0);
+      animateNumber('homeEnergy', homeDays, 0);
+      animateNumber('treesPlanted', treesEquiv, 0);
+      
+      // Update leaderboard if platform view
+      if (currentView === 'platform' && data.leaderboard) {
+        updateLeaderboard(data.leaderboard);
+      }
+    }
+    
+    // Animate number counting
+    function animateNumber(elementId, targetValue, decimals = 0) {
+      const element = document.getElementById(elementId);
+      const startValue = parseFloat(element.textContent.replace(/,/g, '')) || 0;
+      const duration = 1000;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentValue = startValue + (targetValue - startValue) * easeOut;
+        
+        if (decimals > 0) {
+          element.textContent = currentValue.toFixed(decimals);
+        } else {
+          element.textContent = Math.round(currentValue).toLocaleString();
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+      
+      requestAnimationFrame(update);
+    }
+    
+    // Initialize all charts
+    function initializeCharts() {
+      const data = currentView === 'personal' ? personalData : platformData;
+      if (!data) return;
+      
+      // PM2.5 Chart
+      const pm25Ctx = document.getElementById('pm25Chart').getContext('2d');
+      charts.pm25 = new Chart(pm25Ctx, {
+        type: 'line',
+        data: {
+          labels: data.monthly_data.map(d => d.month),
+          datasets: [{
+            label: 'PM2.5 Prevented (kg)',
+            data: data.monthly_data.map(d => d.pm25_prevented),
+            borderColor: '#0EA5E9',
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#0EA5E9',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+      
+      // CO2 Chart
+      const co2Ctx = document.getElementById('co2Chart').getContext('2d');
+      charts.co2 = new Chart(co2Ctx, {
+        type: 'bar',
+        data: {
+          labels: data.monthly_data.map(d => d.month),
+          datasets: [{
+            label: 'CO₂ Prevented (kg)',
+            data: data.monthly_data.map(d => d.co2_prevented),
+            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+            borderColor: '#10B981',
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+      
+      // Verification Pie Chart
+      const pieCtx = document.getElementById('verificationPieChart').getContext('2d');
+      charts.pie = new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['ไม่พบการเผา', 'พบการเผา'],
+          datasets: [{
+            data: [data.no_burn_count, data.burn_detected_count],
+            backgroundColor: ['#10B981', '#EF4444'],
+            borderWidth: 0,
+            cutout: '70%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true
+              }
+            }
+          }
+        }
+      });
+      
+      // Province Chart (platform only)
+      const provinceData = platformData?.province_data || [
+        { province: 'เชียงใหม่', area_rai: 100 },
+        { province: 'เชียงราย', area_rai: 80 },
+        { province: 'ลำพูน', area_rai: 60 },
+        { province: 'ลำปาง', area_rai: 40 },
+        { province: 'อื่นๆ', area_rai: 20 }
+      ];
+      
+      const provinceCtx = document.getElementById('provinceChart').getContext('2d');
+      charts.province = new Chart(provinceCtx, {
+        type: 'polarArea',
+        data: {
+          labels: provinceData.map(d => d.province),
+          datasets: [{
+            data: provinceData.map(d => d.area_rai),
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.7)',
+              'rgba(14, 165, 233, 0.7)',
+              'rgba(139, 92, 246, 0.7)',
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(239, 68, 68, 0.7)'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            }
+          }
+        }
+      });
+      
+      // Monthly Impact Chart
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      charts.monthly = new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: data.monthly_data.map(d => d.month),
+          datasets: [
+            {
+              label: 'พื้นที่ (ไร่)',
+              data: data.monthly_data.map(d => d.area_rai),
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              fill: true,
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'การตรวจสอบ',
+              data: data.monthly_data.map(d => d.verifications),
+              borderColor: '#8B5CF6',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                padding: 20,
+                usePointStyle: true
+              }
+            }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: { drawOnChartArea: false }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+    
+    // Update charts with new data
+    function updateCharts() {
+      const data = currentView === 'personal' ? personalData : platformData;
+      if (!data || !charts.pm25) return;
+      
+      // Update PM2.5 chart
+      charts.pm25.data.labels = data.monthly_data.map(d => d.month);
+      charts.pm25.data.datasets[0].data = data.monthly_data.map(d => d.pm25_prevented);
+      charts.pm25.update();
+      
+      // Update CO2 chart
+      charts.co2.data.labels = data.monthly_data.map(d => d.month);
+      charts.co2.data.datasets[0].data = data.monthly_data.map(d => d.co2_prevented);
+      charts.co2.update();
+      
+      // Update Pie chart
+      charts.pie.data.datasets[0].data = [data.no_burn_count, data.burn_detected_count];
+      charts.pie.update();
+      
+      // Update Province chart
+      if (data.province_data) {
+        charts.province.data.labels = data.province_data.map(d => d.province);
+        charts.province.data.datasets[0].data = data.province_data.map(d => d.area_rai);
+        charts.province.update();
+      }
+      
+      // Update Monthly chart
+      charts.monthly.data.labels = data.monthly_data.map(d => d.month);
+      charts.monthly.data.datasets[0].data = data.monthly_data.map(d => d.area_rai);
+      charts.monthly.data.datasets[1].data = data.monthly_data.map(d => d.verifications);
+      charts.monthly.update();
+    }
+    
+    // Update leaderboard
+    function updateLeaderboard(leaderboard) {
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+      
+      leaderboard.forEach((item, index) => {
+        const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal';
+        
+        list.innerHTML += `
+          <li class="leaderboard-item">
+            <div class="leaderboard-rank ${rankClass}">${item.rank}</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">${item.name}</div>
+              <div class="leaderboard-stats">${item.area_rai} ไร่ • ${item.verifications} การตรวจสอบ</div>
+            </div>
+            <div class="leaderboard-value">
+              <div class="leaderboard-primary">${(item.co2_prevented / 1000).toFixed(1)}t CO₂</div>
+              <div class="leaderboard-secondary">prevented</div>
+            </div>
+          </li>
+        `;
+      });
+    }
+    
+    // Update achievements
+    function updateAchievements() {
+      const data = currentView === 'personal' ? personalData : platformData;
+      if (!data) return;
+      
+      let unlockedCount = 0;
+      
+      // Achievement 1: First verification
+      if (data.total_verifications >= 1) {
+        document.getElementById('achieve1').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 2: 5 no burns
+      if (data.no_burn_count >= 5) {
+        document.getElementById('achieve2').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 3: 1000 kg CO2
+      if (data.co2_prevented >= 1000) {
+        document.getElementById('achieve3').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 4: 100 kg PM2.5
+      if (data.pm25_prevented >= 100) {
+        document.getElementById('achieve4').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 5: 100 rai
+      if (data.total_area_rai >= 100) {
+        document.getElementById('achieve5').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 6: 100% success rate
+      if (parseFloat(data.success_rate) >= 100) {
+        document.getElementById('achieve6').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 7: 10000 kg CO2
+      if (data.co2_prevented >= 10000) {
+        document.getElementById('achieve7').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      // Achievement 8: Top 10 (platform only)
+      if (currentView === 'platform') {
+        document.getElementById('achieve8').classList.add('unlocked');
+        unlockedCount++;
+      }
+      
+      document.getElementById('achievementCount').textContent = `${unlockedCount}/8`;
+    }
+    
+    // Initialize on page load
+    initializeStats();
+  </script>
+</body>
+</html>
