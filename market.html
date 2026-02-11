@@ -1021,10 +1021,10 @@
     // Update checkout summary
     function updateCheckoutSummary() {
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const total = subtotal - coinsUsed;
+      const total = subtotal - (coinsUsed*0.5);
 
       document.getElementById('summarySubtotal').textContent = `${subtotal} ฿`;
-      document.getElementById('summaryDiscount').textContent = `-${coinsUsed} ฿`;
+      document.getElementById('summaryDiscount').textContent = `-${(coinsUsed)*0.5} ฿`;
       document.getElementById('summaryTotal').textContent = `${total} ฿`;
     }
 
