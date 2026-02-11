@@ -336,6 +336,7 @@
       opacity: 0.9;
     }
 
+    /* Reward Banner - Enhanced */
     .reward-banner {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: var(--white);
@@ -353,6 +354,59 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+    }
+
+    /* NEW: Reward Breakdown Section */
+    .reward-breakdown {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-top: 1rem;
+      text-align: left;
+    }
+
+    .reward-breakdown-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .reward-breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.875rem;
+    }
+
+    .reward-breakdown-item:last-child {
+      border-bottom: none;
+      font-weight: 600;
+      padding-top: 0.75rem;
+      margin-top: 0.25rem;
+      border-top: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .reward-breakdown-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .reward-breakdown-value {
+      font-weight: 600;
+    }
+
+    .reward-explanation {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-top: 0.75rem;
+      line-height: 1.5;
+      text-align: center;
     }
 
     .action-buttons {
@@ -513,6 +567,10 @@
       .impact-grid {
         grid-template-columns: 1fr;
       }
+
+      .reward-breakdown-item {
+        font-size: 0.8rem;
+      }
     }
 
     /* Loading Animation */
@@ -567,7 +625,7 @@
 </head>
 <body>
   <div class="verification-container">
-    <-- Header -->
+    <!-- Header -->
     <div class="verification-header">
       <div class="header-content">
         <div class="header-title">
@@ -576,14 +634,14 @@
         </div>
         <div class="header-subtitle">
           ตรวจสอบว่าไร่ของคุณไม่มีการเผาในช่วง 3 เดือนที่ผ่านมา<br>
-          รับ 100 AgriCoins เมื่อผ่านการตรวจสอบ<br>
-          Verify your farm has no burning in the last 3 months and earn 100 AgriCoins
+          รับ AgriCoins ตามขนาดพื้นที่และผลกระทบสิ่งแวดล้อม<br>
+          Verify your farm has no burning and earn AgriCoins based on environmental impact
         </div>
       </div>
     </div>
 
     <div class="content-wrapper">
-      <-- Mode Selection -->
+      <!-- Mode Selection -->
       <div class="mode-selector">
         <div class="mode-title">เลือกวิธีการระบุแปลง / Select Field Method</div>
         <div class="mode-buttons">
@@ -606,7 +664,7 @@
         </div>
       </div>
 
-      <-- Map Section -->
+      <!-- Map Section -->
       <div class="map-section">
         <div class="map-controls">
           <button class="btn btn-primary" onclick="useCurrentLocation()">
@@ -622,7 +680,7 @@
 
         <div id="verificationMap"></div>
 
-        <-- Burn Scar Layer Toggle (shown after verification) -->
+        <!-- Burn Scar Layer Toggle (shown after verification) -->
         <div class="burn-layer-toggle hidden" id="burnLayerToggle">
           <div class="toggle-header">
             <div class="toggle-title">
@@ -669,7 +727,7 @@
         </div>
       </div>
 
-      <-- Field Info -->
+      <!-- Field Info -->
       <div class="field-info" id="fieldInfo">
         <h3 style="margin-bottom: 1rem;">ข้อมูลแปลง / Field Information</h3>
         <div class="info-row">
@@ -690,7 +748,7 @@
         </button>
       </div>
 
-      <-- Results Section -->
+      <!-- Results Section -->
       <div class="results-section" id="resultsSection">
         <div class="result-card" id="resultCard">
           <div class="result-icon" id="resultIcon">✅</div>
@@ -729,7 +787,7 @@
             <div class="confidence-text" id="confidenceReason">-</div>
           </div>
           
-          <-- Environmental Impact (shown for successful verifications) -->
+          <!-- Environmental Impact (shown for successful verifications) -->
           <div class="environmental-impact" id="environmentalImpact" style="display: none;">
             <div class="impact-title">
               <span>🌍</span>
@@ -747,13 +805,49 @@
             </div>
           </div>
 
+          <!-- Reward Banner - Now with detailed breakdown -->
           <div class="reward-banner" id="rewardBanner" style="display: none;">
             <div>🎉 ยินดีด้วย คุณได้รับ</div>
             <div class="reward-amount">
               <img src="Untitled_design-removebg-preview.png" class="coin" style="width: 40px; height: 40px;">
-              <span>+100</span>
+              <span id="totalAgricoins">+100</span>
             </div>
-            <div>AgriCoins เข้าบัญชีแล้ว</div>
+            <div>AgriCoins เข้าบัญชีแล้ว!</div>
+            
+            <!-- Reward Breakdown -->
+            <div class="reward-breakdown" id="rewardBreakdown">
+              <div class="reward-breakdown-title">
+                <span>📋</span>
+                <span>รายละเอียดการคำนวณ</span>
+              </div>
+              <div class="reward-breakdown-item">
+                <span class="reward-breakdown-label">
+                  <span>🌫️</span>
+                  <span>PM2.5 ที่ลดได้ (<span id="breakdownPM25kg">0</span> kg × 10)</span>
+                </span>
+                <span class="reward-breakdown-value" id="breakdownPM25coins">+0</span>
+              </div>
+              <div class="reward-breakdown-item">
+                <span class="reward-breakdown-label">
+                  <span>🌱</span>
+                  <span>CO₂ ที่ลดได้ (<span id="breakdownCO2kg">0</span> kg ÷ 100)</span>
+                </span>
+                <span class="reward-breakdown-value" id="breakdownCO2coins">+0</span>
+              </div>
+              <div class="reward-breakdown-item">
+                <span class="reward-breakdown-label">
+                  <span>🏆</span>
+                  <span>รวมทั้งหมด</span>
+                </span>
+                <span class="reward-breakdown-value" id="breakdownTotal">+0</span>
+              </div>
+            </div>
+            
+            <div class="reward-explanation">
+              💡 ยิ่งพื้นที่ใหญ่และไม่มีการเผา ยิ่งช่วยลดมลพิษได้มาก<br>
+              ทุก 100g ของ PM2.5 ที่ลดได้ = 1 AgriCoin<br>
+              ทุก 100kg ของ CO₂ ที่ลดได้ = 1 AgriCoin
+            </div>
           </div>
         </div>
 
@@ -824,9 +918,13 @@
     // ========================================
     // CONSTANTS FOR ENVIRONMENTAL CALCULATIONS
     // ========================================
-    const PM25_PER_RAI = 3.88;      // kg PM2.5 prevented per rai
-    const CO2_PER_RAI = 898;     // kg CO2 prevented per rai  
+    const PM25_PER_RAI = 3.88;      // kg PM2.5 prevented per rai (based on research)
+    const CO2_PER_RAI = 898;        // kg CO2 prevented per rai (based on biomass burning studies)
     const HA_TO_RAI = 6.25;         // 1 hectare = 6.25 rai
+
+    // AgriCoin calculation rates
+    const COINS_PER_100G_PM25 = 1;  // 1 coin per 100g of PM2.5 prevented
+    const COINS_PER_100KG_CO2 = 1;  // 1 coin per 100kg of CO2 prevented
 
     // Global variables
     let verificationMap = null;
@@ -1248,150 +1346,173 @@
     }
 
     // ========================================
+    // CALCULATE AGRICOINS WITH BREAKDOWN
+    // ========================================
+    function calculateAgricoins(areaRai) {
+      const pm25Prevented = parseFloat(areaRai) * PM25_PER_RAI;  // kg
+      const co2Prevented = parseFloat(areaRai) * CO2_PER_RAI;   // kg
+      
+      // PM2.5: 1 coin per 100g (0.1 kg) = multiply by 10
+      const pm25Coins = Math.floor(pm25Prevented * 10);
+      
+      // CO2: 1 coin per 100kg = divide by 100
+      const co2Coins = Math.floor(co2Prevented / 100);
+      
+      const totalCoins = pm25Coins + co2Coins;
+      
+      return {
+        pm25Prevented: pm25Prevented.toFixed(2),
+        co2Prevented: co2Prevented.toFixed(2),
+        pm25Coins: pm25Coins,
+        co2Coins: co2Coins,
+        totalCoins: totalCoins
+      };
+    }
+
+    // ========================================
     // DISPLAY RESULTS - SAVES REAL DATA TO DATABASE
     // ========================================
-  // ========================================
-// DISPLAY RESULTS - SAVES REAL DATA TO DATABASE
-// ========================================
-async function displayResults(result) {
-  const resultCard = document.getElementById('resultCard');
-  const areaHa = result.farm_area_ha;
-  const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
-  const burnedRai = (result.burned_area_ha * HA_TO_RAI).toFixed(2);
+    async function displayResults(result) {
+      const resultCard = document.getElementById('resultCard');
+      const areaHa = result.farm_area_ha;
+      const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
+      const burnedRai = (result.burned_area_ha * HA_TO_RAI).toFixed(2);
 
-  // Calculate environmental impact
-  const pm25Prevented = (parseFloat(areaRai) * PM25_PER_RAI).toFixed(2);
-  const co2Prevented = (parseFloat(areaRai) * CO2_PER_RAI).toFixed(2);
+      // Calculate environmental impact and coins
+      const coinCalc = calculateAgricoins(areaRai);
 
-  // Update UI
-  document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
-  document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
-  document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
-  document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
-  
-  if (result.source) {
-    document.getElementById('dataSource').textContent = result.source;
-  }
-
-  const confidencePercent = (result.confidence_score * 100).toFixed(0);
-  document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
-  document.getElementById('confidenceReason').textContent = result.confidence_reason;
-
-  // ========================================
-  // 💾 SAVE VERIFIED FIELD DATA (REAL DATA)
-  // ========================================
-  console.log('💾 Saving verification data to database...');
-  try {
-    const saveResult = await API.callBackend('/api/stats/record-verification', {
-      user_id: currentUser.id,
-      analysis_id: result.analysis_id,
-      area_rai: parseFloat(areaRai),
-      area_ha: areaHa,
-      burn_detected: result.burn_detected,
-      burn_percentage: result.burn_percentage,
-      confidence_score: result.confidence_score,
-      lat: autoDetectLat || (selectedPolygon ? selectedPolygon.coordinates[0][0][1] : null),
-      lng: autoDetectLng || (selectedPolygon ? selectedPolygon.coordinates[0][0][0] : null),
-      province: 'เชียงใหม่',
-      field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
-    });
-    
-    if (saveResult.success) {
-      console.log('✅ Verification data saved:', saveResult);
-      console.log(`📊 Environmental Impact: PM2.5=${saveResult.environmental_impact.pm25_prevented_kg}kg, CO2=${saveResult.environmental_impact.co2_prevented_kg}kg`);
-    } else {
-      console.error('❌ Failed to save verification:', saveResult.error);
-    }
-  } catch (error) {
-    console.error('❌ Error saving verification data:', error);
-  }
-
-  // Load burn scar visualization
-  await loadBurnScarLayer();
-
-  if (!result.burn_detected) {
-    // SUCCESS - No burning detected
-    resultCard.className = 'result-card success';
-    document.getElementById('resultIcon').textContent = '✅';
-    document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
-    document.getElementById('resultSubtitle').textContent = 
-      'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
-
-    // Show environmental impact
-    document.getElementById('environmentalImpact').style.display = 'block';
-    document.getElementById('impactPM25').textContent = `${pm25Prevented} kg`;
-    document.getElementById('impactCO2').textContent = `${co2Prevented} kg`;
-
-    // Calculate AgriCoins: (CO2/100kg) + (PM2.5/100g)
-    const agricoinsEarned = Math.floor(parseFloat(co2Prevented) / 100 + parseFloat(pm25Prevented) * 10);
-
-    // Add AgriCoins to user account
-    try {
-      const balanceResult = await API.callBackend('/agricoin/add', {
-        user_id: currentUser.id,
-        amount: agricoinsEarned,
-        description: `Burn verification reward - ${areaRai} rai`
-      });
-      if (balanceResult.success) {
-        currentUser.agricoin_balance = balanceResult.transaction.new_balance;
-        Auth.setCurrentUser(currentUser);
+      // Update UI
+      document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
+      document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
+      document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
+      document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
+      
+      if (result.source) {
+        document.getElementById('dataSource').textContent = result.source;
       }
-    } catch (e) {
-      console.error('Error adding AgriCoins:', e);
+
+      const confidencePercent = (result.confidence_score * 100).toFixed(0);
+      document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
+      document.getElementById('confidenceReason').textContent = result.confidence_reason;
+
+      // ========================================
+      // 💾 SAVE VERIFIED FIELD DATA (REAL DATA)
+      // ========================================
+      console.log('💾 Saving verification data to database...');
+      try {
+        const saveResult = await API.callBackend('/api/stats/record-verification', {
+          user_id: currentUser.id,
+          analysis_id: result.analysis_id,
+          area_rai: parseFloat(areaRai),
+          area_ha: areaHa,
+          burn_detected: result.burn_detected,
+          burn_percentage: result.burn_percentage,
+          confidence_score: result.confidence_score,
+          lat: autoDetectLat || (selectedPolygon ? selectedPolygon.coordinates[0][0][1] : null),
+          lng: autoDetectLng || (selectedPolygon ? selectedPolygon.coordinates[0][0][0] : null),
+          province: 'เชียงใหม่',
+          field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
+        });
+        
+        if (saveResult.success) {
+          console.log('✅ Verification data saved:', saveResult);
+          console.log(`📊 Environmental Impact: PM2.5=${coinCalc.pm25Prevented}kg, CO2=${coinCalc.co2Prevented}kg`);
+        } else {
+          console.error('❌ Failed to save verification:', saveResult.error);
+        }
+      } catch (error) {
+        console.error('❌ Error saving verification data:', error);
+      }
+
+      // Load burn scar visualization
+      await loadBurnScarLayer();
+
+      if (!result.burn_detected) {
+        // SUCCESS - No burning detected
+        resultCard.className = 'result-card success';
+        document.getElementById('resultIcon').textContent = '✅';
+        document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
+        document.getElementById('resultSubtitle').textContent = 
+          'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
+
+        // Show environmental impact
+        document.getElementById('environmentalImpact').style.display = 'block';
+        document.getElementById('impactPM25').textContent = `${coinCalc.pm25Prevented} kg`;
+        document.getElementById('impactCO2').textContent = `${coinCalc.co2Prevented} kg`;
+
+        // Add AgriCoins to user account
+        try {
+          const balanceResult = await API.callBackend('/agricoin/add', {
+            user_id: currentUser.id,
+            amount: coinCalc.totalCoins,
+            description: `Burn verification reward - ${areaRai} rai (PM2.5: ${coinCalc.pm25Prevented}kg, CO2: ${coinCalc.co2Prevented}kg)`
+          });
+          if (balanceResult.success) {
+            currentUser.agricoin_balance = balanceResult.transaction.new_balance;
+            Auth.setCurrentUser(currentUser);
+          }
+        } catch (e) {
+          console.error('Error adding AgriCoins:', e);
+        }
+
+        // Show reward banner with detailed breakdown
+        document.getElementById('rewardBanner').style.display = 'block';
+        document.getElementById('totalAgricoins').textContent = `+${coinCalc.totalCoins}`;
+        
+        // Update breakdown details
+        document.getElementById('breakdownPM25kg').textContent = coinCalc.pm25Prevented;
+        document.getElementById('breakdownPM25coins').textContent = `+${coinCalc.pm25Coins}`;
+        document.getElementById('breakdownCO2kg').textContent = coinCalc.co2Prevented;
+        document.getElementById('breakdownCO2coins').textContent = `+${coinCalc.co2Coins}`;
+        document.getElementById('breakdownTotal').textContent = `+${coinCalc.totalCoins} AgriCoins`;
+
+        Toast.success(`🎉 คุณได้รับ ${coinCalc.totalCoins} AgriCoins เข้าบัญชีแล้ว!`, 3000);
+
+        // Green overlay on map
+        drawnItems.eachLayer(function(layer) {
+          layer.setStyle({
+            color: '#4CAF50',
+            fillColor: '#66BB6A',
+            fillOpacity: 0.4
+          });
+          layer.bindPopup(`
+            ✅ ผ่านการตรวจสอบ<br>
+            <strong>${areaRai} ไร่</strong><br>
+            🌫️ PM2.5: -${coinCalc.pm25Prevented}kg<br>
+            🌱 CO₂: -${coinCalc.co2Prevented}kg<br>
+            🪙 +${coinCalc.totalCoins} AgriCoins
+          `).openPopup();
+        });
+
+      } else {
+        // WARNING - Burning detected
+        resultCard.className = 'result-card warning';
+        document.getElementById('resultIcon').textContent = '⚠️';
+        document.getElementById('resultTitle').textContent = 'พบการเผา!';
+        document.getElementById('resultSubtitle').textContent = 
+          `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
+
+        // Hide environmental impact and reward
+        document.getElementById('environmentalImpact').style.display = 'none';
+        document.getElementById('rewardBanner').style.display = 'none';
+
+        Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
+
+        // Red overlay on map
+        drawnItems.eachLayer(function(layer) {
+          layer.setStyle({
+            color: '#EF5350',
+            fillColor: '#E57373',
+            fillOpacity: 0.4
+          });
+          layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
+        });
+      }
+
+      // Show results section
+      document.getElementById('resultsSection').classList.add('show');
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
-
-    // Show reward banner with dynamic amount
-    document.getElementById('rewardBanner').style.display = 'block';
-    document.getElementById('rewardBanner').innerHTML = `
-      <div>🎉 ยินดีด้วย คุณได้รับ</div>
-      <div class="reward-amount">
-        <img src="Untitled_design-removebg-preview.png" class="coin" style="width: 40px; height: 40px;">
-        <span>+${agricoinsEarned}</span>
-      </div>
-      <div>AgriCoins เข้าบัญชีแล้ว</div>
-    `;
-
-    Toast.success(`🎉 คุณได้รับ ${agricoinsEarned} AgriCoins เข้าบัญชีแล้ว!`, 3000);
-
-    // Green overlay on map
-    drawnItems.eachLayer(function(layer) {
-      layer.setStyle({
-        color: '#4CAF50',
-        fillColor: '#66BB6A',
-        fillOpacity: 0.4
-      });
-      layer.bindPopup(`✅ ผ่านการตรวจสอบ<br><strong>${areaRai} ไร่</strong><br>PM2.5: -${pm25Prevented}kg | CO₂: -${co2Prevented}kg`).openPopup();
-    });
-
-  } else {
-    // WARNING - Burning detected
-    resultCard.className = 'result-card warning';
-    document.getElementById('resultIcon').textContent = '⚠️';
-    document.getElementById('resultTitle').textContent = 'พบการเผา!';
-    document.getElementById('resultSubtitle').textContent = 
-      `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
-
-    // Hide environmental impact and reward
-    document.getElementById('environmentalImpact').style.display = 'none';
-    document.getElementById('rewardBanner').style.display = 'none';
-
-    Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
-
-    // Red overlay on map
-    drawnItems.eachLayer(function(layer) {
-      layer.setStyle({
-        color: '#EF5350',
-        fillColor: '#E57373',
-        fillOpacity: 0.4
-      });
-      layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
-    });
-  }
-
-  // Show results section
-  document.getElementById('resultsSection').classList.add('show');
-  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-}
 
     function resetVerification() {
       clearPolygon();
