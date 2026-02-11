@@ -1250,81 +1250,72 @@
     // ========================================
     // DISPLAY RESULTS - SAVES REAL DATA TO DATABASE
     // ========================================
-    async function displayResults(result) {
-      const resultCard = document.getElementById('resultCard');
-      const areaHa = result.farm_area_ha;
-      const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
-      const burnedRai = (result.burned_area_ha * HA_TO_RAI).toFixed(2);
+  // ========================================
+// DISPLAY RESULTS - SAVES REAL DATA TO DATABASE
+// ========================================
+async function displayResults(result) {
+  const resultCard = document.getElementById('resultCard');
+  const areaHa = result.farm_area_ha;
+  const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
+  const burnedRai = (result.burned_area_ha * HA_TO_RAI).toFixed(2);
 
-      // Calculate environmental impact
-      const pm25Prevented = (parseFloat(areaRai) * PM25_PER_RAI).toFixed(2);
-      const co2Prevented = (parseFloat(areaRai) * CO2_PER_RAI).toFixed(2);
+  // Calculate environmental impact
+  const pm25Prevented = (parseFloat(areaRai) * PM25_PER_RAI).toFixed(2);
+  const co2Prevented = (parseFloat(areaRai) * CO2_PER_RAI).toFixed(2);
 
-      // Update UI
-      document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
-      document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
-      document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
-      document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
-      
-      if (result.source) {
-        document.getElementById('dataSource').textContent = result.source;
-      }
+  // Update UI
+  document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
+  document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
+  document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
+  document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
+  
+  if (result.source) {
+    document.getElementById('dataSource').textContent = result.source;
+  }
 
-      const confidencePercent = (result.confidence_score * 100).toFixed(0);
-      document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
-      document.getElementById('confidenceReason').textContent = result.confidence_reason;
+  const confidencePercent = (result.confidence_score * 100).toFixed(0);
+  document.getElementById('confidenceFill').style.width = `${confidencePercent}%`;
+  document.getElementById('confidenceReason').textContent = result.confidence_reason;
 
-      // ========================================
-      // 💾 SAVE VERIFIED FIELD DATA (REAL DATA)
-      // ========================================
-      console.log('💾 Saving verification data to database...');
-      try {
-        const saveResult = await API.callBackend('/api/stats/record-verification', {
-          user_id: currentUser.id,
-          analysis_id: result.analysis_id,
-          area_rai: parseFloat(areaRai),
-          area_ha: areaHa,
-          burn_detected: result.burn_detected,
-          burn_percentage: result.burn_percentage,
-          confidence_score: result.confidence_score,
-          lat: autoDetectLat || (selectedPolygon ? selectedPolygon.coordinates[0][0][1] : null),
-          lng: autoDetectLng || (selectedPolygon ? selectedPolygon.coordinates[0][0][0] : null),
-          province: 'เชียงใหม่',
-          field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
-        });
-        
-        if (saveResult.success) {
-          console.log('✅ Verification data saved:', saveResult);
-          console.log(`📊 Environmental Impact: PM2.5=${saveResult.environmental_impact.pm25_prevented_kg}kg, CO2=${saveResult.environmental_impact.co2_prevented_kg}kg`);
-        } else {
-          console.error('❌ Failed to save verification:', saveResult.error);
-        }
-      } catch (error) {
-        console.error('❌ Error saving verification data:', error);
-      }
+  // ========================================
+  // 💾 SAVE VERIFIED FIELD DATA (REAL DATA)
+  // ========================================
+  console.log('💾 Saving verification data to database...');
+  try {
+    const saveResult = await API.callBackend('/api/stats/record-verification', {
+      user_id: currentUser.id,
+      analysis_id: result.analysis_id,
+      area_rai: parseFloat(areaRai),
+      area_ha: areaHa,
+      burn_detected: result.burn_detected,
+      burn_percentage: result.burn_percentage,
+      confidence_score: result.confidence_score,
+      lat: autoDetectLat || (selectedPolygon ? selectedPolygon.coordinates[0][0][1] : null),
+      lng: autoDetectLng || (selectedPolygon ? selectedPolygon.coordinates[0][0][0] : null),
+      province: 'เชียงใหม่',
+      field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
+    });
+    
+    if (saveResult.success) {
+      console.log('✅ Verification data saved:', saveResult);
+      console.log(`📊 Environmental Impact: PM2.5=${saveResult.environmental_impact.pm25_prevented_kg}kg, CO2=${saveResult.environmental_impact.co2_prevented_kg}kg`);
+    } else {
+      console.error('❌ Failed to save verification:', saveResult.error);
+    }
+  } catch (error) {
+    console.error('❌ Error saving verification data:', error);
+  }
 
-      // Load burn scar visualization
-      await loadBurnScarLayer();
+  // Load burn scar visualization
+  await loadBurnScarLayer();
 
-      if (!result.burn_detected) {
-           const agricoinsEarned = Math.floor(parseFloat(co2Prevented) / 100 + parseFloat(pm25Prevented) * 10);
-
-const balanceResult = await API.callBackend('/agricoin/add', {
-  user_id: currentUser.id,
-  amount: agricoinsEarned,
-  description: `Burn verification reward - ${areaRai} rai`
-});
-
-        // SUCCESS - No burning detected
-        resultCard.className = 'result-card success';
-        document.getElementById('resultIcon').textContent = '✅';
-        document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
-        document.getElementById('resultSubtitle').textContent = 
-          'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
-
-        // Show environmental impact
-if (!result.burn_detected) {
-    // ... existing code ...
+  if (!result.burn_detected) {
+    // SUCCESS - No burning detected
+    resultCard.className = 'result-card success';
+    document.getElementById('resultIcon').textContent = '✅';
+    document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
+    document.getElementById('resultSubtitle').textContent = 
+      'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
 
     // Show environmental impact
     document.getElementById('environmentalImpact').style.display = 'block';
@@ -1333,6 +1324,21 @@ if (!result.burn_detected) {
 
     // Calculate AgriCoins: (CO2/100kg) + (PM2.5/100g)
     const agricoinsEarned = Math.floor(parseFloat(co2Prevented) / 100 + parseFloat(pm25Prevented) * 10);
+
+    // Add AgriCoins to user account
+    try {
+      const balanceResult = await API.callBackend('/agricoin/add', {
+        user_id: currentUser.id,
+        amount: agricoinsEarned,
+        description: `Burn verification reward - ${areaRai} rai`
+      });
+      if (balanceResult.success) {
+        currentUser.agricoin_balance = balanceResult.transaction.new_balance;
+        Auth.setCurrentUser(currentUser);
+      }
+    } catch (e) {
+      console.error('Error adding AgriCoins:', e);
+    }
 
     // Show reward banner with dynamic amount
     document.getElementById('rewardBanner').style.display = 'block';
@@ -1346,58 +1352,46 @@ if (!result.burn_detected) {
     `;
 
     Toast.success(`🎉 คุณได้รับ ${agricoinsEarned} AgriCoins เข้าบัญชีแล้ว!`, 3000);
-        // Update user balance
-        try {
-          const balanceResult = await API.callBackend('/agricoin/balance', {
-            user_id: currentUser.id
-          });
-          if (balanceResult.success) {
-            currentUser.agricoin_balance = balanceResult.balance;
-            Auth.setCurrentUser(currentUser);
-          }
-        } catch (e) {
-          console.error('Error fetching balance:', e);
-        }
 
-        // Green overlay on map
-        drawnItems.eachLayer(function(layer) {
-          layer.setStyle({
-            color: '#4CAF50',
-            fillColor: '#66BB6A',
-            fillOpacity: 0.4
-          });
-          layer.bindPopup(`✅ ผ่านการตรวจสอบ<br><strong>${areaRai} ไร่</strong><br>PM2.5: -${pm25Prevented}kg | CO₂: -${co2Prevented}kg`).openPopup();
-        });
+    // Green overlay on map
+    drawnItems.eachLayer(function(layer) {
+      layer.setStyle({
+        color: '#4CAF50',
+        fillColor: '#66BB6A',
+        fillOpacity: 0.4
+      });
+      layer.bindPopup(`✅ ผ่านการตรวจสอบ<br><strong>${areaRai} ไร่</strong><br>PM2.5: -${pm25Prevented}kg | CO₂: -${co2Prevented}kg`).openPopup();
+    });
 
-      } else {
-        // WARNING - Burning detected
-        resultCard.className = 'result-card warning';
-        document.getElementById('resultIcon').textContent = '⚠️';
-        document.getElementById('resultTitle').textContent = 'พบการเผา!';
-        document.getElementById('resultSubtitle').textContent = 
-          `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
+  } else {
+    // WARNING - Burning detected
+    resultCard.className = 'result-card warning';
+    document.getElementById('resultIcon').textContent = '⚠️';
+    document.getElementById('resultTitle').textContent = 'พบการเผา!';
+    document.getElementById('resultSubtitle').textContent = 
+      `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
 
-        // Hide environmental impact and reward
-        document.getElementById('environmentalImpact').style.display = 'none';
-        document.getElementById('rewardBanner').style.display = 'none';
+    // Hide environmental impact and reward
+    document.getElementById('environmentalImpact').style.display = 'none';
+    document.getElementById('rewardBanner').style.display = 'none';
 
-        Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
+    Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
 
-        // Red overlay on map
-        drawnItems.eachLayer(function(layer) {
-          layer.setStyle({
-            color: '#EF5350',
-            fillColor: '#E57373',
-            fillOpacity: 0.4
-          });
-          layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
-        });
-      }
+    // Red overlay on map
+    drawnItems.eachLayer(function(layer) {
+      layer.setStyle({
+        color: '#EF5350',
+        fillColor: '#E57373',
+        fillOpacity: 0.4
+      });
+      layer.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
+    });
+  }
 
-      // Show results section
-      document.getElementById('resultsSection').classList.add('show');
-      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-    }
+  // Show results section
+  document.getElementById('resultsSection').classList.add('show');
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+}
 
     function resetVerification() {
       clearPolygon();
