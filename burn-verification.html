@@ -567,7 +567,7 @@
 </head>
 <body>
   <div class="verification-container">
-    <!-- Header -->
+    <-- Header -->
     <div class="verification-header">
       <div class="header-content">
         <div class="header-title">
@@ -576,14 +576,14 @@
         </div>
         <div class="header-subtitle">
           ตรวจสอบว่าไร่ของคุณไม่มีการเผาในช่วง 3 เดือนที่ผ่านมา<br>
-          รับ 100 AgriCoins เมื่อผ่านการตรวจสอบ!<br>
-          Verify your farm has no burning in the last 3 months and earn 100 AgriCoins!
+          รับ 100 AgriCoins เมื่อผ่านการตรวจสอบ<br>
+          Verify your farm has no burning in the last 3 months and earn 100 AgriCoins
         </div>
       </div>
     </div>
 
     <div class="content-wrapper">
-      <!-- Mode Selection -->
+      <-- Mode Selection -->
       <div class="mode-selector">
         <div class="mode-title">เลือกวิธีการระบุแปลง / Select Field Method</div>
         <div class="mode-buttons">
@@ -606,7 +606,7 @@
         </div>
       </div>
 
-      <!-- Map Section -->
+      <-- Map Section -->
       <div class="map-section">
         <div class="map-controls">
           <button class="btn btn-primary" onclick="useCurrentLocation()">
@@ -622,7 +622,7 @@
 
         <div id="verificationMap"></div>
 
-        <!-- Burn Scar Layer Toggle (shown after verification) -->
+        <-- Burn Scar Layer Toggle (shown after verification) -->
         <div class="burn-layer-toggle hidden" id="burnLayerToggle">
           <div class="toggle-header">
             <div class="toggle-title">
@@ -669,7 +669,7 @@
         </div>
       </div>
 
-      <!-- Field Info -->
+      <-- Field Info -->
       <div class="field-info" id="fieldInfo">
         <h3 style="margin-bottom: 1rem;">ข้อมูลแปลง / Field Information</h3>
         <div class="info-row">
@@ -690,11 +690,11 @@
         </button>
       </div>
 
-      <!-- Results Section -->
+      <-- Results Section -->
       <div class="results-section" id="resultsSection">
         <div class="result-card" id="resultCard">
           <div class="result-icon" id="resultIcon">✅</div>
-          <div class="result-title" id="resultTitle">ผ่านการตรวจสอบ!</div>
+          <div class="result-title" id="resultTitle">ผ่านการตรวจสอบ</div>
           <div class="result-subtitle" id="resultSubtitle">
             ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา
           </div>
@@ -729,7 +729,7 @@
             <div class="confidence-text" id="confidenceReason">-</div>
           </div>
           
-          <!-- Environmental Impact (shown for successful verifications) -->
+          <-- Environmental Impact (shown for successful verifications) -->
           <div class="environmental-impact" id="environmentalImpact" style="display: none;">
             <div class="impact-title">
               <span>🌍</span>
@@ -748,12 +748,12 @@
           </div>
 
           <div class="reward-banner" id="rewardBanner" style="display: none;">
-            <div>🎉 ยินดีด้วย! คุณได้รับ</div>
+            <div>🎉 ยินดีด้วย คุณได้รับ</div>
             <div class="reward-amount">
               <img src="Untitled_design-removebg-preview.png" class="coin" style="width: 40px; height: 40px;">
               <span>+100</span>
             </div>
-            <div>AgriCoins เข้าบัญชีแล้ว!</div>
+            <div>AgriCoins เข้าบัญชีแล้ว</div>
           </div>
         </div>
 
@@ -1307,6 +1307,14 @@
       await loadBurnScarLayer();
 
       if (!result.burn_detected) {
+           const agricoinsEarned = Math.floor(parseFloat(co2Prevented) / 100 + parseFloat(pm25Prevented) * 10);
+
+const balanceResult = await API.callBackend('/agricoin/add', {
+  user_id: currentUser.id,
+  amount: agricoinsEarned,
+  description: `Burn verification reward - ${areaRai} rai`
+});
+
         // SUCCESS - No burning detected
         resultCard.className = 'result-card success';
         document.getElementById('resultIcon').textContent = '✅';
@@ -1315,15 +1323,29 @@
           'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
 
         // Show environmental impact
-        document.getElementById('environmentalImpact').style.display = 'block';
-        document.getElementById('impactPM25').textContent = `${pm25Prevented} kg`;
-        document.getElementById('impactCO2').textContent = `${co2Prevented} kg`;
+if (!result.burn_detected) {
+    // ... existing code ...
 
-        // Show reward banner
-        document.getElementById('rewardBanner').style.display = 'block';
+    // Show environmental impact
+    document.getElementById('environmentalImpact').style.display = 'block';
+    document.getElementById('impactPM25').textContent = `${pm25Prevented} kg`;
+    document.getElementById('impactCO2').textContent = `${co2Prevented} kg`;
 
-        Toast.success('🎉 คุณได้รับ 100 AgriCoins เข้าบัญชีแล้ว!', 3000);
-        
+    // Calculate AgriCoins: (CO2/100kg) + (PM2.5/100g)
+    const agricoinsEarned = Math.floor(parseFloat(co2Prevented) / 100 + parseFloat(pm25Prevented) * 10);
+
+    // Show reward banner with dynamic amount
+    document.getElementById('rewardBanner').style.display = 'block';
+    document.getElementById('rewardBanner').innerHTML = `
+      <div>🎉 ยินดีด้วย คุณได้รับ</div>
+      <div class="reward-amount">
+        <img src="Untitled_design-removebg-preview.png" class="coin" style="width: 40px; height: 40px;">
+        <span>+${agricoinsEarned}</span>
+      </div>
+      <div>AgriCoins เข้าบัญชีแล้ว</div>
+    `;
+
+    Toast.success(`🎉 คุณได้รับ ${agricoinsEarned} AgriCoins เข้าบัญชีแล้ว!`, 3000);
         // Update user balance
         try {
           const balanceResult = await API.callBackend('/agricoin/balance', {
