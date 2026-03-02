@@ -417,23 +417,25 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // LOAD SAVED POLYGON FROM DB ON PAGE LOAD
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function loadSavedPolygonFromDB() {
-    try {
-      const result = await API.callBackend('/api/user/get-polygon', { user_id: currentUser.id });
-      if (result.success && result.has_polygon) {
-        savedPolygon = result.polygon;
-        displayPolygonOnMap(savedPolygon, 'saved');
-        Toast.info('🌾 โหลดแปลงที่บันทึกไว้แล้ว');
-      }
-    } catch (e) {
-      console.warn('Could not load saved polygon:', e);
-    }
-  }
+ async function loadSavedPolygonFromDB() {
+  try {
+    console.log('🔍 Loading saved polygon for user:', currentUser.id);
+    const result = await API.callBackend('/api/user/get-polygon', { user_id: currentUser.id });
+    console.log('📦 Get-polygon result:', result);
 
-  async function reloadSavedPolygon() {
-    clearPolygon(false); // clear without touching DB
-    await loadSavedPolygonFromDB();
+    if (result.success && result.has_polygon) {
+      savedPolygon = result.polygon;
+      displayPolygonOnMap(savedPolygon, 'saved');
+      Toast.info('🌾 โหลดแปลงที่บันทึกไว้แล้ว');
+    } else {
+      console.log('ℹ️ No saved polygon found:', result);
+      Toast.info('ยังไม่มีแปลงที่บันทึกไว้ — คลิกแผนที่หรือวาดแปลงแล้วกด 💾');
+    }
+  } catch (e) {
+    console.error('❌ Could not load saved polygon:', e);
+    Toast.error('โหลดแปลงไม่ได้: ' + e.message);
   }
+}
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // DISPLAY A POLYGON ON THE MAP
