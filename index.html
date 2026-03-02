@@ -15,6 +15,18 @@
       padding: 1rem;
       background: var(--light-cream);
     }
+    .demo-farmer-card {
+  cursor: pointer;
+  padding: .625rem .75rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(127,173,107,.25);
+  background: rgba(127,173,107,.05);
+  transition: background .2s, border-color .2s;
+}
+.demo-farmer-card:hover { background: rgba(127,173,107,.13); border-color: var(--primary-green); }
+.demo-farmer-top { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--text-dark); font-size: .8125rem; }
+.demo-tag { background: var(--primary-green); color: #fff; border-radius: 99px; padding: .1rem .5rem; font-size: .7rem; font-weight: 700; }
+.demo-farmer-sub { color: var(--text-medium); font-size: .75rem; margin-top: .2rem; }
     
     .login-card {
       background: var(--white);
@@ -628,16 +640,56 @@
           </button>
         </form>
         
-        <div class="demo-credentials">
-          <h4>📱 Demo Phone Numbers</h4>
-          <p><strong>Customer:</strong> 0812345678</p>
-          <p><strong>Farmer:</strong> 0823456789</p>
-          <p><strong>Baler:</strong> 0834567890</p>
-          <p style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(127, 173, 107, 0.3);">
-            <strong>🔑 OTP Code:</strong> 1234 (ทุกเบอร์)
-          </p>
-        </div>
+  <div class="demo-credentials">
+  <h4>👨‍🌾 เกษตรกรทดสอบ 5 คน (OTP: 1234)</h4>
+
+  <div style="display:grid; gap:.5rem; margin-top:.625rem;">
+
+    <div onclick="fillDemo('0811111111','farmer')" class="demo-farmer-card">
+      <div class="demo-farmer-top">
+        <span>🌾 สมชาย นาข้าวสารภี</span>
+        <span class="demo-tag">~8 ไร่</span>
       </div>
+      <div class="demo-farmer-sub">0811111111 · สารภี เชียงใหม่</div>
+    </div>
+
+    <div onclick="fillDemo('0822222222','farmer')" class="demo-farmer-card">
+      <div class="demo-farmer-top">
+        <span>🌾 วิไล ทุ่งสันทราย</span>
+        <span class="demo-tag">~15 ไร่</span>
+      </div>
+      <div class="demo-farmer-sub">0822222222 · สันทราย เชียงใหม่</div>
+    </div>
+
+    <div onclick="fillDemo('0833333333','farmer')" class="demo-farmer-card">
+      <div class="demo-farmer-top">
+        <span>🌾 ประเสริฐ ไร่ลำพูน</span>
+        <span class="demo-tag">~25 ไร่</span>
+      </div>
+      <div class="demo-farmer-sub">0833333333 · เมือง ลำพูน</div>
+    </div>
+
+    <div onclick="fillDemo('0844444444','farmer')" class="demo-farmer-card">
+      <div class="demo-farmer-top">
+        <span>🌾 มาลี สวนแม่ริม</span>
+        <span class="demo-tag">~35 ไร่</span>
+      </div>
+      <div class="demo-farmer-sub">0844444444 · แม่ริม เชียงใหม่</div>
+    </div>
+
+    <div onclick="fillDemo('0855555555','farmer')" class="demo-farmer-card">
+      <div class="demo-farmer-top">
+        <span>🌾 ไชยา นาเชียงราย</span>
+        <span class="demo-tag">~50 ไร่</span>
+      </div>
+      <div class="demo-farmer-sub">0855555555 · เมือง เชียงราย</div>
+    </div>
+
+  </div>
+  <p style="margin-top:.625rem; font-size:.75rem; color:var(--text-light); text-align:center;">
+    คลิกเพื่อกรอกอัตโนมัติ · แปลงจะโหลดทันทีหลังล็อกอิน
+  </p>
+</div>
       
       <!-- SMS Sending Animation -->
       <div class="sms-animation" id="smsAnimation">
@@ -929,6 +981,14 @@
         i.classList.remove('filled');
       });
     });
+    function fillDemo(phone, userType) {
+  document.querySelector(`input[name="userType"][value="${userType}"]`).checked = true;
+  document.getElementById('phone').value = phone.replace(/^0/, '');
+  // Visual feedback on the selected card
+  document.querySelectorAll('.demo-farmer-card').forEach(c => c.style.borderColor = '');
+  event.currentTarget.style.borderColor = 'var(--primary-green)';
+  Toast.info('✅ กรอกข้อมูลแล้ว — กด "รับรหัส OTP"');
+}
   </script>
 </body>
 </html>
