@@ -686,9 +686,27 @@
     </div>
 
   </div>
-  <p style="margin-top:.625rem; font-size:.75rem; color:var(--text-light); text-align:center;">
-    คลิกเพื่อกรอกอัตโนมัติ · แปลงจะโหลดทันทีหลังล็อกอิน
-  </p>
+ <div style="border-top:1px dashed rgba(127,173,107,.3); padding-top:.5rem; margin-top:.25rem;">
+      <div style="font-size:.7rem; color:var(--text-medium); margin-bottom:.375rem; font-weight:600;">👥 ผู้ใช้ประเภทอื่น / Other Users</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:.375rem;">
+
+        <div class="demo-farmer-card" onclick="fillDemo('0812345678','customer')">
+          <div class="demo-farmer-top"><span>👨‍💼 ลูกค้า</span><span class="demo-tag" style="background:#5b8ac8;">Customer</span></div>
+          <div class="demo-farmer-sub">0812345678</div>
+        </div>
+
+        <div class="demo-farmer-card" onclick="fillDemo('0823456789','farmer')">
+          <div class="demo-farmer-top"><span>👨‍🌾 เกษตรกร</span><span class="demo-tag">Farmer</span></div>
+          <div class="demo-farmer-sub">0823456789</div>
+        </div>
+
+        <div class="demo-farmer-card" onclick="fillDemo('0834567890','baler')" style="grid-column:1/-1;">
+          <div class="demo-farmer-top"><span>🚜 คนอัดฟาง / Baler</span><span class="demo-tag" style="background:#e07b39;">Baler</span></div>
+          <div class="demo-farmer-sub">0834567890</div>
+        </div>
+
+      </div>
+    </div>
 </div>
       
       <!-- SMS Sending Animation -->
