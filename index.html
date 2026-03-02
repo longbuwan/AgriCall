@@ -940,7 +940,6 @@
     // OTP form handler
     document.getElementById('otpForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       // Get OTP value
       const otp = Array.from(otpInputs).map(i => i.value).join('');
       
