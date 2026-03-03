@@ -31,6 +31,59 @@
 
     .content-wrapper { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
+    /* Demo Mode Toggle */
+    .demo-toggle-container {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .demo-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .demo-toggle-label:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .demo-toggle-label input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .demo-toggle-label span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .demo-badge {
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-left: 0.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); }
+    }
+
     /* Step Progress */
     .step-progress {
       background: var(--white);
@@ -200,6 +253,7 @@
       font-size: 1rem;
       font-family: 'Prompt', sans-serif;
       transition: border-color 0.2s;
+      box-sizing: border-box;
     }
 
     .form-select:focus, .form-input:focus {
@@ -229,6 +283,11 @@
     .info-box.error {
       background: rgba(239, 68, 68, 0.1);
       border-left-color: #EF4444;
+    }
+
+    .info-box.demo {
+      background: rgba(139, 92, 246, 0.1);
+      border-left-color: #8B5CF6;
     }
 
     .info-box-title {
@@ -498,6 +557,34 @@
       color: var(--primary-green);
     }
 
+    /* Skip Button Styles */
+    .btn-skip {
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+      color: white !important;
+      animation: pulse 2s infinite;
+    }
+
+    .btn-skip:hover {
+      background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+    }
+
+    .skip-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      color: var(--text-medium);
+      font-size: 0.875rem;
+    }
+
+    .skip-divider::before,
+    .skip-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+
     /* Loading */
     .loading-overlay {
       position: fixed;
@@ -544,13 +631,28 @@
     <div class="header-content">
       <div class="header-title"><span>🌾</span><span>ระบบตรวจสอบการเพาะปลูก</span></div>
       <div class="header-subtitle">
-        ลงทะเบียนการปลูก → ตรวจสอบพืช → รอ 60 วันหลังเก็บเกี่ยว → รับ AgriCoins<br>
-        Register farming → Verify crops → 60-day no-burn monitoring → Earn AgriCoins
+        ลงทะเบียนการปลูก → ตรวจสอบพืช → รอ 60 วันหลังเก็บเกี่ยว → รับ AgriCoins
+      </div>
+      <!-- Demo Mode Toggle -->
+      <div class="demo-toggle-container">
+        <label class="demo-toggle-label">
+          <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()">
+          <span>🚀 Demo Mode (ข้ามเวลารอ)</span>
+        </label>
+        <span class="demo-badge" id="demoBadge" style="display: none;">DEMO</span>
       </div>
     </div>
   </div>
 
   <div class="content-wrapper">
+
+    <!-- Demo Mode Info Box -->
+    <div class="info-box demo" id="demoInfoBox" style="display: none;">
+      <div class="info-box-title"><span>🚀</span> Demo Mode เปิดใช้งาน</div>
+      <div class="info-box-text">
+        คุณสามารถข้ามเวลารอ 30 วัน และ 60 วัน เพื่อทดสอบระบบได้ทันที
+      </div>
+    </div>
 
     <!-- Step Progress -->
     <div class="step-progress">
@@ -595,7 +697,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">📍 ระบุขอบเขตแปลง</label>
+        <label class="form-label">📍 ระบุขอบเขตแปลง (คลิกบนแผนที่)</label>
         <div id="farmingMap"></div>
         <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
           <button class="btn btn-secondary" onclick="useCurrentLocation()" style="flex: 1;">
@@ -628,6 +730,8 @@
         <div class="info-box-text">
           หลังจากลงทะเบียนแล้ว คุณจะต้อง<strong>รออย่างน้อย 30 วัน</strong>ก่อนที่จะสามารถตรวจสอบพืชได้
           ระบบจะใช้ภาพถ่ายดาวเทียมเพื่อยืนยันว่ามีพืชเติบโตในแปลงจริง
+          <br><br>
+          <em>💡 เปิด Demo Mode เพื่อข้ามเวลารอในการทดสอบ</em>
         </div>
       </div>
 
@@ -672,7 +776,15 @@
         </div>
       </div>
 
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep2()" id="step2SubmitBtn" disabled>
+      <!-- Skip button for demo mode -->
+      <div id="step2SkipSection" style="display: none;">
+        <div class="skip-divider">หรือ</div>
+        <button class="btn btn-skip" style="width: 100%;" onclick="submitStep2(true)">
+          🚀 ข้าม 30 วัน & ตรวจสอบทันที (Demo)
+        </button>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep2(false)" id="step2SubmitBtn" disabled>
         🔍 ตรวจสอบพืชด้วยดาวเทียม
       </button>
     </div>
@@ -720,9 +832,17 @@
           </div>
         </div>
 
-        <button class="btn btn-secondary" style="width: 100%;" onclick="checkBurnStatus()">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="checkBurnStatus(false)" id="checkBurnBtn">
           🔍 ตรวจสอบสถานะการเผา
         </button>
+
+        <!-- Skip button for demo mode -->
+        <div id="step3SkipSection" style="display: none;">
+          <div class="skip-divider">หรือ</div>
+          <button class="btn btn-skip" style="width: 100%;" onclick="checkBurnStatus(true)">
+            🚀 ข้าม 60 วัน & รับ AgriCoins ทันที (Demo)
+          </button>
+        </div>
 
         <div class="reward-preview">
           <div class="reward-preview-title"><span>🎁</span> รางวัลที่จะได้รับเมื่อผ่าน</div>
@@ -749,11 +869,11 @@
       <div class="success-card">
         <div class="success-icon">🎉</div>
         <div class="success-title">ยินดีด้วย!</div>
-        <div class="success-subtitle">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
+        <div class="success-subtitle" id="successSubtitle">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
         <div class="success-reward">
           <div>คุณได้รับ</div>
           <div class="success-reward-amount">
-            <img src="Untitled_design-removebg-preview.png" style="width: 48px; height: 48px;">
+            <span>🪙</span>
             <span id="successCoins">+0</span>
           </div>
           <div>AgriCoins</div>
@@ -834,6 +954,27 @@
   let drawControl = null;
   let selectedPolygon = null;
   let activeCycle = null;
+  let demoMode = false;
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // DEMO MODE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function toggleDemoMode() {
+    demoMode = document.getElementById('demoModeToggle').checked;
+    document.getElementById('demoBadge').style.display = demoMode ? 'inline-flex' : 'none';
+    document.getElementById('demoInfoBox').style.display = demoMode ? 'block' : 'none';
+    
+    if (demoMode) {
+      Toast.info('🚀 Demo Mode เปิดใช้งาน - สามารถข้ามเวลารอได้');
+    } else {
+      Toast.info('Demo Mode ปิดใช้งาน');
+    }
+    
+    // Refresh UI to show/hide skip buttons
+    if (activeCycle) {
+      renderActiveCycle(activeCycle);
+    }
+  }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // INIT
@@ -886,7 +1027,7 @@
 
     if (cycle.final_status === 'completed') {
       document.getElementById('successCard').classList.add('active');
-      document.getElementById('successCoins').textContent = `+${cycle.reward.agricoin_awarded}`;
+      document.getElementById('successCoins').textContent = `+${Math.round(cycle.reward.agricoin_awarded)}`;
       return;
     }
 
@@ -1032,30 +1173,44 @@
       document.getElementById('step2ReadyInfo').style.display = 'none';
       document.getElementById('step2DaysRemaining').textContent = daysUntilCheck;
       document.getElementById('step2SubmitBtn').disabled = true;
+      
+      // Show skip button in demo mode
+      document.getElementById('step2SkipSection').style.display = demoMode ? 'block' : 'none';
     } else {
       document.getElementById('step2WaitInfo').style.display = 'none';
       document.getElementById('step2ReadyInfo').style.display = 'block';
       document.getElementById('step2SubmitBtn').disabled = false;
+      document.getElementById('step2SkipSection').style.display = 'none';
     }
   }
 
-  async function submitStep2() {
-    showLoading('กำลังตรวจสอบพืชด้วยดาวเทียม...');
+  async function submitStep2(skipWait = false) {
+    showLoading(skipWait ? 'กำลังข้าม 30 วัน...' : 'กำลังตรวจสอบพืช...');
     try {
       const result = await API.callBackend('/api/farming/verify-crops', {
         user_id: currentUser.id,
-        cycle_id: activeCycle.cycle_id
+        cycle_id: activeCycle.cycle_id,
+        skip_wait: skipWait || demoMode
       });
       hideLoading();
 
       if (result.crops_verified) {
-        Toast.success(result.message);
+        Toast.success(result.message + (result.demo_mode ? ' (Demo)' : ''));
         await loadFarmingStatus();
+      } else if (result.success === false && result.days_remaining) {
+        // Still need to wait
+        if (demoMode) {
+          // Auto-retry with skip in demo mode
+          submitStep2(true);
+        } else {
+          Toast.warning(result.error);
+        }
       } else {
-        Toast.warning(result.message);
+        Toast.warning(result.message || 'ไม่พบพืชในแปลง');
       }
     } catch (e) {
       hideLoading();
+      console.error(e);
       Toast.error('เกิดข้อผิดพลาด');
     }
   }
@@ -1083,6 +1238,9 @@
       document.getElementById('previewPM25').textContent = (areaRai * PM25_PER_RAI).toFixed(1);
       document.getElementById('previewCO2').textContent = (areaRai * CO2_PER_RAI).toFixed(0);
       document.getElementById('previewCoins').textContent = calculateCoins(areaRai);
+
+      // Show skip button in demo mode
+      document.getElementById('step3SkipSection').style.display = demoMode ? 'block' : 'none';
     } else {
       document.getElementById('step3HarvestSection').style.display = 'block';
       document.getElementById('step3MonitoringSection').style.display = 'none';
@@ -1110,12 +1268,13 @@
     }
   }
 
-  async function checkBurnStatus() {
-    showLoading('กำลังตรวจสอบการเผา...');
+  async function checkBurnStatus(skipWait = false) {
+    showLoading(skipWait ? 'กำลังข้าม 60 วัน...' : 'กำลังตรวจสอบการเผา...');
     try {
       const result = await API.callBackend('/api/farming/check-burn-status', {
         user_id: currentUser.id,
-        cycle_id: activeCycle.cycle_id
+        cycle_id: activeCycle.cycle_id,
+        skip_wait: skipWait
       });
       hideLoading();
 
@@ -1152,12 +1311,12 @@
             ${h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳'}
           </div>
           <div>
-            <div class="history-item-name">${h.field_name}</div>
+            <div class="history-item-name">${h.field_name || 'แปลงเกษตร'}</div>
             <div class="history-item-date">${h.area_rai?.toFixed(1) || '-'} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
           </div>
         </div>
         <div class="history-item-reward">
-          ${h.final_status === 'completed' ? `+${h.agricoin_awarded}` : '-'}
+          ${h.final_status === 'completed' ? `+${Math.round(h.agricoin_awarded)}` : '-'}
         </div>
       </div>
     `).join('');
@@ -1167,13 +1326,16 @@
   // UTILITIES
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async function useCurrentLocation() {
+    showLoading('กำลังระบุตำแหน่ง...');
     try {
       const pos = await new Promise((res, rej) =>
         navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 })
       );
+      hideLoading();
       farmingMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
       await handleMapClick(pos.coords.latitude, pos.coords.longitude);
     } catch (e) {
+      hideLoading();
       Toast.error('ไม่สามารถระบุตำแหน่งได้');
     }
   }
@@ -1206,13 +1368,16 @@
       Toast.success('วาดขอบเขตเรียบร้อย!');
     });
 
-    Toast.info('คลิกบนแผนที่เพื่อวาดขอบเขต');
+    Toast.info('คลิกบนแผนที่เพื่อวาดขอบเขต แล้วกด Finish');
   }
 
   function startNewCycle() {
     activeCycle = null;
     selectedPolygon = null;
     drawnItems.clearLayers();
+    document.getElementById('step1FieldInfo').style.display = 'none';
+    document.getElementById('step1SubmitBtn').disabled = true;
+    document.getElementById('fieldName').value = '';
     showStep1();
   }
 
