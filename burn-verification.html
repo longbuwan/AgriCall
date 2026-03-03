@@ -3,158 +3,536 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ตรวจสอบการเผา - AgriCall Burn Verification</title>
+  <title>ระบบตรวจสอบการเพาะปลูก - AgriCall</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
   <style>
-    /* ── base layout ── */
+    :root {
+      --step-pending: #9CA3AF;
+      --step-active: #3B82F6;
+      --step-completed: #10B981;
+      --step-failed: #EF4444;
+    }
+
     .verification-container { min-height:100vh; background:var(--light-cream); padding-bottom:80px; }
-    .verification-header { background:linear-gradient(135deg,var(--primary-green) 0%,var(--secondary-green) 100%); color:var(--white); padding:1.5rem; box-shadow:var(--shadow-lg); }
-    .header-content { max-width:1200px; margin:0 auto; }
-    .header-title { display:flex; align-items:center; gap:.75rem; font-size:1.5rem; font-weight:700; margin-bottom:.5rem; }
-    .header-subtitle { font-size:.9375rem; opacity:.95; line-height:1.5; }
-    .content-wrapper { max-width:1200px; margin:0 auto; padding:1rem; }
+    
+    /* Header */
+    .verification-header {
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+      color: var(--white);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+    .header-content { max-width: 1200px; margin: 0 auto; }
+    .header-title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .header-subtitle { font-size: 0.9rem; opacity: 0.95; line-height: 1.5; }
 
-    /* ── mode selector ── */
-    .mode-selector { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); }
-    .mode-title { font-size:1.125rem; font-weight:600; margin-bottom:1rem; color:var(--text-dark); }
-    .mode-buttons { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-    .mode-btn { padding:1.25rem; border:2px solid var(--border-light); background:var(--white); border-radius:var(--radius-lg); cursor:pointer; transition:all .3s ease; text-align:center; }
-    .mode-btn:hover { border-color:var(--primary-green); transform:translateY(-2px); box-shadow:var(--shadow-md); }
-    .mode-btn.active { border-color:var(--primary-green); background:linear-gradient(135deg,rgba(127,173,107,.1) 0%,rgba(107,155,90,.1) 100%); box-shadow:var(--shadow-md); }
-    .mode-icon { font-size:2.5rem; margin-bottom:.5rem; }
-    .mode-name { font-weight:600; color:var(--text-dark); margin-bottom:.25rem; }
-    .mode-description { font-size:.875rem; color:var(--text-medium); line-height:1.4; }
+    .content-wrapper { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
-    /* ── saved field banner ── */
-    .saved-field-banner {
-      display: none;
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #fff;
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
+    /* Step Progress */
+    .step-progress {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
       box-shadow: var(--shadow-md);
     }
-    .saved-field-banner.show { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
-    .saved-field-banner-text { flex: 1; font-size: .9375rem; font-weight: 600; }
-    .saved-field-banner-sub { font-size: .8125rem; opacity: .9; font-weight: 400; display: block; margin-top: .15rem; }
-    .saved-field-banner-actions { display: flex; gap: .5rem; }
-    .sfb-btn {
-      padding: .5rem .875rem; border-radius: var(--radius-md); font-size: .8125rem;
-      font-weight: 600; cursor: pointer; border: 2px solid rgba(255,255,255,.7);
-      background: rgba(255,255,255,.15); color: #fff; transition: all .2s;
-      font-family: 'Prompt', sans-serif;
+
+    .step-progress-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 1.25rem;
+      text-align: center;
     }
-    .sfb-btn:hover { background: rgba(255,255,255,.3); }
-    .sfb-btn.danger { border-color: rgba(255,100,100,.7); background: rgba(220,50,50,.2); }
-    .sfb-btn.danger:hover { background: rgba(220,50,50,.35); }
 
-    /* ── map section ── */
-    .map-section { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); }
-    .map-controls { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
-    .map-controls .btn { flex:1; min-width:130px; }
-    #verificationMap { height:500px; border-radius:var(--radius-lg); border:2px solid var(--border-light); margin-bottom:1rem; }
-    .map-info { background:rgba(127,173,107,.1); padding:1rem; border-radius:var(--radius-lg); border-left:4px solid var(--primary-green); }
-    .map-info-title { font-weight:600; color:var(--text-dark); margin-bottom:.5rem; display:flex; align-items:center; gap:.5rem; }
-    .map-info-text { font-size:.875rem; color:var(--text-medium); line-height:1.5; }
+    .steps-container {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+    }
 
-    /* save-polygon button row (appears under map after polygon placed) */
-    .polygon-actions {
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 15%;
+      right: 15%;
+      height: 4px;
+      background: var(--border-light);
+      z-index: 0;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--step-pending);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .step-item.active .step-circle {
+      background: var(--step-active);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .step-item.completed .step-circle {
+      background: var(--step-completed);
+    }
+
+    .step-item.failed .step-circle {
+      background: var(--step-failed);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--text-medium);
+      text-align: center;
+      font-weight: 500;
+      max-width: 80px;
+    }
+
+    .step-item.active .step-label {
+      color: var(--step-active);
+      font-weight: 600;
+    }
+
+    .step-item.completed .step-label {
+      color: var(--step-completed);
+    }
+
+    /* Step Cards */
+    .step-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
       display: none;
-      gap: .75rem;
-      margin-top: .75rem;
     }
-    .polygon-actions.show { display: flex; flex-wrap: wrap; }
-    .polygon-actions .btn { flex: 1; min-width: 150px; }
 
-    /* ── field info ── */
-    .field-info { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); display:none; }
-    .field-info.show { display:block; }
-    .info-row { display:flex; justify-content:space-between; align-items:center; padding:1rem 0; border-bottom:1px solid var(--border-light); }
-    .info-row:last-child { border-bottom:none; }
-    .info-label { font-weight:500; color:var(--text-medium); }
-    .info-value { font-weight:600; color:var(--text-dark); text-align:right; }
+    .step-card.active {
+      display: block;
+    }
 
-    /* ── results ── */
-    .results-section { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); display:none; }
-    .results-section.show { display:block; }
-    .result-card { border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1rem; }
-    .result-card.success { background:linear-gradient(135deg,#66BB6A 0%,#4CAF50 100%); color:var(--white); }
-    .result-card.warning { background:linear-gradient(135deg,#FFA726 0%,#FB8C00 100%); color:var(--white); }
-    .result-icon { font-size:4rem; text-align:center; margin-bottom:1rem; }
-    .result-title { font-size:1.5rem; font-weight:700; text-align:center; margin-bottom:.5rem; }
-    .result-subtitle { text-align:center; font-size:1rem; opacity:.95; margin-bottom:1rem; }
-    .result-stats { background:rgba(255,255,255,.2); border-radius:var(--radius-lg); padding:1rem; margin-top:1rem; }
-    .stat-row { display:flex; justify-content:space-between; padding:.5rem 0; font-size:.9375rem; }
-    .confidence-section { background:var(--white); color:var(--text-dark); border-radius:var(--radius-lg); padding:1rem; margin-top:1rem; }
-    .confidence-title { font-weight:600; margin-bottom:.5rem; display:flex; align-items:center; gap:.5rem; }
-    .confidence-bar { height:8px; background:var(--border-light); border-radius:var(--radius-full); overflow:hidden; margin-bottom:.5rem; }
-    .confidence-fill { height:100%; background:linear-gradient(90deg,var(--primary-green) 0%,var(--secondary-green) 100%); transition:width .5s ease; }
-    .confidence-text { font-size:.875rem; color:var(--text-medium); line-height:1.5; }
+    .step-card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-light);
+    }
 
-    /* environmental impact */
-    .environmental-impact { background:linear-gradient(135deg,#10B981 0%,#059669 100%); color:var(--white); border-radius:var(--radius-lg); padding:1rem; margin-top:1rem; }
-    .impact-title { font-weight:600; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
-    .impact-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
-    .impact-item { background:rgba(255,255,255,.2); border-radius:var(--radius-md); padding:.75rem; text-align:center; }
-    .impact-value { font-size:1.25rem; font-weight:700; }
-    .impact-label { font-size:.75rem; opacity:.9; }
+    .step-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+    }
 
-    /* reward */
-    .reward-banner { background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%); color:var(--white); border-radius:var(--radius-lg); padding:1.5rem; text-align:center; margin-top:1rem; }
-    .reward-amount { font-size:2.5rem; font-weight:700; margin:.5rem 0; display:flex; align-items:center; justify-content:center; gap:.5rem; }
-    .reward-breakdown { background:rgba(255,255,255,.15); border-radius:var(--radius-md); padding:1rem; margin-top:1rem; text-align:left; }
-    .reward-breakdown-title { font-weight:600; font-size:.9rem; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
-    .reward-breakdown-item { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.2); font-size:.875rem; }
-    .reward-breakdown-item:last-child { border-bottom:none; font-weight:600; padding-top:.75rem; margin-top:.25rem; border-top:2px solid rgba(255,255,255,.3); }
-    .reward-breakdown-label { display:flex; align-items:center; gap:.5rem; }
-    .reward-breakdown-value { font-weight:600; }
-    .reward-explanation { font-size:.75rem; opacity:.9; margin-top:.75rem; line-height:1.5; text-align:center; }
+    .step-card-icon.step1 { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .step-card-icon.step2 { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); }
+    .step-card-icon.step3 { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
 
-    /* action buttons */
-    .action-buttons { display:flex; gap:1rem; margin-top:1.5rem; }
-    .action-buttons .btn { flex:1; }
+    .step-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
 
-    /* burn layer toggle */
-    .burn-layer-toggle { background:var(--white); border-radius:var(--radius-lg); padding:1rem; margin-top:1rem; border:2px solid #EF5350; }
-    .burn-layer-toggle.hidden { display:none; }
-    .toggle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
-    .toggle-title { font-weight:600; color:var(--text-dark); display:flex; align-items:center; gap:.5rem; }
-    .toggle-switch { position:relative; width:50px; height:26px; }
-    .toggle-switch input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.3s; border-radius:26px; }
-    .toggle-slider:before { position:absolute; content:""; height:20px; width:20px; left:3px; bottom:3px; background-color:white; transition:.3s; border-radius:50%; }
-    .toggle-switch input:checked + .toggle-slider { background-color:#EF5350; }
-    .toggle-switch input:checked + .toggle-slider:before { transform:translateX(24px); }
-    .opacity-control { margin-top:.75rem; }
-    .opacity-label { font-size:.875rem; color:var(--text-medium); margin-bottom:.25rem; }
-    .opacity-slider { width:100%; height:6px; -webkit-appearance:none; background:linear-gradient(to right,rgba(239,83,80,.2),rgba(239,83,80,1)); border-radius:3px; outline:none; }
-    .opacity-slider::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:#EF5350; border-radius:50%; cursor:pointer; border:2px solid white; box-shadow:0 2px 4px rgba(0,0,0,.2); }
-    .burn-legend { display:flex; gap:1rem; margin-top:.75rem; font-size:.8rem; color:var(--text-medium); }
-    .legend-item { display:flex; align-items:center; gap:.25rem; }
-    .legend-color { width:16px; height:16px; border-radius:3px; }
+    .step-card-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+    }
 
-    /* loading */
-    .analyzing-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,.95); display:none; align-items:center; justify-content:center; z-index:3000; }
-    .analyzing-overlay.show { display:flex; }
-    .analyzing-content { text-align:center; padding:2rem; }
-    .analyzing-spinner { width:80px; height:80px; border:6px solid var(--border-light); border-top-color:var(--primary-green); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 1.5rem; }
-    .analyzing-text { font-size:1.25rem; font-weight:600; color:var(--text-dark); margin-bottom:.5rem; }
-    .analyzing-subtext { font-size:.9375rem; color:var(--text-medium); }
-    @keyframes spin { to { transform:rotate(360deg); } }
+    /* Map */
+    #farmingMap {
+      height: 350px;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--border-light);
+      margin-bottom: 1rem;
+    }
 
-    /* mobile */
-    @media (max-width:480px) {
-      .mode-buttons { grid-template-columns:1fr; }
-      #verificationMap { height:400px; }
-      .map-controls { flex-direction:column; }
-      .map-controls .btn { width:100%; }
-      .reward-amount { font-size:2rem; }
-      .impact-grid { grid-template-columns:1fr; }
-      .saved-field-banner.show { flex-direction: column; align-items: flex-start; }
+    /* Form fields */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      font-size: 0.9375rem;
+    }
+
+    .form-select, .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-family: 'Prompt', sans-serif;
+      transition: border-color 0.2s;
+    }
+
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: var(--primary-green);
+    }
+
+    /* Info boxes */
+    .info-box {
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #3B82F6;
+    }
+
+    .info-box.success {
+      background: rgba(16, 185, 129, 0.1);
+      border-left-color: #10B981;
+    }
+
+    .info-box.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-left-color: #F59E0B;
+    }
+
+    .info-box.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-left-color: #EF4444;
+    }
+
+    .info-box-title {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-box-text {
+      font-size: 0.875rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+
+    /* Monitoring Progress */
+    .monitoring-card {
+      background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .monitoring-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .monitoring-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .monitoring-status {
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .monitoring-status.active {
+      background: #10B981;
+    }
+
+    .monitoring-status.warning {
+      background: #F59E0B;
+    }
+
+    .days-display {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .days-number {
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .days-label {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar-container {
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-full);
+      height: 12px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+      border-radius: var(--radius-full);
+      transition: width 0.5s ease;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    /* Reward Preview */
+    .reward-preview {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .reward-preview-title {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .reward-preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .reward-preview-item {
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .reward-preview-value {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    .reward-preview-label {
+      font-size: 0.6875rem;
+      opacity: 0.9;
+    }
+
+    /* Success Card */
+    .success-card {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-subtitle {
+      font-size: 1rem;
+      opacity: 0.95;
+      margin-bottom: 1.5rem;
+    }
+
+    .success-reward {
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    .success-reward-amount {
+      font-size: 3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    /* No Cycle */
+    .no-cycle-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .no-cycle-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .no-cycle-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .no-cycle-text {
+      color: var(--text-medium);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* History */
+    .history-section {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .history-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.875rem;
+      background: var(--light-cream);
+      border-radius: var(--radius-lg);
+      margin-bottom: 0.5rem;
+    }
+
+    .history-item-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .history-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .history-item-icon.completed { background: rgba(16, 185, 129, 0.2); }
+    .history-item-icon.failed { background: rgba(239, 68, 68, 0.2); }
+    .history-item-icon.in_progress { background: rgba(59, 130, 246, 0.2); }
+
+    .history-item-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 0.9375rem;
+    }
+
+    .history-item-date {
+      font-size: 0.75rem;
+      color: var(--text-medium);
+    }
+
+    .history-item-reward {
+      font-weight: 600;
+      color: var(--primary-green);
+    }
+
+    /* Loading */
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .loading-overlay.show { display: flex; }
+
+    .loading-content { text-align: center; }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid var(--border-light);
+      border-top-color: var(--primary-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .steps-container::before { left: 10%; right: 10%; }
+      .step-circle { width: 40px; height: 40px; font-size: 1rem; }
+      .step-label { font-size: 0.6875rem; max-width: 60px; }
+      #farmingMap { height: 280px; }
+      .reward-preview-grid { grid-template-columns: 1fr; }
+      .days-number { font-size: 3rem; }
     }
   </style>
 </head>
@@ -164,175 +542,253 @@
   <!-- Header -->
   <div class="verification-header">
     <div class="header-content">
-      <div class="header-title"><span>🔥</span><span>ตรวจสอบการเผาไร่นา</span></div>
+      <div class="header-title"><span>🌾</span><span>ระบบตรวจสอบการเพาะปลูก</span></div>
       <div class="header-subtitle">
-        ตรวจสอบว่าไร่ของคุณไม่มีการเผาในช่วง 3 เดือนที่ผ่านมา<br>
-        รับ AgriCoins ตามขนาดพื้นที่และผลกระทบสิ่งแวดล้อม<br>
-        Verify your farm has no burning and earn AgriCoins based on environmental impact
+        ลงทะเบียนการปลูก → ตรวจสอบพืช → รอ 60 วันหลังเก็บเกี่ยว → รับ AgriCoins<br>
+        Register farming → Verify crops → 60-day no-burn monitoring → Earn AgriCoins
       </div>
     </div>
   </div>
 
   <div class="content-wrapper">
 
-    <!-- Saved-field banner -->
-    <div class="saved-field-banner" id="savedFieldBanner">
-      <span style="font-size:1.75rem;">🌾</span>
-      <div class="saved-field-banner-text">
-        แปลงที่บันทึกไว้ถูกโหลดแล้ว
-        <span class="saved-field-banner-sub" id="savedFieldDesc">–</span>
-      </div>
-      <div class="saved-field-banner-actions">
-        <button class="sfb-btn" onclick="reloadSavedPolygon()">↺ โหลดซ้ำ</button>
-        <button class="sfb-btn danger" onclick="clearSavedPolygonFromDB()">🗑 ลบที่บันทึก</button>
-      </div>
-    </div>
-
-    <!-- Mode Selection -->
-    <div class="mode-selector">
-      <div class="mode-title">เลือกวิธีการระบุแปลง / Select Field Method</div>
-      <div class="mode-buttons">
-        <div class="mode-btn active" data-mode="auto" onclick="selectMode('auto')">
-          <div class="mode-icon">🤖</div>
-          <div class="mode-name">ตรวจจับอัตโนมัติ</div>
-          <div class="mode-description">Auto-Detect<br>ระบบจะค้นหาแปลงเกษตรโดยอัตโนมัติ</div>
+    <!-- Step Progress -->
+    <div class="step-progress">
+      <div class="step-progress-title">ขั้นตอนการตรวจสอบ</div>
+      <div class="steps-container">
+        <div class="step-item" id="stepItem1">
+          <div class="step-circle">🌱</div>
+          <div class="step-label">เริ่มปลูก</div>
         </div>
-        <div class="mode-btn" data-mode="manual" onclick="selectMode('manual')">
-          <div class="mode-icon">✏️</div>
-          <div class="mode-name">วาดเอง</div>
-          <div class="mode-description">Manual Draw<br>วาดขอบเขตแปลงด้วยตนเอง</div>
+        <div class="step-item" id="stepItem2">
+          <div class="step-circle">🌾</div>
+          <div class="step-label">ตรวจสอบพืช</div>
+        </div>
+        <div class="step-item" id="stepItem3">
+          <div class="step-circle">🔥</div>
+          <div class="step-label">ตรวจสอบ 60 วัน</div>
         </div>
       </div>
     </div>
 
-    <!-- Map Section -->
-    <div class="map-section">
-      <div class="map-controls">
-        <button class="btn btn-primary" onclick="useCurrentLocation()">📍 ใช้ตำแหน่งปัจจุบัน</button>
-        <button class="btn btn-secondary" id="drawPolygonBtn" onclick="enableDrawing()" style="display:none;">✏️ เริ่มวาดขอบเขต</button>
-        <button class="btn btn-secondary" id="clearPolygonBtn" onclick="clearPolygon()">🗑️ ลบขอบเขต</button>
+    <!-- No Cycle Card -->
+    <div class="no-cycle-card" id="noCycleCard" style="display: none;">
+      <div class="no-cycle-icon">🌱</div>
+      <div class="no-cycle-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
+      <div class="no-cycle-text">
+        ลงทะเบียนแปลงเกษตรของคุณและเริ่มรอบการตรวจสอบ<br>
+        เพื่อรับ AgriCoins เมื่อไม่มีการเผาหลังเก็บเกี่ยว
       </div>
-
-      <div id="verificationMap"></div>
-
-      <!-- Save polygon actions (appear after a polygon is placed) -->
-      <div class="polygon-actions" id="polygonActions">
-        <button class="btn btn-primary" onclick="savePolygonToDB()" id="savePolygonBtn">
-          💾 บันทึกเป็นแปลงของฉัน
-        </button>
-      </div>
-
-      <!-- Burn Scar Layer Toggle -->
-      <div class="burn-layer-toggle hidden" id="burnLayerToggle">
-        <div class="toggle-header">
-          <div class="toggle-title"><span>🔥</span><span>แสดงข้อมูลการเผาจากดาวเทียม</span></div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="burnLayerCheckbox" checked onchange="toggleBurnLayer()">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="opacity-control">
-          <div class="opacity-label">ความโปร่งใส: <span id="opacityValue">70%</span></div>
-          <input type="range" class="opacity-slider" id="burnOpacitySlider" min="10" max="100" value="70" oninput="updateBurnLayerOpacity(this.value)">
-        </div>
-        <div class="burn-legend">
-          <div class="legend-item"><div class="legend-color" style="background:rgba(255,0,0,.8)"></div><span>พื้นที่เผาสูง</span></div>
-          <div class="legend-item"><div class="legend-color" style="background:rgba(255,165,0,.8)"></div><span>พื้นที่เผาปานกลาง</span></div>
-          <div class="legend-item"><div class="legend-color" style="background:rgba(255,255,0,.8)"></div><span>พื้นที่เผาต่ำ</span></div>
-        </div>
-      </div>
-
-      <div class="map-info" id="mapInstructions">
-        <div class="map-info-title"><span>💡</span><span>วิธีใช้งาน</span></div>
-        <div class="map-info-text" id="instructionText">
-          <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
-          1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่<br>
-          2. ระบบจะค้นหาขอบเขตแปลงเกษตรโดยอัตโนมัติ<br>
-          3. ตรวจสอบขอบเขตและกดปุ่ม "ตรวจสอบการเผา"
-        </div>
-      </div>
-    </div>
-
-    <!-- Field Info -->
-    <div class="field-info" id="fieldInfo">
-      <h3 style="margin-bottom:1rem;">ข้อมูลแปลง / Field Information</h3>
-      <div class="info-row">
-        <div class="info-label">📏 ขนาดพื้นที่</div>
-        <div class="info-value" id="fieldArea">- ไร่</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">📅 ช่วงเวลาตรวจสอบ</div>
-        <div class="info-value">3 เดือนที่ผ่านมา (90 วัน)</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">🛰️ ข้อมูลดาวเทียม</div>
-        <div class="info-value" id="dataSource">NASA MODIS/VIIRS</div>
-      </div>
-      <div class="info-row" id="polygonSourceRow" style="display:none;">
-        <div class="info-label">🌾 แหล่งที่มาของขอบเขต</div>
-        <div class="info-value" id="polygonSourceLabel">–</div>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="analyzeBurnScar()">
-        🔍 เริ่มตรวจสอบการเผา
+      <button class="btn btn-primary" onclick="showStep1()">
+        🌱 เริ่มลงทะเบียนการปลูก
       </button>
     </div>
 
-    <!-- Results Section -->
-    <div class="results-section" id="resultsSection">
-      <div class="result-card" id="resultCard">
-        <div class="result-icon" id="resultIcon">✅</div>
-        <div class="result-title" id="resultTitle">ผ่านการตรวจสอบ</div>
-        <div class="result-subtitle" id="resultSubtitle">ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา</div>
-        <div class="result-stats">
-          <div class="stat-row"><span>ขนาดพื้นที่:</span><span id="resultArea">-</span></div>
-          <div class="stat-row"><span>พื้นที่เผา:</span><span id="resultBurnedArea">0 ไร่</span></div>
-          <div class="stat-row"><span>เปอร์เซ็นต์การเผา:</span><span id="resultBurnPercentage">0%</span></div>
-          <div class="stat-row"><span>วันที่ตรวจสอบ:</span><span id="resultDate">-</span></div>
+    <!-- Step 1: Start Farming -->
+    <div class="step-card" id="step1Card">
+      <div class="step-card-header">
+        <div class="step-card-icon step1">🌱</div>
+        <div>
+          <div class="step-card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div>
+          <div class="step-card-subtitle">ระบุแปลงและประเภทพืชที่ปลูก</div>
         </div>
-        <div class="confidence-section">
-          <div class="confidence-title"><span>📊</span><span>ความเชื่อมั่นในผลตรวจสอบ</span></div>
-          <div class="confidence-bar"><div class="confidence-fill" id="confidenceFill" style="width:0%"></div></div>
-          <div class="confidence-text" id="confidenceReason">-</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📍 ระบุขอบเขตแปลง</label>
+        <div id="farmingMap"></div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button class="btn btn-secondary" onclick="useCurrentLocation()" style="flex: 1;">
+            📍 ตำแหน่งปัจจุบัน
+          </button>
+          <button class="btn btn-secondary" onclick="enableDrawing()" style="flex: 1;">
+            ✏️ วาดขอบเขต
+          </button>
         </div>
-        <div class="environmental-impact" id="environmentalImpact" style="display:none;">
-          <div class="impact-title"><span>🌍</span><span>ผลกระทบเชิงบวกต่อสิ่งแวดล้อม</span></div>
-          <div class="impact-grid">
-            <div class="impact-item"><div class="impact-value" id="impactPM25">0 kg</div><div class="impact-label">PM2.5 ที่ลดได้</div></div>
-            <div class="impact-item"><div class="impact-value" id="impactCO2">0 kg</div><div class="impact-label">CO₂ ที่ลดได้</div></div>
-          </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🌾 ประเภทพืชที่ปลูก</label>
+        <select class="form-select" id="cropType">
+          <option value="rice">🌾 ข้าว</option>
+          <option value="corn">🌽 ข้าวโพด</option>
+          <option value="sugarcane">🎋 อ้อย</option>
+          <option value="cassava">🥔 มันสำปะหลัง</option>
+          <option value="other">🌿 อื่นๆ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📝 ชื่อแปลง (ไม่บังคับ)</label>
+        <input type="text" class="form-input" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title"><span>💡</span> ข้อมูลสำคัญ</div>
+        <div class="info-box-text">
+          หลังจากลงทะเบียนแล้ว คุณจะต้อง<strong>รออย่างน้อย 30 วัน</strong>ก่อนที่จะสามารถตรวจสอบพืชได้
+          ระบบจะใช้ภาพถ่ายดาวเทียมเพื่อยืนยันว่ามีพืชเติบโตในแปลงจริง
         </div>
-        <div class="reward-banner" id="rewardBanner" style="display:none;">
-          <div>🎉 ยินดีด้วย คุณได้รับ</div>
-          <div class="reward-amount">
-            <img src="Untitled_design-removebg-preview.png" class="coin" style="width:40px;height:40px;">
-            <span id="totalAgricoins">+100</span>
-          </div>
-          <div>AgriCoins เข้าบัญชีแล้ว!</div>
-          <div class="reward-breakdown" id="rewardBreakdown">
-            <div class="reward-breakdown-title"><span>📋</span><span>รายละเอียดการคำนวณ</span></div>
-            <div class="reward-breakdown-item">
-              <span class="reward-breakdown-label"><span>🌫️</span><span>PM2.5 ที่ลดได้ (<span id="breakdownPM25kg">0</span> kg × 10)</span></span>
-              <span class="reward-breakdown-value" id="breakdownPM25coins">+0</span>
-            </div>
-            <div class="reward-breakdown-item">
-              <span class="reward-breakdown-label"><span>🌱</span><span>CO₂ ที่ลดได้ (<span id="breakdownCO2kg">0</span> kg ÷ 100)</span></span>
-              <span class="reward-breakdown-value" id="breakdownCO2coins">+0</span>
-            </div>
-            <div class="reward-breakdown-item">
-              <span class="reward-breakdown-label"><span>🏆</span><span>รวมทั้งหมด</span></span>
-              <span class="reward-breakdown-value" id="breakdownTotal">+0</span>
-            </div>
-          </div>
-          <div class="reward-explanation">
-            💡 ยิ่งพื้นที่ใหญ่และไม่มีการเผา ยิ่งช่วยลดมลพิษได้มาก<br>
-            ทุก 100g ของ PM2.5 ที่ลดได้ = 1 AgriCoin<br>
-            ทุก 100kg ของ CO₂ ที่ลดได้ = 1 AgriCoin
+      </div>
+
+      <div id="step1FieldInfo" style="display: none;">
+        <div class="info-box success">
+          <div class="info-box-title"><span>✅</span> ข้อมูลแปลง</div>
+          <div class="info-box-text">
+            <strong>ขนาด:</strong> <span id="step1AreaDisplay">-</span> ไร่<br>
+            <strong>AgriCoins ที่คาดว่าจะได้รับ:</strong> ~<span id="step1CoinsPreview">-</span> coins
           </div>
         </div>
       </div>
-      <div class="action-buttons">
-        <button class="btn btn-secondary" onclick="resetVerification()">🔄 ตรวจสอบใหม่</button>
-        <button class="btn btn-primary" onclick="viewStatistics()">📊 ดูสถิติ</button>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep1()" id="step1SubmitBtn" disabled>
+        🌱 ลงทะเบียนเริ่มปลูก
+      </button>
+    </div>
+
+    <!-- Step 2: Verify Crops -->
+    <div class="step-card" id="step2Card">
+      <div class="step-card-header">
+        <div class="step-card-icon step2">🌾</div>
+        <div>
+          <div class="step-card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div>
+          <div class="step-card-subtitle">ยืนยันว่ามีพืชเติบโตในแปลง</div>
+        </div>
+      </div>
+
+      <div class="info-box" id="step2WaitInfo">
+        <div class="info-box-title"><span>⏳</span> รอการตรวจสอบ</div>
+        <div class="info-box-text">
+          ต้องรออีก <strong id="step2DaysRemaining">-</strong> วัน ก่อนตรวจสอบพืช<br>
+          <small>รอให้พืชเติบโตเพียงพอเพื่อให้ดาวเทียมสามารถตรวจจับได้</small>
+        </div>
+      </div>
+
+      <div class="info-box success" id="step2ReadyInfo" style="display: none;">
+        <div class="info-box-title"><span>✅</span> พร้อมตรวจสอบ</div>
+        <div class="info-box-text">
+          คุณสามารถตรวจสอบพืชได้แล้ว!<br>
+          ระบบจะใช้ดัชนี NDVI จากภาพถ่ายดาวเทียมเพื่อยืนยันว่ามีพืชในแปลง
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep2()" id="step2SubmitBtn" disabled>
+        🔍 ตรวจสอบพืชด้วยดาวเทียม
+      </button>
+    </div>
+
+    <!-- Step 3: Harvest & Monitoring -->
+    <div class="step-card" id="step3Card">
+      <div class="step-card-header">
+        <div class="step-card-icon step3">🔥</div>
+        <div>
+          <div class="step-card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div>
+          <div class="step-card-subtitle">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div>
+        </div>
+      </div>
+
+      <!-- Before harvest declaration -->
+      <div id="step3HarvestSection">
+        <div class="info-box success">
+          <div class="info-box-title"><span>🌾</span> พืชผ่านการตรวจสอบแล้ว!</div>
+          <div class="info-box-text">
+            เมื่อเก็บเกี่ยวเสร็จแล้ว กดปุ่มด้านล่างเพื่อเริ่มช่วงตรวจสอบ 60 วัน
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="declareHarvest()">
+          🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว
+        </button>
+      </div>
+
+      <!-- During monitoring -->
+      <div id="step3MonitoringSection" style="display: none;">
+        <div class="monitoring-card">
+          <div class="monitoring-header">
+            <div class="monitoring-title">🛰️ กำลังตรวจสอบ</div>
+            <div class="monitoring-status active" id="monitoringStatus">กำลังดำเนินการ</div>
+          </div>
+          <div class="days-display">
+            <div class="days-number" id="daysRemaining">60</div>
+            <div class="days-label">วันที่เหลือ</div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="monitoringProgress" style="width: 0%"></div>
+          </div>
+          <div class="progress-labels">
+            <span>เริ่มต้น</span>
+            <span>60 วัน</span>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" style="width: 100%;" onclick="checkBurnStatus()">
+          🔍 ตรวจสอบสถานะการเผา
+        </button>
+
+        <div class="reward-preview">
+          <div class="reward-preview-title"><span>🎁</span> รางวัลที่จะได้รับเมื่อผ่าน</div>
+          <div class="reward-preview-grid">
+            <div class="reward-preview-item">
+              <div class="reward-preview-value" id="previewPM25">-</div>
+              <div class="reward-preview-label">kg PM2.5 ลดได้</div>
+            </div>
+            <div class="reward-preview-item">
+              <div class="reward-preview-value" id="previewCO2">-</div>
+              <div class="reward-preview-label">kg CO₂ ลดได้</div>
+            </div>
+            <div class="reward-preview-item">
+              <div class="reward-preview-value" id="previewCoins">-</div>
+              <div class="reward-preview-label">AgriCoins</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Card -->
+    <div class="step-card" id="successCard">
+      <div class="success-card">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">ยินดีด้วย!</div>
+        <div class="success-subtitle">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
+        <div class="success-reward">
+          <div>คุณได้รับ</div>
+          <div class="success-reward-amount">
+            <img src="Untitled_design-removebg-preview.png" style="width: 48px; height: 48px;">
+            <span id="successCoins">+0</span>
+          </div>
+          <div>AgriCoins</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startNewCycle()">
+        🌱 เริ่มรอบใหม่
+      </button>
+    </div>
+
+    <!-- Failed Card -->
+    <div class="step-card" id="failedCard">
+      <div style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; border-radius: var(--radius-xl); padding: 2rem; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">😔</div>
+        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">พบการเผา</div>
+        <div style="font-size: 1rem; opacity: 0.95; margin-bottom: 1rem;">
+          ตรวจพบการเผาในแปลงของคุณ<br>ไม่ได้รับ AgriCoins ในรอบนี้
+        </div>
+        <div style="background: rgba(255,255,255,0.2); border-radius: var(--radius-lg); padding: 1rem;">
+          <div style="font-size: 0.875rem;">
+            💡 ลองใหม่อีกครั้งในฤดูกาลหน้า<br>
+            การไม่เผาช่วยลดมลพิษและรักษาสุขภาพของคุณและชุมชน
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startNewCycle()">
+        🌱 เริ่มรอบใหม่
+      </button>
+    </div>
+
+    <!-- History -->
+    <div class="history-section" id="historySection">
+      <div class="history-title"><span>📋</span> ประวัติการตรวจสอบ</div>
+      <div id="historyList">
+        <!-- Filled by JS -->
       </div>
     </div>
 
@@ -341,585 +797,443 @@
   <!-- Bottom Navigation -->
   <nav class="mobile-nav">
     <a href="home.html" class="mobile-nav-item"><div class="mobile-nav-icon">🏠</div><div class="mobile-nav-label">หน้าหลัก</div></a>
-    <a href="burn-verification.html" class="mobile-nav-item active"><div class="mobile-nav-icon">🔥</div><div class="mobile-nav-label">ตรวจสอบ</div></a>
+    <a href="burn-verification-v2.html" class="mobile-nav-item active"><div class="mobile-nav-icon">🌾</div><div class="mobile-nav-label">ตรวจสอบ</div></a>
     <a href="Stat.html" class="mobile-nav-item"><div class="mobile-nav-icon">📊</div><div class="mobile-nav-label">สถิติ</div></a>
     <a href="#" class="mobile-nav-item" onclick="logout()"><div class="mobile-nav-icon">🚪</div><div class="mobile-nav-label">ออก</div></a>
   </nav>
-</div><!-- /verification-container -->
+</div>
 
-<!-- Analyzing Overlay -->
-<div class="analyzing-overlay" id="analyzingOverlay">
-  <div class="analyzing-content">
-    <div class="analyzing-spinner"></div>
-    <div class="analyzing-text">กำลังวิเคราะห์ข้อมูลดาวเทียม...</div>
-    <div class="analyzing-subtext">Analyzing satellite data from NASA MODIS<br>This may take 10–30 seconds</div>
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div id="loadingText">กำลังโหลด...</div>
   </div>
 </div>
 
-<div id="toast" class="toast" style="display:none;"></div>
+<div id="toast" class="toast" style="display: none;"></div>
 
 <!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-<script src="https://unpkg.com/georaster"></script>
-<script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 <script src="utils.js"></script>
 <script src="api.js"></script>
 <script>
-  // ── auth guard ──
+  // Auth guard
   const currentUser = Auth.getCurrentUser();
   if (!currentUser) window.location.href = 'index.html';
 
-  // ── constants ──
+  // Constants
   const PM25_PER_RAI = 3.88;
-  const CO2_PER_RAI  = 898;
-  const HA_TO_RAI    = 6.25;
-
-  // ── state ──
-  let verificationMap  = null;
-  let currentMode      = 'auto';
-  let selectedPolygon  = null;   // active GeoJSON polygon
-  let currentMarker    = null;
-  let drawnItems       = null;
-  let drawControl      = null;
-  let autoDetectLat    = null;
-  let autoDetectLng    = null;
-  let savedPolygon     = null;   // polygon loaded from DB
-  let polygonSource    = null;   // 'saved' | 'auto' | 'manual'
-
-  // burn layer
-  let burnScarLayer    = null;
-  let burnScarGeoRaster= null;
-  const BURN_SCAR_TIF_PATH = 'strict_burn_tier1_chiangmai.tif';
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // MAP INIT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function initMap() {
-    verificationMap = L.map('verificationMap').setView([18.7883, 98.9853], 13);
-
-    const googleHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom:20, attribution:'Google' });
-    const esriSat      = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 });
-    const osm          = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
-
-    googleHybrid.addTo(verificationMap);
-    L.control.layers({ 'Google Hybrid': googleHybrid, 'Esri Satellite': esriSat, 'OpenStreetMap': osm }, null, { collapsed:true }).addTo(verificationMap);
-    L.control.scale({ metric:true, imperial:false }).addTo(verificationMap);
-
-    drawnItems = new L.FeatureGroup();
-    verificationMap.addLayer(drawnItems);
-
-    verificationMap.on('click', async (e) => {
-      if (currentMode === 'auto') await handleAutoDetect(e.latlng.lat, e.latlng.lng);
-    });
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LOAD SAVED POLYGON FROM DB ON PAGE LOAD
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- async function loadSavedPolygonFromDB() {
-  try {
-    console.log('🔍 Loading saved polygon for user:', currentUser.id);
-    const result = await API.callBackend('/api/user/get-polygon', { user_id: currentUser.id });
-    console.log('📦 Get-polygon result:', result);
-
-    if (result.success && result.has_polygon) {
-      savedPolygon = result.polygon;
-      displayPolygonOnMap(savedPolygon, 'saved');
-      Toast.info('🌾 โหลดแปลงที่บันทึกไว้แล้ว');
-    } else {
-      console.log('ℹ️ No saved polygon found:', result);
-      Toast.info('ยังไม่มีแปลงที่บันทึกไว้ — คลิกแผนที่หรือวาดแปลงแล้วกด 💾');
-    }
-  } catch (e) {
-    console.error('❌ Could not load saved polygon:', e);
-    Toast.error('โหลดแปลงไม่ได้: ' + e.message);
-  }
-}
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // DISPLAY A POLYGON ON THE MAP
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function displayPolygonOnMap(geojson, source) {
-    drawnItems.clearLayers();
-    selectedPolygon = geojson;
-    polygonSource   = source;
-
-    const coordinates = geojson.coordinates[0];
-    const latlngs     = coordinates.map(c => [c[1], c[0]]);
-
-    // Style differs: saved = gold dashed, auto/manual = green dashed
-    const isSaved = source === 'saved';
-    const layer = L.polygon(latlngs, {
-      color:       isSaved ? '#f59e0b' : '#4CAF50',
-      weight:      isSaved ? 3 : 3,
-      opacity:     0.9,
-      fillColor:   isSaved ? '#fbbf24' : '#7FAD6B',
-      fillOpacity: 0.25,
-      dashArray:   isSaved ? '8, 6' : '5, 5'
-    });
-
-    drawnItems.addLayer(layer);
-
-    // Compute area
-    const areaM2 = L.GeometryUtil.geodesicArea(latlngs);
-    const areaHa = (areaM2 / 10000).toFixed(2);
-    const areaRai = (areaHa * HA_TO_RAI).toFixed(2);
-
-    layer.bindPopup(`${isSaved ? '🌾 แปลงที่บันทึกไว้' : '✅ แปลงที่ตรวจพบ'}<br><strong>${areaRai} ไร่</strong>`);
-
-    verificationMap.fitBounds(layer.getBounds(), { padding: [50, 50] });
-
-    // Update UI
-    document.getElementById('fieldArea').textContent = `${areaRai} ไร่ (${areaHa} hectares)`;
-    document.getElementById('fieldInfo').classList.add('show');
-
-    // Source label
-    document.getElementById('polygonSourceRow').style.display = 'flex';
-    document.getElementById('polygonSourceLabel').textContent =
-      source === 'saved' ? '🌾 แปลงที่บันทึกไว้' :
-      source === 'auto'  ? '🤖 ตรวจจับอัตโนมัติ' : '✏️ วาดเอง';
-
-    // Show saved banner if this is the user's stored polygon
-    if (source === 'saved') {
-      document.getElementById('savedFieldDesc').textContent = `${areaRai} ไร่ · ${areaHa} ha`;
-      document.getElementById('savedFieldBanner').classList.add('show');
-    } else {
-      // Show the save-polygon action bar for non-saved polygons
-      document.getElementById('polygonActions').classList.add('show');
-      document.getElementById('savedFieldBanner').classList.remove('show');
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // SAVE POLYGON TO DB
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function savePolygonToDB() {
-    if (!selectedPolygon) { Toast.error('ไม่มีขอบเขตแปลงให้บันทึก'); return; }
-    try {
-      Loading.show();
-      const result = await API.callBackend('/api/user/save-polygon', {
-        user_id: currentUser.id,
-        polygon: selectedPolygon
-      });
-      Loading.hide();
-      if (result.success) {
-        savedPolygon = selectedPolygon;
-        polygonSource = 'saved';
-        Toast.success('💾 บันทึกแปลงสำเร็จ! จะถูกโหลดอัตโนมัติในครั้งถัดไป');
-        // Re-style polygon as saved (gold)
-        drawnItems.eachLayer(l => l.setStyle({ color:'#f59e0b', fillColor:'#fbbf24', dashArray:'8, 6' }));
-        document.getElementById('polygonActions').classList.remove('show');
-        const areaText = document.getElementById('fieldArea').textContent;
-        document.getElementById('savedFieldDesc').textContent = areaText;
-        document.getElementById('savedFieldBanner').classList.add('show');
-        document.getElementById('polygonSourceLabel').textContent = '🌾 แปลงที่บันทึกไว้';
-      } else {
-        Toast.error('บันทึกไม่สำเร็จ: ' + result.error);
-      }
-    } catch (e) {
-      Loading.hide();
-      Toast.error('เกิดข้อผิดพลาด');
-      console.error(e);
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // DELETE SAVED POLYGON FROM DB
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function clearSavedPolygonFromDB() {
-    if (!confirm('ต้องการลบแปลงที่บันทึกไว้ออกจากระบบหรือไม่?\nDelete your saved field boundary?')) return;
-    try {
-      Loading.show();
-      const result = await API.callBackend('/api/user/save-polygon', {
-        user_id: currentUser.id,
-        polygon: null    // null clears it — our endpoint treats null as invalid, so use a dummy clear polygon
-      });
-      // Actually, send empty coords polygon to wipe; better: just save a flag
-      // Workaround: send the "clear" signal via a special call. We pass an empty-ish polygon
-      // The cleanest solution: call save-polygon with {"polygon": null}
-      // Since our endpoint validates type, we need a dedicated /clear endpoint.
-      // For now we do it client-side + a trick:
-      await API.callBackend('/api/user/save-polygon', {
-        user_id: currentUser.id,
-        _clear: true   // backend ignores unknown keys; polygon missing → 400
-      });
-    } catch(e) { /* ignore */ }
-
-    // Actually the cleanest approach without a new endpoint:
-    // We can reuse save-polygon and let the backend store null.
-    // Let's patch the backend call: use a direct fetch.
-    try {
-      const resp = await fetch(API.BASE_URL + '/api/user/clear-polygon', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ user_id: currentUser.id })
-      });
-      const data = await resp.json().catch(()=>({}));
-      Loading.hide();
-      if (data.success || resp.status === 404) {
-        // assume cleared regardless
-      }
-    } catch(e2) { Loading.hide(); }
-
-    // Always clear locally
-    savedPolygon = null;
-    clearPolygon(false);
-    document.getElementById('savedFieldBanner').classList.remove('show');
-    Toast.success('ลบแปลงที่บันทึกไว้แล้ว');
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // MODE SELECTION
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function selectMode(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
-    clearPolygon(false);
-
-    if (mode === 'auto') {
-      document.getElementById('drawPolygonBtn').style.display = 'none';
-      document.getElementById('instructionText').innerHTML = `
-        <strong>โหมดตรวจจับอัตโนมัติ:</strong><br>
-        1. กดปุ่ม "ใช้ตำแหน่งปัจจุบัน" หรือคลิกบนแผนที่ดาวเทียม<br>
-        2. ระบบจะค้นหาขอบเขตแปลงเกษตรแบบแปลงเดี่ยวโดยอัตโนมัติ<br>
-        3. กด "💾 บันทึกเป็นแปลงของฉัน" เพื่อจดจำขอบเขตนี้<br>
-        4. กดปุ่ม "ตรวจสอบการเผา"`;
-    } else {
-      document.getElementById('drawPolygonBtn').style.display = 'block';
-      document.getElementById('instructionText').innerHTML = `
-        <strong>โหมดวาดเอง:</strong><br>
-        1. กดปุ่ม "เริ่มวาดขอบเขต"<br>
-        2. คลิกบนแผนที่เพื่อวาดรูปหลายเหลี่ยมตามขอบเขตแปลง<br>
-        3. คลิกที่จุดแรกอีกครั้งเพื่อปิดรูป<br>
-        4. กด "💾 บันทึกเป็นแปลงของฉัน" เพื่อจดจำขอบเขตนี้<br>
-        5. กดปุ่ม "ตรวจสอบการเผา"`;
-    }
-
-    // Re-show saved polygon if it exists
-    if (savedPolygon) displayPolygonOnMap(savedPolygon, 'saved');
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // CLEAR POLYGON (keepSaved = false wipes savedPolygon too)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function clearPolygon(keepSaved = true) {
-    drawnItems.clearLayers();
-    selectedPolygon = null;
-    autoDetectLat = null;
-    autoDetectLng = null;
-    polygonSource  = null;
-
-    if (!keepSaved) {
-      // only wipe local reference, not from DB
-      // (clearSavedPolygonFromDB handles DB deletion)
-    }
-
-    document.getElementById('fieldInfo').classList.remove('show');
-    document.getElementById('resultsSection').classList.remove('show');
-    document.getElementById('polygonActions').classList.remove('show');
-    document.getElementById('savedFieldBanner').classList.remove('show');
-    document.getElementById('polygonSourceRow').style.display = 'none';
-
-    if (currentMarker) { verificationMap.removeLayer(currentMarker); currentMarker = null; }
-    if (drawControl)   { verificationMap.removeControl(drawControl); drawControl = null; }
-    removeBurnScarLayer();
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LOCATION + AUTO-DETECT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function useCurrentLocation() {
-    try {
-      Loading.show();
-      Toast.show('กำลังค้นหาตำแหน่งของคุณ...', 'info');
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy:true, timeout:10000 })
-      );
-      const { latitude: lat, longitude: lng } = pos.coords;
-      verificationMap.setView([lat, lng], 17);
-      if (currentMode === 'auto') await handleAutoDetect(lat, lng);
-      else {
-        if (currentMarker) verificationMap.removeLayer(currentMarker);
-        currentMarker = L.marker([lat, lng]).addTo(verificationMap)
-          .bindPopup('📍 ตำแหน่งปัจจุบันของคุณ').openPopup();
-        Toast.success('พบตำแหน่งของคุณแล้ว กรุณาวาดขอบเขตแปลง');
-      }
-      Loading.hide();
-    } catch (e) {
-      Loading.hide();
-      Toast.error('ไม่สามารถระบุตำแหน่งได้');
-    }
-  }
-
-  async function handleAutoDetect(lat, lng) {
-    try {
-      Loading.show();
-      Toast.show('กำลังตรวจจับขอบเขตแปลงจากดาวเทียม...', 'info');
-
-      drawnItems.clearLayers();
-      autoDetectLat = lat;
-      autoDetectLng = lng;
-
-      if (currentMarker) verificationMap.removeLayer(currentMarker);
-      currentMarker = L.marker([lat, lng]).addTo(verificationMap)
-        .bindPopup('🌾 กำลังวิเคราะห์แปลง...').openPopup();
-
-      const result = await API.callBackend('/api/burn-scar/analyze', {
-        mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id
-      });
-
-      Loading.hide();
-
-      if (result.success && result.polygon) {
-        displayPolygonOnMap(result.polygon, 'auto');
-        if (currentMarker) currentMarker.setPopupContent('✅ ตรวจพบแปลงเกษตร');
-        Toast.success('ตรวจจับขอบเขตแปลงสำเร็จ!');
-      } else {
-        Toast.error('ไม่พบแปลงเกษตรในพื้นที่นี้ กรุณาลองตำแหน่งอื่น');
-      }
-    } catch (e) {
-      Loading.hide();
-      Toast.error('เกิดข้อผิดพลาดในการตรวจจับแปลง');
-      console.error(e);
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // MANUAL DRAWING
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function enableDrawing() {
-    if (drawControl) verificationMap.removeControl(drawControl);
-    drawControl = new L.Control.Draw({
-      draw: {
-        polygon: { allowIntersection:false, showArea:true, metric:true,
-          shapeOptions:{ color:'#4CAF50', weight:3, fillColor:'#7FAD6B', fillOpacity:.3 } },
-        polyline:false, rectangle:false, circle:false, marker:false, circlemarker:false
-      },
-      edit: { featureGroup: drawnItems, remove:true }
-    });
-    verificationMap.addControl(drawControl);
-
-    verificationMap.on(L.Draw.Event.CREATED, (e) => {
-      drawnItems.clearLayers();
-      drawnItems.addLayer(e.layer);
-
-      const latlngs = e.layer.getLatLngs()[0];
-      const coords  = latlngs.map(ll => [ll.lng, ll.lat]);
-      coords.push(coords[0]);
-      const geojson = { type:'Polygon', coordinates:[coords] };
-
-      displayPolygonOnMap(geojson, 'manual');
-      Toast.success('วาดขอบเขตแปลงเรียบร้อยแล้ว!');
-    });
-
-    Toast.info('คลิกบนแผนที่เพื่อเริ่มวาดขอบเขต');
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // BURN SCAR GeoTIFF LAYER
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function loadBurnScarLayer() {
-    try {
-      const response = await fetch(BURN_SCAR_TIF_PATH);
-      if (!response.ok) return false;
-      const buf = await response.arrayBuffer();
-      burnScarGeoRaster = await parseGeoraster(buf);
-      burnScarLayer = new GeoRasterLayer({
-        georaster: burnScarGeoRaster, opacity:0.7, resolution:256,
-        pixelValuesToColorFn: (values) => {
-          const v = values[0];
-          if (!v || isNaN(v) || v === 0 || v === -9999) return null;
-          if (v >= 0.8 || v >= 3) return 'rgba(255,0,0,0.85)';
-          if (v >= 0.5 || v >= 2) return 'rgba(255,140,0,0.75)';
-          if (v >= 0.2 || v >= 1) return 'rgba(255,200,0,0.65)';
-          return 'rgba(255,255,100,0.5)';
-        }
-      });
-      burnScarLayer.addTo(verificationMap);
-      document.getElementById('burnLayerToggle').classList.remove('hidden');
-      Toast.success('โหลดข้อมูลการเผาจากดาวเทียมสำเร็จ!');
-      return true;
-    } catch(e) { return false; }
-  }
-
-  function toggleBurnLayer() {
-    if (!burnScarLayer) return;
-    document.getElementById('burnLayerCheckbox').checked
-      ? burnScarLayer.addTo(verificationMap)
-      : verificationMap.removeLayer(burnScarLayer);
-  }
-
-  function updateBurnLayerOpacity(v) {
-    document.getElementById('opacityValue').textContent = v + '%';
-    if (burnScarLayer) burnScarLayer.setOpacity(v / 100);
-  }
-
-  function removeBurnScarLayer() {
-    if (burnScarLayer && verificationMap.hasLayer(burnScarLayer)) verificationMap.removeLayer(burnScarLayer);
-    burnScarLayer = null; burnScarGeoRaster = null;
-    document.getElementById('burnLayerToggle').classList.add('hidden');
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ANALYZE BURN SCAR
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function analyzeBurnScar() {
-    if (!selectedPolygon && !autoDetectLat) {
-      Toast.error('กรุณาระบุขอบเขตแปลงก่อน');
-      return;
-    }
-    try {
-      document.getElementById('analyzingOverlay').classList.add('show');
-
-      let reqData;
-      if (currentMode === 'auto' && autoDetectLat && autoDetectLng) {
-        reqData = { mode:'auto', lat:autoDetectLat, lng:autoDetectLng, radius_m:500, days_back:90, user_id:currentUser.id };
-      } else {
-        reqData = { mode:'custom', polygon:selectedPolygon, days_back:90, user_id:currentUser.id };
-      }
-
-      const result = await API.callBackend('/api/burn-scar/analyze', reqData);
-      document.getElementById('analyzingOverlay').classList.remove('show');
-
-      if (result.success) await displayResults(result);
-      else Toast.error(result.error || 'เกิดข้อผิดพลาดในการวิเคราะห์');
-    } catch (e) {
-      document.getElementById('analyzingOverlay').classList.remove('show');
-      Toast.error('เกิดข้อผิดพลาดในการวิเคราะห์');
-      console.error(e);
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // AGRICOIN CALCULATION
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function calculateAgricoins(areaRai) {
-    const pm25 = parseFloat(areaRai) * PM25_PER_RAI;
-    const co2  = parseFloat(areaRai) * CO2_PER_RAI;
-    const pm25Coins = Math.floor(pm25 * 10);
-    const co2Coins  = Math.floor(co2 / 100);
-    return { pm25Prevented:pm25.toFixed(2), co2Prevented:co2.toFixed(2), pm25Coins, co2Coins, totalCoins:pm25Coins+co2Coins };
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // DISPLAY RESULTS
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function displayResults(result) {
-    const areaHa   = result.farm_area_ha;
-    const areaRai  = (areaHa * HA_TO_RAI).toFixed(2);
-    const burnedRai= (result.burned_area_ha * HA_TO_RAI).toFixed(2);
-    const coinCalc = calculateAgricoins(areaRai);
-
-    document.getElementById('resultArea').textContent = `${areaRai} ไร่`;
-    document.getElementById('resultBurnedArea').textContent = `${burnedRai} ไร่`;
-    document.getElementById('resultBurnPercentage').textContent = `${result.burn_percentage}%`;
-    document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH');
-    if (result.source) document.getElementById('dataSource').textContent = result.source;
-
-    const confPct = (result.confidence_score * 100).toFixed(0);
-    document.getElementById('confidenceFill').style.width = `${confPct}%`;
-    document.getElementById('confidenceReason').textContent = result.confidence_reason;
-
-    // Save to stats DB
-    try {
-      const poly = selectedPolygon || result.polygon;
-      await API.callBackend('/api/stats/record-verification', {
-        user_id: currentUser.id,
-        analysis_id: result.analysis_id,
-        area_rai: parseFloat(areaRai),
-        area_ha:  areaHa,
-        burn_detected:   result.burn_detected,
-        burn_percentage: result.burn_percentage,
-        confidence_score: result.confidence_score,
-        lat: autoDetectLat || (poly ? poly.coordinates[0][0][1] : null),
-        lng: autoDetectLng || (poly ? poly.coordinates[0][0][0] : null),
-        province:   'เชียงใหม่',
-        field_name: `แปลงตรวจสอบ ${new Date().toLocaleDateString('th-TH')}`
-      });
-    } catch(e) { console.error('Save stats error:', e); }
-
-    // Load burn layer
-    await loadBurnScarLayer();
-
-    if (!result.burn_detected) {
-      // ── PASS ──
-      document.getElementById('resultCard').className = 'result-card success';
-      document.getElementById('resultIcon').textContent = '✅';
-      document.getElementById('resultTitle').textContent = 'ผ่านการตรวจสอบ!';
-      document.getElementById('resultSubtitle').textContent = 'ไม่พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา';
-
-      document.getElementById('environmentalImpact').style.display = 'block';
-      document.getElementById('impactPM25').textContent = `${coinCalc.pm25Prevented} kg`;
-      document.getElementById('impactCO2').textContent  = `${coinCalc.co2Prevented} kg`;
-
-      try {
-        const bal = await API.callBackend('/agricoin/add', {
-          user_id: currentUser.id, amount: coinCalc.totalCoins,
-          description: `Burn verification reward – ${areaRai} rai`
-        });
-        if (bal.success) { currentUser.agricoin_balance = bal.transaction.new_balance; Auth.setCurrentUser(currentUser); }
-      } catch(e) {}
-
-      document.getElementById('rewardBanner').style.display = 'block';
-      document.getElementById('totalAgricoins').textContent = `+${coinCalc.totalCoins}`;
-      document.getElementById('breakdownPM25kg').textContent = coinCalc.pm25Prevented;
-      document.getElementById('breakdownPM25coins').textContent = `+${coinCalc.pm25Coins}`;
-      document.getElementById('breakdownCO2kg').textContent = coinCalc.co2Prevented;
-      document.getElementById('breakdownCO2coins').textContent = `+${coinCalc.co2Coins}`;
-      document.getElementById('breakdownTotal').textContent = `+${coinCalc.totalCoins} AgriCoins`;
-
-      Toast.success(`🎉 คุณได้รับ ${coinCalc.totalCoins} AgriCoins!`, 3000);
-
-      drawnItems.eachLayer(l => {
-        l.setStyle({ color:'#4CAF50', fillColor:'#66BB6A', fillOpacity:.4, dashArray:null });
-        l.bindPopup(`✅ ผ่านการตรวจสอบ<br><strong>${areaRai} ไร่</strong><br>🌫️ −${coinCalc.pm25Prevented} kg PM2.5<br>🌱 −${coinCalc.co2Prevented} kg CO₂<br>🪙 +${coinCalc.totalCoins} AgriCoins`).openPopup();
-      });
-
-    } else {
-      // ── FAIL ──
-      document.getElementById('resultCard').className = 'result-card warning';
-      document.getElementById('resultIcon').textContent = '⚠️';
-      document.getElementById('resultTitle').textContent = 'พบการเผา!';
-      document.getElementById('resultSubtitle').textContent = `พบการเผา ${result.burn_percentage}% ของพื้นที่`;
-      document.getElementById('environmentalImpact').style.display = 'none';
-      document.getElementById('rewardBanner').style.display = 'none';
-
-      Toast.warning('พบการเผาในแปลงของคุณในช่วง 3 เดือนที่ผ่านมา', 3000);
-
-      drawnItems.eachLayer(l => {
-        l.setStyle({ color:'#EF5350', fillColor:'#E57373', fillOpacity:.4 });
-        l.bindPopup(`⚠️ พบการเผา ${result.burn_percentage}%<br><strong>${areaRai} ไร่</strong>`).openPopup();
-      });
-    }
-
-    document.getElementById('resultsSection').classList.add('show');
-    document.getElementById('resultsSection').scrollIntoView({ behavior:'smooth' });
-  }
-
-  function resetVerification() {
-    clearPolygon(true); // keep savedPolygon reference
-    document.getElementById('resultsSection').classList.remove('show');
-    window.scrollTo({ top:0, behavior:'smooth' });
-    // Re-show saved polygon if exists
-    if (savedPolygon) displayPolygonOnMap(savedPolygon, 'saved');
-    else Toast.info('เริ่มการตรวจสอบใหม่');
-  }
-
-  function viewStatistics() { window.location.href = 'Stat.html'; }
-  function logout() {
-    if (confirm('คุณต้องการออกจากระบบหรือไม่?')) { Auth.logout(); window.location.href = 'index.html'; }
-  }
+  const CO2_PER_RAI = 898;
+  const HA_TO_RAI = 6.25;
+
+  // State
+  let farmingMap = null;
+  let drawnItems = null;
+  let drawControl = null;
+  let selectedPolygon = null;
+  let activeCycle = null;
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // INIT
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  window.addEventListener('load', async () => {
+  async function init() {
     initMap();
-    await loadSavedPolygonFromDB();   // 🔑 auto-load saved field
-    if (!savedPolygon) Toast.success('ยินดีต้อนรับสู่ระบบตรวจสอบการเผา!');
-  });
+    await loadFarmingStatus();
+  }
+
+  function initMap() {
+    farmingMap = L.map('farmingMap').setView([18.7883, 98.9853], 13);
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(farmingMap);
+    drawnItems = new L.FeatureGroup();
+    farmingMap.addLayer(drawnItems);
+
+    farmingMap.on('click', async (e) => {
+      await handleMapClick(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LOAD STATUS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  async function loadFarmingStatus() {
+    showLoading('กำลังโหลดข้อมูล...');
+    try {
+      const result = await API.callBackend('/api/farming/status', { user_id: currentUser.id });
+      hideLoading();
+
+      if (result.success) {
+        activeCycle = result.active_cycle;
+        renderHistory(result.history || []);
+
+        if (result.has_active_cycle) {
+          renderActiveCycle(activeCycle);
+        } else {
+          showNoCycle();
+        }
+      }
+    } catch (e) {
+      hideLoading();
+      console.error(e);
+      showNoCycle();
+    }
+  }
+
+  function renderActiveCycle(cycle) {
+    hideAllCards();
+    updateStepProgress(cycle.current_step, cycle.final_status);
+
+    if (cycle.final_status === 'completed') {
+      document.getElementById('successCard').classList.add('active');
+      document.getElementById('successCoins').textContent = `+${cycle.reward.agricoin_awarded}`;
+      return;
+    }
+
+    if (cycle.final_status === 'failed') {
+      document.getElementById('failedCard').classList.add('active');
+      return;
+    }
+
+    // Show appropriate step
+    if (cycle.current_step === 1) {
+      showStep1();
+    } else if (cycle.current_step === 2) {
+      showStep2(cycle);
+    } else if (cycle.current_step === 3) {
+      showStep3(cycle);
+    }
+  }
+
+  function showNoCycle() {
+    hideAllCards();
+    document.getElementById('noCycleCard').style.display = 'block';
+    updateStepProgress(0, 'none');
+  }
+
+  function hideAllCards() {
+    document.getElementById('noCycleCard').style.display = 'none';
+    ['step1Card', 'step2Card', 'step3Card', 'successCard', 'failedCard'].forEach(id => {
+      document.getElementById(id).classList.remove('active');
+    });
+  }
+
+  function updateStepProgress(currentStep, status) {
+    for (let i = 1; i <= 3; i++) {
+      const item = document.getElementById(`stepItem${i}`);
+      item.classList.remove('active', 'completed', 'failed');
+
+      if (status === 'completed') {
+        item.classList.add('completed');
+      } else if (status === 'failed' && i <= currentStep) {
+        item.classList.add(i === currentStep ? 'failed' : 'completed');
+      } else if (i < currentStep) {
+        item.classList.add('completed');
+      } else if (i === currentStep) {
+        item.classList.add('active');
+      }
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 1
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showStep1() {
+    hideAllCards();
+    document.getElementById('step1Card').classList.add('active');
+    updateStepProgress(1, 'in_progress');
+    setTimeout(() => farmingMap.invalidateSize(), 100);
+  }
+
+  async function handleMapClick(lat, lng) {
+    showLoading('กำลังตรวจจับแปลง...');
+    try {
+      const result = await API.callBackend('/api/burn-scar/analyze', {
+        mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id
+      });
+      hideLoading();
+
+      if (result.success && result.polygon) {
+        displayPolygon(result.polygon);
+        selectedPolygon = result.polygon;
+        updateStep1Preview(result.farm_area_ha * HA_TO_RAI);
+        document.getElementById('step1SubmitBtn').disabled = false;
+        Toast.success('ตรวจจับแปลงสำเร็จ!');
+      } else {
+        Toast.error('ไม่พบแปลงในพื้นที่นี้');
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด');
+    }
+  }
+
+  function displayPolygon(geojson) {
+    drawnItems.clearLayers();
+    const coords = geojson.coordinates[0];
+    const latlngs = coords.map(c => [c[1], c[0]]);
+    const layer = L.polygon(latlngs, {
+      color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3
+    });
+    drawnItems.addLayer(layer);
+    farmingMap.fitBounds(layer.getBounds(), { padding: [30, 30] });
+  }
+
+  function updateStep1Preview(areaRai) {
+    const coins = calculateCoins(areaRai);
+    document.getElementById('step1AreaDisplay').textContent = areaRai.toFixed(2);
+    document.getElementById('step1CoinsPreview').textContent = coins;
+    document.getElementById('step1FieldInfo').style.display = 'block';
+  }
+
+  function calculateCoins(areaRai) {
+    const pm25 = areaRai * PM25_PER_RAI;
+    const co2 = areaRai * CO2_PER_RAI;
+    return Math.floor(pm25 * 10) + Math.floor(co2 / 100);
+  }
+
+  async function submitStep1() {
+    if (!selectedPolygon) { Toast.error('กรุณาเลือกแปลงก่อน'); return; }
+
+    showLoading('กำลังลงทะเบียน...');
+    try {
+      const result = await API.callBackend('/api/farming/start', {
+        user_id: currentUser.id,
+        polygon: selectedPolygon,
+        crop_type: document.getElementById('cropType').value,
+        field_name: document.getElementById('fieldName').value || 'แปลงเกษตร'
+      });
+      hideLoading();
+
+      if (result.success) {
+        Toast.success(result.message);
+        await loadFarmingStatus();
+      } else {
+        Toast.error(result.error);
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด');
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 2
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showStep2(cycle) {
+    hideAllCards();
+    document.getElementById('step2Card').classList.add('active');
+    updateStepProgress(2, 'in_progress');
+
+    const daysUntilCheck = cycle.days_info?.days_until_crop_check || 0;
+
+    if (daysUntilCheck > 0) {
+      document.getElementById('step2WaitInfo').style.display = 'block';
+      document.getElementById('step2ReadyInfo').style.display = 'none';
+      document.getElementById('step2DaysRemaining').textContent = daysUntilCheck;
+      document.getElementById('step2SubmitBtn').disabled = true;
+    } else {
+      document.getElementById('step2WaitInfo').style.display = 'none';
+      document.getElementById('step2ReadyInfo').style.display = 'block';
+      document.getElementById('step2SubmitBtn').disabled = false;
+    }
+  }
+
+  async function submitStep2() {
+    showLoading('กำลังตรวจสอบพืชด้วยดาวเทียม...');
+    try {
+      const result = await API.callBackend('/api/farming/verify-crops', {
+        user_id: currentUser.id,
+        cycle_id: activeCycle.cycle_id
+      });
+      hideLoading();
+
+      if (result.crops_verified) {
+        Toast.success(result.message);
+        await loadFarmingStatus();
+      } else {
+        Toast.warning(result.message);
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด');
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 3
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showStep3(cycle) {
+    hideAllCards();
+    document.getElementById('step3Card').classList.add('active');
+    updateStepProgress(3, 'in_progress');
+
+    if (cycle.steps.step3.status === 'monitoring') {
+      document.getElementById('step3HarvestSection').style.display = 'none';
+      document.getElementById('step3MonitoringSection').style.display = 'block';
+
+      const daysRemaining = cycle.days_info?.days_remaining_monitoring || cycle.steps.step3.days_remaining || 60;
+      const progress = ((60 - daysRemaining) / 60) * 100;
+
+      document.getElementById('daysRemaining').textContent = daysRemaining;
+      document.getElementById('monitoringProgress').style.width = `${progress}%`;
+
+      // Preview rewards
+      const areaRai = cycle.area_rai;
+      document.getElementById('previewPM25').textContent = (areaRai * PM25_PER_RAI).toFixed(1);
+      document.getElementById('previewCO2').textContent = (areaRai * CO2_PER_RAI).toFixed(0);
+      document.getElementById('previewCoins').textContent = calculateCoins(areaRai);
+    } else {
+      document.getElementById('step3HarvestSection').style.display = 'block';
+      document.getElementById('step3MonitoringSection').style.display = 'none';
+    }
+  }
+
+  async function declareHarvest() {
+    showLoading('กำลังบันทึก...');
+    try {
+      const result = await API.callBackend('/api/farming/declare-harvest', {
+        user_id: currentUser.id,
+        cycle_id: activeCycle.cycle_id
+      });
+      hideLoading();
+
+      if (result.success) {
+        Toast.success(result.message);
+        await loadFarmingStatus();
+      } else {
+        Toast.error(result.error);
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด');
+    }
+  }
+
+  async function checkBurnStatus() {
+    showLoading('กำลังตรวจสอบการเผา...');
+    try {
+      const result = await API.callBackend('/api/farming/check-burn-status', {
+        user_id: currentUser.id,
+        cycle_id: activeCycle.cycle_id
+      });
+      hideLoading();
+
+      if (result.status === 'completed') {
+        Toast.success(result.message);
+      } else if (result.status === 'failed') {
+        Toast.error(result.message);
+      } else {
+        Toast.success(result.message);
+      }
+
+      await loadFarmingStatus();
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด');
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // HISTORY
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function renderHistory(history) {
+    const container = document.getElementById('historyList');
+
+    if (!history.length) {
+      container.innerHTML = '<div style="text-align: center; color: var(--text-medium); padding: 1rem;">ยังไม่มีประวัติ</div>';
+      return;
+    }
+
+    container.innerHTML = history.map(h => `
+      <div class="history-item">
+        <div class="history-item-info">
+          <div class="history-item-icon ${h.final_status}">
+            ${h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳'}
+          </div>
+          <div>
+            <div class="history-item-name">${h.field_name}</div>
+            <div class="history-item-date">${h.area_rai?.toFixed(1) || '-'} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
+          </div>
+        </div>
+        <div class="history-item-reward">
+          ${h.final_status === 'completed' ? `+${h.agricoin_awarded}` : '-'}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // UTILITIES
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  async function useCurrentLocation() {
+    try {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 })
+      );
+      farmingMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
+      await handleMapClick(pos.coords.latitude, pos.coords.longitude);
+    } catch (e) {
+      Toast.error('ไม่สามารถระบุตำแหน่งได้');
+    }
+  }
+
+  function enableDrawing() {
+    if (drawControl) farmingMap.removeControl(drawControl);
+    drawControl = new L.Control.Draw({
+      draw: {
+        polygon: { allowIntersection: false, showArea: true,
+          shapeOptions: { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 } },
+        polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
+      },
+      edit: { featureGroup: drawnItems, remove: true }
+    });
+    farmingMap.addControl(drawControl);
+
+    farmingMap.on(L.Draw.Event.CREATED, (e) => {
+      drawnItems.clearLayers();
+      drawnItems.addLayer(e.layer);
+
+      const latlngs = e.layer.getLatLngs()[0];
+      const coords = latlngs.map(ll => [ll.lng, ll.lat]);
+      coords.push(coords[0]);
+      selectedPolygon = { type: 'Polygon', coordinates: [coords] };
+
+      const area = L.GeometryUtil.geodesicArea(latlngs);
+      const areaRai = (area / 10000) * HA_TO_RAI;
+      updateStep1Preview(areaRai);
+      document.getElementById('step1SubmitBtn').disabled = false;
+      Toast.success('วาดขอบเขตเรียบร้อย!');
+    });
+
+    Toast.info('คลิกบนแผนที่เพื่อวาดขอบเขต');
+  }
+
+  function startNewCycle() {
+    activeCycle = null;
+    selectedPolygon = null;
+    drawnItems.clearLayers();
+    showStep1();
+  }
+
+  function showLoading(text) {
+    document.getElementById('loadingText').textContent = text || 'กำลังโหลด...';
+    document.getElementById('loadingOverlay').classList.add('show');
+  }
+
+  function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }
+
+  function logout() {
+    if (confirm('ต้องการออกจากระบบ?')) {
+      Auth.logout();
+      window.location.href = 'index.html';
+    }
+  }
+
+  // Init
+  window.addEventListener('load', init);
 </script>
 </body>
 </html>
