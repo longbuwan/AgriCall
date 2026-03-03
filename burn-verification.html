@@ -115,6 +115,23 @@
     .info-box-title { font-weight:600; color:var(--text-dark); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
     .info-box-text  { font-size:0.875rem; color:var(--text-medium); line-height:1.5; }
 
+    /* Satellite Evidence Panel */
+    .sat-evidence {
+      background:#0F172A; color:#E2E8F0; border-radius:var(--radius-lg);
+      padding:1rem; margin-top:1rem; font-size:0.8125rem; font-family:monospace;
+    }
+    .sat-evidence-title { color:#34D399; font-weight:700; margin-bottom:0.75rem; font-family:'Prompt',sans-serif; font-size:0.875rem; }
+    .sat-row { display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid #1E293B; }
+    .sat-row:last-child { border-bottom:none; }
+    .sat-label { color:#94A3B8; }
+    .sat-value { font-weight:600; }
+    .sat-value.pass { color:#34D399; }
+    .sat-value.fail { color:#F87171; }
+    .sat-value.warn { color:#FBBF24; }
+    .sat-reasons { margin-top:0.75rem; }
+    .sat-reason-item { padding:0.25rem 0; color:#CBD5E1; line-height:1.4; }
+    .sat-source { margin-top:0.75rem; color:#64748B; font-size:0.75rem; border-top:1px solid #1E293B; padding-top:0.5rem; }
+
     /* Monitoring */
     .monitoring-card { background:linear-gradient(135deg,#1E3A5F,#0F172A); color:white; border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1rem; }
     .monitoring-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
@@ -213,7 +230,10 @@
 
     <div class="info-box demo" id="demoInfoBox" style="display:none;">
       <div class="info-box-title"><span>🚀</span> Demo Mode เปิดใช้งาน</div>
-      <div class="info-box-text">สามารถข้ามเวลารอ 30 วัน และ 60 วัน เพื่อทดสอบระบบได้ทันที</div>
+      <div class="info-box-text">
+        ข้ามเวลารอ 30 วันและ 60 วันได้ แต่การตรวจสอบดาวเทียมยังคงทำงานจริง<br>
+        <strong>หากไม่มี GEE:</strong> ระบบจะแสดงข้อมูลสมมติและแจ้งชัดเจนว่าไม่ใช่ข้อมูลจริง
+      </div>
     </div>
 
     <!-- Step Progress -->
@@ -246,7 +266,6 @@
 
       <div class="form-group">
         <label class="form-label">📍 เลือกวิธีระบุขอบเขตแปลง</label>
-        <!-- Explicit toolbar — map click does NOTHING until a mode is chosen -->
         <div class="map-toolbar">
           <button class="map-tool-btn tool-saved" id="btnLoadSaved"   onclick="setMapMode('saved')">💾 แปลงของฉัน</button>
           <button class="map-tool-btn tool-auto"  id="btnAutoDetect"  onclick="setMapMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
@@ -286,7 +305,6 @@
         </div>
       </div>
 
-      <!-- Shows real backend error message -->
       <div class="info-box error" id="step1Error" style="display:none;">
         <div class="info-box-title"><span>⚠️</span> เกิดข้อผิดพลาด</div>
         <div class="info-box-text" id="step1ErrorText"></div>
@@ -303,23 +321,37 @@
         <div class="step-card-icon step2">🌾</div>
         <div>
           <div class="step-card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div>
-          <div class="step-card-subtitle">ยืนยันว่ามีพืชเติบโตในแปลง</div>
+          <div class="step-card-subtitle">ยืนยันว่ามีพืชเติบโตในแปลงด้วยข้อมูลดาวเทียมจริง</div>
         </div>
       </div>
+
       <div class="info-box" id="step2WaitInfo">
         <div class="info-box-title"><span>⏳</span> รอการตรวจสอบ</div>
-        <div class="info-box-text">ต้องรออีก <strong id="step2DaysRemaining">-</strong> วัน ก่อนตรวจสอบพืช<br><small>รอให้พืชเติบโตเพียงพอเพื่อให้ดาวเทียมสามารถตรวจจับได้</small></div>
+        <div class="info-box-text">ต้องรออีก <strong id="step2DaysRemaining">-</strong> วัน ก่อนตรวจสอบพืช<br>
+        <small>รอให้พืชเติบโตเพียงพอเพื่อให้ Sentinel-2 สามารถตรวจจับได้</small></div>
       </div>
+
       <div class="info-box success" id="step2ReadyInfo" style="display:none;">
         <div class="info-box-title"><span>✅</span> พร้อมตรวจสอบแล้ว!</div>
-        <div class="info-box-text">ระบบจะใช้ NDVI จากภาพดาวเทียมยืนยันว่ามีพืชในแปลง</div>
+        <div class="info-box-text">
+          ระบบจะวิเคราะห์จาก Sentinel-2:<br>
+          • <strong>NDVI</strong> — ดัชนีพืชพรรณ (ต้องการ ≥0.30 และเพิ่มขึ้น ≥0.08)<br>
+          • <strong>EVI</strong> — ยืนยันมวลชีวภาพ (ต้องการ ≥0.15)<br>
+          • <strong>ESA WorldCover</strong> — ยืนยันว่าเป็นพื้นที่เกษตร (ต้องการ ≥30%)<br>
+          • <strong>NDWI</strong> — ตรวจนาข้าวแบบน้ำขัง
+        </div>
       </div>
+
+      <!-- Satellite Evidence (shown after check) -->
+      <div id="step2EvidenceBox" style="display:none;"></div>
+
       <div id="step2SkipSection" style="display:none;">
-        <div class="skip-divider">หรือ</div>
-        <button class="btn btn-skip" style="width:100%;" onclick="submitStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบทันที (Demo)</button>
+        <div class="skip-divider">หรือ (Demo Mode)</div>
+        <button class="btn btn-skip" style="width:100%;" onclick="submitStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบด้วยดาวเทียม (Demo)</button>
       </div>
+
       <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="submitStep2(false)" id="step2SubmitBtn" disabled>
-        🔍 ตรวจสอบพืชด้วยดาวเทียม
+        🛰️ ตรวจสอบพืชด้วยดาวเทียม Sentinel-2
       </button>
     </div>
 
@@ -354,7 +386,7 @@
         </div>
         <button class="btn btn-secondary" style="width:100%;" onclick="checkBurnStatus(false)">🔍 ตรวจสอบสถานะการเผา</button>
         <div id="step3SkipSection" style="display:none;">
-          <div class="skip-divider">หรือ</div>
+          <div class="skip-divider">หรือ (Demo Mode)</div>
           <button class="btn btn-skip" style="width:100%;" onclick="checkBurnStatus(true)">🚀 ข้าม 60 วัน & รับ AgriCoins ทันที (Demo)</button>
         </div>
         <div class="reward-preview">
@@ -436,11 +468,11 @@
   let farmingMap      = null;
   let drawnItems      = null;
   let drawControl     = null;
-  let selectedPolygon = null;   // GeoJSON currently displayed
+  let selectedPolygon = null;
   let activeCycle     = null;
   let demoMode        = false;
-  let mapMode         = 'none'; // 'none' | 'auto' | 'draw' | 'saved'
-  let savedPolygon    = null;   // loaded from /api/user/get-polygon
+  let mapMode         = 'none';
+  let savedPolygon    = null;
 
   // ════════════════════════════════════════════════════════════════════════
   // DEMO MODE
@@ -449,8 +481,80 @@
     demoMode = document.getElementById('demoModeToggle').checked;
     document.getElementById('demoBadge').style.display   = demoMode ? 'inline-flex' : 'none';
     document.getElementById('demoInfoBox').style.display = demoMode ? 'block'       : 'none';
-    Toast.info(demoMode ? '🚀 Demo Mode เปิดใช้งาน' : 'Demo Mode ปิดใช้งาน');
+    Toast.info(demoMode ? '🚀 Demo Mode เปิดใช้งาน — ยังตรวจสอบดาวเทียมจริง' : 'Demo Mode ปิดใช้งาน');
     if (activeCycle) renderActiveCycle(activeCycle);
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // SATELLITE EVIDENCE RENDERER
+  // Shows exactly what the satellite found — transparency is key
+  // ════════════════════════════════════════════════════════════════════════
+  function renderSatEvidence(verification, containerId) {
+    const box = document.getElementById(containerId);
+    if (!box || !verification) return;
+
+    const v = verification;
+    const fmt = (n) => n !== null && n !== undefined ? Number(n).toFixed(3) : 'N/A';
+    const pct = (n) => n !== null && n !== undefined ? (Number(n) * 100).toFixed(0) + '%' : 'N/A';
+
+    // Thresholds (mirror server constants)
+    const NDVI_MIN  = 0.30;
+    const NDVI_INC  = 0.08;
+    const EVI_MIN   = 0.15;
+    const CROP_FRAC = 0.30;
+
+    function cls(val, threshold, above = true) {
+      if (val === null || val === undefined) return 'warn';
+      return (above ? val >= threshold : val <= threshold) ? 'pass' : 'fail';
+    }
+
+    const ndvi_peak_cls = cls(v.ndvi_peak, NDVI_MIN);
+    const ndvi_inc_cls  = cls(v.ndvi_increase, NDVI_INC);
+    const evi_cls       = cls(v.evi_score, EVI_MIN);
+    const crop_cls      = cls(v.cropland_fraction, CROP_FRAC);
+
+    const isDemo = v.source && v.source.includes('DEMO');
+    const passed = v.crops_detected;
+
+    const reasonsHtml = (v.reasons || []).map(r =>
+      `<div class="sat-reason-item">${r}</div>`
+    ).join('');
+
+    box.innerHTML = `
+      <div class="sat-evidence">
+        <div class="sat-evidence-title">
+          🛰️ หลักฐานจากดาวเทียม${isDemo ? ' <span style="color:#FBBF24">[DEMO — ข้อมูลสมมติ]</span>' : ''}
+          — ผล: <span class="${passed ? 'sat-value pass' : 'sat-value fail'}">${passed ? '✅ ตรวจพบพืช' : '❌ ไม่พบพืช'}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">NDVI สูงสุด (≥${NDVI_MIN})</span>
+          <span class="sat-value ${ndvi_peak_cls}">${fmt(v.ndvi_peak)} ${ndvi_peak_cls === 'pass' ? '✓' : '✗'}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">NDVI เพิ่มขึ้น (≥${NDVI_INC})</span>
+          <span class="sat-value ${ndvi_inc_cls}">${fmt(v.ndvi_increase)} ${ndvi_inc_cls === 'pass' ? '✓' : '✗'}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">EVI มวลชีวภาพ (≥${EVI_MIN})</span>
+          <span class="sat-value ${evi_cls}">${fmt(v.evi_score)} ${evi_cls === 'pass' ? '✓' : '✗'}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">ESA พื้นที่เกษตร (≥${CROP_FRAC * 100}%)</span>
+          <span class="sat-value ${crop_cls}">${pct(v.cropland_fraction)} ${crop_cls === 'pass' ? '✓' : '✗'}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">NDWI (นาน้ำขัง)</span>
+          <span class="sat-value">${fmt(v.ndwi_score)}</span>
+        </div>
+        <div class="sat-row">
+          <span class="sat-label">จำนวนภาพดาวเทียม</span>
+          <span class="sat-value ${(v.imagery_count || 0) >= 2 ? 'pass' : 'warn'}">${v.imagery_count || 0} ภาพ</span>
+        </div>
+        ${reasonsHtml ? `<div class="sat-reasons">${reasonsHtml}</div>` : ''}
+        <div class="sat-source">แหล่งข้อมูล: ${v.source || 'N/A'}</div>
+      </div>
+    `;
+    box.style.display = 'block';
   }
 
   // ════════════════════════════════════════════════════════════════════════
@@ -458,7 +562,7 @@
   // ════════════════════════════════════════════════════════════════════════
   async function init() {
     initMap();
-    loadSavedPolygon();           // non-blocking background fetch
+    loadSavedPolygon();
     await loadFarmingStatus();
   }
 
@@ -467,15 +571,12 @@
     L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(farmingMap);
     drawnItems = new L.FeatureGroup();
     farmingMap.addLayer(drawnItems);
-
-    // ── KEY FIX #1: click only fires when user explicitly chose 'auto' mode ──
     farmingMap.on('click', async (e) => {
       if (mapMode !== 'auto') return;
       await handleAutoDetect(e.latlng.lat, e.latlng.lng);
     });
   }
 
-  // ── KEY FIX #2: load saved polygon from server ──────────────────────────
   async function loadSavedPolygon() {
     try {
       const res  = await fetch(BACKEND + '/api/user/get-polygon', {
@@ -491,13 +592,11 @@
         btn.style.borderColor = '#10B981';
         btn.style.color       = '#059669';
       }
-    } catch (e) {
-      console.warn('Could not load saved polygon:', e);
-    }
+    } catch (e) { console.warn('Could not load saved polygon:', e); }
   }
 
   // ════════════════════════════════════════════════════════════════════════
-  // MAP MODES — user must click a button; nothing happens automatically
+  // MAP MODES
   // ════════════════════════════════════════════════════════════════════════
   function setMapMode(mode) {
     mapMode = mode;
@@ -517,14 +616,12 @@
         document.getElementById('mapHint').textContent = '⚠️ ยังไม่มีแปลงที่บันทึกไว้ กรุณาเลือกวิธีอื่น';
         Toast.warning('ยังไม่มีแปลงที่บันทึกไว้');
       }
-
     } else if (mode === 'auto') {
       document.getElementById('btnAutoDetect').classList.add('active');
       farmingMap.getContainer().classList.add('mode-auto');
       if (drawControl) { farmingMap.removeControl(drawControl); drawControl = null; }
-      document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ ระบบจะตรวจจับขอบเขตอัตโนมัติ';
+      document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ';
       Toast.info('คลิกบนแผนที่เพื่อตรวจจับแปลง');
-
     } else if (mode === 'draw') {
       document.getElementById('btnDraw').classList.add('active');
       document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต แล้วกด Finish';
@@ -532,7 +629,6 @@
     }
   }
 
-  // ── Auto-detect — only reachable when mapMode === 'auto' ────────────────
   async function handleAutoDetect(lat, lng) {
     showLoading('กำลังตรวจจับแปลง...');
     try {
@@ -556,7 +652,6 @@
     }
   }
 
-  // ── Leaflet Draw ─────────────────────────────────────────────────────────
   function enableDrawingControl() {
     if (drawControl) { farmingMap.removeControl(drawControl); drawControl = null; }
     drawControl = new L.Control.Draw({
@@ -607,7 +702,6 @@
       const { latitude: lat, longitude: lng } = pos.coords;
       farmingMap.setView([lat, lng], 17);
       document.getElementById('btnMyLocation').classList.add('active');
-      // Only auto-detect if that mode is already active; otherwise just pan
       if (mapMode === 'auto') {
         await handleAutoDetect(lat, lng);
       } else {
@@ -713,7 +807,6 @@
     hideAllCards();
     document.getElementById('step1Card').classList.add('active');
     updateStepProgress(1, 'in_progress');
-    // Auto-load saved polygon on first visit if none selected yet
     if (savedPolygon && !selectedPolygon) {
       setTimeout(() => {
         displayPolygon(savedPolygon);
@@ -731,10 +824,8 @@
   async function submitStep1() {
     document.getElementById('step1Error').style.display = 'none';
     if (!selectedPolygon) { showStep1Error('กรุณาเลือกแปลงก่อน'); return; }
-
     showLoading('กำลังลงทะเบียน...');
     try {
-      // ── KEY FIX #3: raw fetch so we get the real error text on 4xx ──
       const res = await fetch(BACKEND + '/api/farming/start', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -747,13 +838,11 @@
       });
       const result = await res.json();
       hideLoading();
-
       if (result.success) {
         Toast.success(result.message || 'ลงทะเบียนสำเร็จ!');
         await loadFarmingStatus();
       } else {
         showStep1Error(result.error || 'เกิดข้อผิดพลาด');
-        // If the user already has an active cycle, surface it instead
         if (result.existing_cycle_id) {
           Toast.warning('กำลังโหลดรอบการปลูกที่กำลังดำเนินการ...');
           setTimeout(() => loadFarmingStatus(), 1500);
@@ -778,12 +867,17 @@
     hideAllCards();
     document.getElementById('step2Card').classList.add('active');
     updateStepProgress(2, 'in_progress');
+    // Clear previous evidence
+    const eb = document.getElementById('step2EvidenceBox');
+    eb.style.display = 'none'; eb.innerHTML = '';
+
     const wait = cycle.days_info?.days_until_crop_check || 0;
     if (wait > 0) {
       document.getElementById('step2WaitInfo').style.display    = 'block';
       document.getElementById('step2ReadyInfo').style.display   = 'none';
       document.getElementById('step2DaysRemaining').textContent = wait;
       document.getElementById('step2SubmitBtn').disabled        = true;
+      // Show skip ONLY if demo mode is on
       document.getElementById('step2SkipSection').style.display = demoMode ? 'block' : 'none';
     } else {
       document.getElementById('step2WaitInfo').style.display    = 'none';
@@ -794,22 +888,52 @@
   }
 
   async function submitStep2(skipWait = false) {
-    showLoading(skipWait ? 'กำลังข้าม 30 วัน...' : 'กำลังตรวจสอบพืช...');
+    // Clear previous evidence panel
+    const eb = document.getElementById('step2EvidenceBox');
+    eb.style.display = 'none'; eb.innerHTML = '';
+
+    showLoading(skipWait ? 'กำลังตรวจสอบดาวเทียม (ข้ามเวลารอ)...' : 'กำลังวิเคราะห์ภาพดาวเทียม Sentinel-2...');
     try {
-      const result = await API.callBackend('/api/farming/verify-crops', {
-        user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skipWait || demoMode
+      const res = await fetch(BACKEND + '/api/farming/verify-crops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id:   currentUser.id,
+          cycle_id:  activeCycle.cycle_id,
+          skip_wait: skipWait  // ← only skip time, not the actual check
+        })
       });
+      const result = await res.json();
       hideLoading();
-      if (result.crops_verified) {
-        Toast.success(result.message + (result.demo_mode ? ' (Demo)' : ''));
-        await loadFarmingStatus();
-      } else if (!result.success && result.days_remaining) {
-        if (demoMode) submitStep2(true);
-        else          Toast.warning(result.error);
-      } else {
-        Toast.warning(result.message || 'ไม่พบพืชในแปลง');
+
+      // ── ALWAYS show satellite evidence, pass or fail ──────────────────
+      if (result.verification) {
+        renderSatEvidence(result.verification, 'step2EvidenceBox');
       }
-    } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
+
+      if (result.success && result.crops_verified) {
+        const demoLabel = result.demo_mode ? ' (ข้ามเวลา Demo)' : '';
+        Toast.success('✅ ตรวจพบพืช!' + demoLabel);
+        setTimeout(() => loadFarmingStatus(), 1500);
+
+      } else if (!result.success && result.days_remaining) {
+        // ── FIX: was silently retrying with skip=true — now just shows error ──
+        Toast.warning(`⏳ ต้องรออีก ${result.days_remaining} วัน`);
+        if (demoMode) {
+          document.getElementById('step2SkipSection').style.display = 'block';
+        }
+
+      } else {
+        // Satellite check ran but crops not found — show the evidence, don't auto-retry
+        const msg = result.message || result.error || 'ไม่พบพืชในแปลง';
+        Toast.warning('⚠️ ' + msg);
+        // Don't reload — keep the evidence panel visible so the user can see why it failed
+      }
+
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด: ' + e.message);
+    }
   }
 
   // ════════════════════════════════════════════════════════════════════════
@@ -840,10 +964,25 @@
   async function declareHarvest() {
     showLoading('กำลังบันทึก...');
     try {
-      const r = await API.callBackend('/api/farming/declare-harvest', { user_id: currentUser.id, cycle_id: activeCycle.cycle_id });
+      const r = await API.callBackend('/api/farming/declare-harvest', {
+        user_id: currentUser.id,
+        cycle_id: activeCycle.cycle_id,
+        verify_satellite: true   // always try satellite harvest check
+      });
       hideLoading();
-      if (r.success) { Toast.success(r.message); await loadFarmingStatus(); }
-      else Toast.error(r.error);
+      if (r.success) {
+        if (r.harvest_satellite_check) {
+          const hc = r.harvest_satellite_check;
+          const msg = hc.harvest_detected
+            ? `🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(hc.ndvi_drop||0).toFixed(2)})`
+            : `⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว แต่รับคำแจ้งของคุณแล้ว`;
+          Toast.info(msg);
+        }
+        Toast.success(r.message);
+        await loadFarmingStatus();
+      } else {
+        Toast.error(r.error);
+      }
     } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
   }
 
@@ -899,6 +1038,8 @@
     document.getElementById('fieldName').value               = '';
     document.getElementById('mapHint').textContent           = 'เลือกวิธีระบุขอบเขตแปลงด้านบนก่อน';
     document.querySelectorAll('.map-tool-btn').forEach(b => b.classList.remove('active'));
+    const eb = document.getElementById('step2EvidenceBox');
+    if (eb) { eb.style.display = 'none'; eb.innerHTML = ''; }
     showStep1();
   }
 
