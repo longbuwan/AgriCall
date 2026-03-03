@@ -15,611 +15,179 @@
       --step-completed: #10B981;
       --step-failed: #EF4444;
     }
-
     .verification-container { min-height:100vh; background:var(--light-cream); padding-bottom:80px; }
-    
-    /* Header */
     .verification-header {
       background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
-      color: var(--white);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-lg);
+      color: var(--white); padding: 1.5rem; box-shadow: var(--shadow-lg);
     }
     .header-content { max-width: 1200px; margin: 0 auto; }
-    .header-title { display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .header-subtitle { font-size: 0.9rem; opacity: 0.95; line-height: 1.5; }
+    .header-title { display:flex; align-items:center; gap:0.75rem; font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
+    .header-subtitle { font-size:0.9rem; opacity:0.95; line-height:1.5; }
+    .content-wrapper { max-width:800px; margin:0 auto; padding:1rem; }
 
-    .content-wrapper { max-width: 800px; margin: 0 auto; padding: 1rem; }
-
-    /* Demo Mode Toggle */
-    .demo-toggle-container {
-      margin-top: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
+    /* Demo Toggle */
+    .demo-toggle-container { margin-top:0.75rem; display:flex; align-items:center; gap:0.5rem; }
     .demo-toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      background: rgba(255,255,255,0.2);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      transition: all 0.3s ease;
+      display:flex; align-items:center; gap:0.5rem; cursor:pointer;
+      background:rgba(255,255,255,0.2); padding:0.5rem 1rem; border-radius:20px; transition:all 0.3s;
     }
-
-    .demo-toggle-label:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    .demo-toggle-label input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    .demo-toggle-label span {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
+    .demo-toggle-label:hover { background:rgba(255,255,255,0.3); }
+    .demo-toggle-label input { width:18px; height:18px; cursor:pointer; }
+    .demo-toggle-label span { font-size:0.875rem; font-weight:500; }
     .demo-badge {
-      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      margin-left: 0.5rem;
-      animation: pulse 2s infinite;
+      background:linear-gradient(135deg,#8B5CF6,#7C3AED); color:white;
+      padding:0.25rem 0.75rem; border-radius:20px; font-size:0.7rem; font-weight:600;
+      display:inline-flex; align-items:center; gap:0.25rem; margin-left:0.5rem;
+      animation:pulse 2s infinite;
     }
-
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); }
+      0%,100% { box-shadow:0 0 0 0 rgba(139,92,246,0.4); }
+      50%      { box-shadow:0 0 0 8px rgba(139,92,246,0); }
     }
 
     /* Step Progress */
-    .step-progress {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow-md);
-    }
-
-    .step-progress-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 1.25rem;
-      text-align: center;
-    }
-
-    .steps-container {
-      display: flex;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .steps-container::before {
-      content: '';
-      position: absolute;
-      top: 24px;
-      left: 15%;
-      right: 15%;
-      height: 4px;
-      background: var(--border-light);
-      z-index: 0;
-    }
-
-    .step-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-      position: relative;
-      z-index: 1;
-    }
-
+    .step-progress { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); }
+    .step-progress-title { font-size:1rem; font-weight:600; color:var(--text-dark); margin-bottom:1.25rem; text-align:center; }
+    .steps-container { display:flex; justify-content:space-between; position:relative; }
+    .steps-container::before { content:''; position:absolute; top:24px; left:15%; right:15%; height:4px; background:var(--border-light); z-index:0; }
+    .step-item { display:flex; flex-direction:column; align-items:center; flex:1; position:relative; z-index:1; }
     .step-circle {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--step-pending);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      transition: all 0.3s ease;
-      border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      width:48px; height:48px; border-radius:50%; background:var(--step-pending); color:white;
+      display:flex; align-items:center; justify-content:center; font-size:1.25rem; font-weight:700;
+      margin-bottom:0.5rem; transition:all 0.3s; border:3px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.15);
     }
-
-    .step-item.active .step-circle {
-      background: var(--step-active);
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-
-    .step-item.completed .step-circle {
-      background: var(--step-completed);
-    }
-
-    .step-item.failed .step-circle {
-      background: var(--step-failed);
-    }
-
-    .step-label {
-      font-size: 0.75rem;
-      color: var(--text-medium);
-      text-align: center;
-      font-weight: 500;
-      max-width: 80px;
-    }
-
-    .step-item.active .step-label {
-      color: var(--step-active);
-      font-weight: 600;
-    }
-
-    .step-item.completed .step-label {
-      color: var(--step-completed);
-    }
+    .step-item.active .step-circle    { background:var(--step-active);    transform:scale(1.1); box-shadow:0 4px 12px rgba(59,130,246,0.4); }
+    .step-item.completed .step-circle { background:var(--step-completed); }
+    .step-item.failed .step-circle    { background:var(--step-failed); }
+    .step-label { font-size:0.75rem; color:var(--text-medium); text-align:center; font-weight:500; max-width:80px; }
+    .step-item.active .step-label    { color:var(--step-active); font-weight:600; }
+    .step-item.completed .step-label { color:var(--step-completed); }
 
     /* Step Cards */
-    .step-card {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow-md);
-      display: none;
+    .step-card { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow-md); display:none; }
+    .step-card.active { display:block; }
+    .step-card-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:2px solid var(--border-light); }
+    .step-card-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.75rem; }
+    .step-card-icon.step1 { background:linear-gradient(135deg,#10B981,#059669); }
+    .step-card-icon.step2 { background:linear-gradient(135deg,#3B82F6,#2563EB); }
+    .step-card-icon.step3 { background:linear-gradient(135deg,#F59E0B,#D97706); }
+    .step-card-title    { font-size:1.25rem; font-weight:700; color:var(--text-dark); margin-bottom:0.25rem; }
+    .step-card-subtitle { font-size:0.875rem; color:var(--text-medium); }
+
+    /* Map Toolbar */
+    .map-toolbar { display:flex; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+    .map-tool-btn {
+      flex:1; min-width:80px; padding:0.6rem 0.75rem;
+      border:2px solid var(--border-light); border-radius:var(--radius-lg);
+      background:var(--white); font-size:0.8125rem;
+      font-family:'Prompt',sans-serif; cursor:pointer; transition:all 0.2s;
+      text-align:center; font-weight:500; color:var(--text-dark);
     }
-
-    .step-card.active {
-      display: block;
+    .map-tool-btn:hover                { border-color:var(--primary-green); background:#f0fdf4; }
+    .map-tool-btn.tool-saved.active    { background:#10B981; border-color:#10B981; color:white; }
+    .map-tool-btn.tool-auto.active     { background:#3B82F6; border-color:#3B82F6; color:white; }
+    .map-tool-btn.tool-draw.active     { background:#F59E0B; border-color:#F59E0B; color:white; }
+    .map-tool-btn.tool-loc.active      { background:#8B5CF6; border-color:#8B5CF6; color:white; }
+    .map-hint {
+      font-size:0.8125rem; color:var(--text-medium); background:#F8FAFC;
+      border-radius:var(--radius-md); padding:0.5rem 0.75rem; margin-bottom:0.5rem;
+      border-left:3px solid #3B82F6; min-height:2rem;
     }
+    #farmingMap { height:350px; border-radius:var(--radius-lg); border:2px solid var(--border-light); margin-bottom:0.75rem; }
+    #farmingMap.mode-auto { cursor:crosshair !important; }
 
-    .step-card-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--border-light);
-    }
-
-    .step-card-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-    }
-
-    .step-card-icon.step1 { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
-    .step-card-icon.step2 { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); }
-    .step-card-icon.step3 { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
-
-    .step-card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.25rem;
-    }
-
-    .step-card-subtitle {
-      font-size: 0.875rem;
-      color: var(--text-medium);
-    }
-
-    /* Map */
-    #farmingMap {
-      height: 350px;
-      border-radius: var(--radius-lg);
-      border: 2px solid var(--border-light);
-      margin-bottom: 1rem;
-    }
-
-    /* Form fields */
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-label {
-      display: block;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      font-size: 0.9375rem;
-    }
-
+    /* Form */
+    .form-group { margin-bottom:1rem; }
+    .form-label { display:block; font-weight:600; color:var(--text-dark); margin-bottom:0.5rem; font-size:0.9375rem; }
     .form-select, .form-input {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      border: 2px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      font-size: 1rem;
-      font-family: 'Prompt', sans-serif;
-      transition: border-color 0.2s;
-      box-sizing: border-box;
+      width:100%; padding:0.875rem 1rem; border:2px solid var(--border-light);
+      border-radius:var(--radius-lg); font-size:1rem;
+      font-family:'Prompt',sans-serif; transition:border-color 0.2s; box-sizing:border-box;
     }
-
-    .form-select:focus, .form-input:focus {
-      outline: none;
-      border-color: var(--primary-green);
-    }
+    .form-select:focus, .form-input:focus { outline:none; border-color:var(--primary-green); }
 
     /* Info boxes */
-    .info-box {
-      background: rgba(59, 130, 246, 0.1);
-      border-radius: var(--radius-lg);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-left: 4px solid #3B82F6;
-    }
+    .info-box { background:rgba(59,130,246,0.1); border-radius:var(--radius-lg); padding:1rem; margin-bottom:1rem; border-left:4px solid #3B82F6; }
+    .info-box.success { background:rgba(16,185,129,0.1);  border-left-color:#10B981; }
+    .info-box.warning { background:rgba(245,158,11,0.1);  border-left-color:#F59E0B; }
+    .info-box.error   { background:rgba(239,68,68,0.1);   border-left-color:#EF4444; }
+    .info-box.demo    { background:rgba(139,92,246,0.1);  border-left-color:#8B5CF6; }
+    .info-box-title { font-weight:600; color:var(--text-dark); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+    .info-box-text  { font-size:0.875rem; color:var(--text-medium); line-height:1.5; }
 
-    .info-box.success {
-      background: rgba(16, 185, 129, 0.1);
-      border-left-color: #10B981;
-    }
-
-    .info-box.warning {
-      background: rgba(245, 158, 11, 0.1);
-      border-left-color: #F59E0B;
-    }
-
-    .info-box.error {
-      background: rgba(239, 68, 68, 0.1);
-      border-left-color: #EF4444;
-    }
-
-    .info-box.demo {
-      background: rgba(139, 92, 246, 0.1);
-      border-left-color: #8B5CF6;
-    }
-
-    .info-box-title {
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .info-box-text {
-      font-size: 0.875rem;
-      color: var(--text-medium);
-      line-height: 1.5;
-    }
-
-    /* Monitoring Progress */
-    .monitoring-card {
-      background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%);
-      color: white;
-      border-radius: var(--radius-xl);
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .monitoring-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.25rem;
-    }
-
-    .monitoring-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-
-    .monitoring-status {
-      padding: 0.375rem 0.75rem;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .monitoring-status.active {
-      background: #10B981;
-    }
-
-    .monitoring-status.warning {
-      background: #F59E0B;
-    }
-
-    .days-display {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
+    /* Monitoring */
+    .monitoring-card { background:linear-gradient(135deg,#1E3A5F,#0F172A); color:white; border-radius:var(--radius-xl); padding:1.5rem; margin-bottom:1rem; }
+    .monitoring-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
+    .monitoring-title  { font-size:1.125rem; font-weight:600; }
+    .monitoring-status { padding:0.375rem 0.75rem; border-radius:var(--radius-full); font-size:0.75rem; font-weight:600; }
+    .monitoring-status.active { background:#10B981; }
+    .days-display { text-align:center; margin-bottom:1.5rem; }
     .days-number {
-      font-size: 4rem;
-      font-weight: 700;
-      line-height: 1;
-      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size:4rem; font-weight:700; line-height:1;
+      background:linear-gradient(135deg,#10B981,#34D399);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     }
-
-    .days-label {
-      font-size: 1rem;
-      opacity: 0.8;
-      margin-top: 0.25rem;
-    }
-
-    .progress-bar-container {
-      background: rgba(255,255,255,0.2);
-      border-radius: var(--radius-full);
-      height: 12px;
-      overflow: hidden;
-      margin-bottom: 0.75rem;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
-      border-radius: var(--radius-full);
-      transition: width 0.5s ease;
-    }
-
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      opacity: 0.7;
-    }
+    .days-label  { font-size:1rem; opacity:0.8; margin-top:0.25rem; }
+    .progress-bar-container { background:rgba(255,255,255,0.2); border-radius:var(--radius-full); height:12px; overflow:hidden; margin-bottom:0.75rem; }
+    .progress-bar-fill { height:100%; background:linear-gradient(90deg,#10B981,#34D399); border-radius:var(--radius-full); transition:width 0.5s; }
+    .progress-labels   { display:flex; justify-content:space-between; font-size:0.75rem; opacity:0.7; }
 
     /* Reward Preview */
-    .reward-preview {
-      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-      color: white;
-      border-radius: var(--radius-lg);
-      padding: 1rem;
-      margin-top: 1rem;
-    }
+    .reward-preview       { background:linear-gradient(135deg,#F59E0B,#D97706); color:white; border-radius:var(--radius-lg); padding:1rem; margin-top:1rem; }
+    .reward-preview-title { font-weight:600; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+    .reward-preview-grid  { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; }
+    .reward-preview-item  { background:rgba(255,255,255,0.2); border-radius:var(--radius-md); padding:0.75rem; text-align:center; }
+    .reward-preview-value { font-size:1.125rem; font-weight:700; }
+    .reward-preview-label { font-size:0.6875rem; opacity:0.9; }
 
-    .reward-preview-title {
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .reward-preview-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 0.5rem;
-    }
-
-    .reward-preview-item {
-      background: rgba(255,255,255,0.2);
-      border-radius: var(--radius-md);
-      padding: 0.75rem;
-      text-align: center;
-    }
-
-    .reward-preview-value {
-      font-size: 1.125rem;
-      font-weight: 700;
-    }
-
-    .reward-preview-label {
-      font-size: 0.6875rem;
-      opacity: 0.9;
-    }
-
-    /* Success Card */
-    .success-card {
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      color: white;
-      border-radius: var(--radius-xl);
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .success-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    .success-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .success-subtitle {
-      font-size: 1rem;
-      opacity: 0.95;
-      margin-bottom: 1.5rem;
-    }
-
-    .success-reward {
-      background: rgba(255,255,255,0.2);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-    }
-
-    .success-reward-amount {
-      font-size: 3rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
+    /* Success */
+    .success-card          { background:linear-gradient(135deg,#10B981,#059669); color:white; border-radius:var(--radius-xl); padding:2rem; text-align:center; }
+    .success-icon          { font-size:4rem; margin-bottom:1rem; }
+    .success-title         { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
+    .success-subtitle      { font-size:1rem; opacity:0.95; margin-bottom:1.5rem; }
+    .success-reward        { background:rgba(255,255,255,0.2); border-radius:var(--radius-lg); padding:1.5rem; }
+    .success-reward-amount { font-size:3rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
 
     /* No Cycle */
-    .no-cycle-card {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-    }
-
-    .no-cycle-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    .no-cycle-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-    }
-
-    .no-cycle-text {
-      color: var(--text-medium);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
+    .no-cycle-card  { background:var(--white); border-radius:var(--radius-xl); padding:2rem; text-align:center; box-shadow:var(--shadow-md); }
+    .no-cycle-icon  { font-size:4rem; margin-bottom:1rem; }
+    .no-cycle-title { font-size:1.25rem; font-weight:700; color:var(--text-dark); margin-bottom:0.5rem; }
+    .no-cycle-text  { color:var(--text-medium); margin-bottom:1.5rem; line-height:1.6; }
 
     /* History */
-    .history-section {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-      box-shadow: var(--shadow-md);
-    }
+    .history-section     { background:var(--white); border-radius:var(--radius-xl); padding:1.5rem; margin-top:1.5rem; box-shadow:var(--shadow-md); }
+    .history-title       { font-size:1rem; font-weight:600; color:var(--text-dark); margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .history-item        { display:flex; justify-content:space-between; align-items:center; padding:0.875rem; background:var(--light-cream); border-radius:var(--radius-lg); margin-bottom:0.5rem; }
+    .history-item-info   { display:flex; align-items:center; gap:0.75rem; }
+    .history-item-icon   { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+    .history-item-icon.completed   { background:rgba(16,185,129,0.2); }
+    .history-item-icon.failed      { background:rgba(239,68,68,0.2);  }
+    .history-item-icon.in_progress { background:rgba(59,130,246,0.2); }
+    .history-item-name   { font-weight:600; color:var(--text-dark); font-size:0.9375rem; }
+    .history-item-date   { font-size:0.75rem; color:var(--text-medium); }
+    .history-item-reward { font-weight:600; color:var(--primary-green); }
 
-    .history-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.875rem;
-      background: var(--light-cream);
-      border-radius: var(--radius-lg);
-      margin-bottom: 0.5rem;
-    }
-
-    .history-item-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .history-item-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-    }
-
-    .history-item-icon.completed { background: rgba(16, 185, 129, 0.2); }
-    .history-item-icon.failed { background: rgba(239, 68, 68, 0.2); }
-    .history-item-icon.in_progress { background: rgba(59, 130, 246, 0.2); }
-
-    .history-item-name {
-      font-weight: 600;
-      color: var(--text-dark);
-      font-size: 0.9375rem;
-    }
-
-    .history-item-date {
-      font-size: 0.75rem;
-      color: var(--text-medium);
-    }
-
-    .history-item-reward {
-      font-weight: 600;
-      color: var(--primary-green);
-    }
-
-    /* Skip Button Styles */
-    .btn-skip {
-      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
-      color: white !important;
-      animation: pulse 2s infinite;
-    }
-
-    .btn-skip:hover {
-      background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    }
-
-    .skip-divider {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 1rem 0;
-      color: var(--text-medium);
-      font-size: 0.875rem;
-    }
-
-    .skip-divider::before,
-    .skip-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border-light);
-    }
+    /* Skip */
+    .btn-skip       { background:linear-gradient(135deg,#8B5CF6,#7C3AED) !important; color:white !important; animation:pulse 2s infinite; }
+    .btn-skip:hover { background:linear-gradient(135deg,#7C3AED,#6D28D9) !important; }
+    .skip-divider   { display:flex; align-items:center; gap:1rem; margin:1rem 0; color:var(--text-medium); font-size:0.875rem; }
+    .skip-divider::before, .skip-divider::after { content:''; flex:1; height:1px; background:var(--border-light); }
 
     /* Loading */
-    .loading-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.95);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-    }
+    .loading-overlay      { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.95); display:none; align-items:center; justify-content:center; z-index:3000; }
+    .loading-overlay.show { display:flex; }
+    .loading-content      { text-align:center; }
+    .loading-spinner      { width:60px; height:60px; border:5px solid var(--border-light); border-top-color:var(--primary-green); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 1rem; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    .loading-overlay.show { display: flex; }
-
-    .loading-content { text-align: center; }
-
-    .loading-spinner {
-      width: 60px;
-      height: 60px;
-      border: 5px solid var(--border-light);
-      border-top-color: var(--primary-green);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Mobile */
-    @media (max-width: 480px) {
-      .steps-container::before { left: 10%; right: 10%; }
-      .step-circle { width: 40px; height: 40px; font-size: 1rem; }
-      .step-label { font-size: 0.6875rem; max-width: 60px; }
-      #farmingMap { height: 280px; }
-      .reward-preview-grid { grid-template-columns: 1fr; }
-      .days-number { font-size: 3rem; }
+    @media (max-width:480px) {
+      .steps-container::before { left:10%; right:10%; }
+      .step-circle  { width:40px; height:40px; font-size:1rem; }
+      .step-label   { font-size:0.6875rem; max-width:60px; }
+      #farmingMap   { height:280px; }
+      .reward-preview-grid { grid-template-columns:1fr; }
+      .days-number  { font-size:3rem; }
+      .map-tool-btn { font-size:0.75rem; padding:0.5rem; }
     }
   </style>
 </head>
@@ -630,63 +198,43 @@
   <div class="verification-header">
     <div class="header-content">
       <div class="header-title"><span>🌾</span><span>ระบบตรวจสอบการเพาะปลูก</span></div>
-      <div class="header-subtitle">
-        ลงทะเบียนการปลูก → ตรวจสอบพืช → รอ 60 วันหลังเก็บเกี่ยว → รับ AgriCoins
-      </div>
-      <!-- Demo Mode Toggle -->
+      <div class="header-subtitle">ลงทะเบียนการปลูก → ตรวจสอบพืช → รอ 60 วันหลังเก็บเกี่ยว → รับ AgriCoins</div>
       <div class="demo-toggle-container">
         <label class="demo-toggle-label">
           <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()">
           <span>🚀 Demo Mode (ข้ามเวลารอ)</span>
         </label>
-        <span class="demo-badge" id="demoBadge" style="display: none;">DEMO</span>
+        <span class="demo-badge" id="demoBadge" style="display:none;">DEMO</span>
       </div>
     </div>
   </div>
 
   <div class="content-wrapper">
 
-    <!-- Demo Mode Info Box -->
-    <div class="info-box demo" id="demoInfoBox" style="display: none;">
+    <div class="info-box demo" id="demoInfoBox" style="display:none;">
       <div class="info-box-title"><span>🚀</span> Demo Mode เปิดใช้งาน</div>
-      <div class="info-box-text">
-        คุณสามารถข้ามเวลารอ 30 วัน และ 60 วัน เพื่อทดสอบระบบได้ทันที
-      </div>
+      <div class="info-box-text">สามารถข้ามเวลารอ 30 วัน และ 60 วัน เพื่อทดสอบระบบได้ทันที</div>
     </div>
 
     <!-- Step Progress -->
     <div class="step-progress">
       <div class="step-progress-title">ขั้นตอนการตรวจสอบ</div>
       <div class="steps-container">
-        <div class="step-item" id="stepItem1">
-          <div class="step-circle">🌱</div>
-          <div class="step-label">เริ่มปลูก</div>
-        </div>
-        <div class="step-item" id="stepItem2">
-          <div class="step-circle">🌾</div>
-          <div class="step-label">ตรวจสอบพืช</div>
-        </div>
-        <div class="step-item" id="stepItem3">
-          <div class="step-circle">🔥</div>
-          <div class="step-label">ตรวจสอบ 60 วัน</div>
-        </div>
+        <div class="step-item" id="stepItem1"><div class="step-circle">🌱</div><div class="step-label">เริ่มปลูก</div></div>
+        <div class="step-item" id="stepItem2"><div class="step-circle">🌾</div><div class="step-label">ตรวจสอบพืช</div></div>
+        <div class="step-item" id="stepItem3"><div class="step-circle">🔥</div><div class="step-label">ตรวจสอบ 60 วัน</div></div>
       </div>
     </div>
 
-    <!-- No Cycle Card -->
-    <div class="no-cycle-card" id="noCycleCard" style="display: none;">
+    <!-- No Cycle -->
+    <div class="no-cycle-card" id="noCycleCard" style="display:none;">
       <div class="no-cycle-icon">🌱</div>
       <div class="no-cycle-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
-      <div class="no-cycle-text">
-        ลงทะเบียนแปลงเกษตรของคุณและเริ่มรอบการตรวจสอบ<br>
-        เพื่อรับ AgriCoins เมื่อไม่มีการเผาหลังเก็บเกี่ยว
-      </div>
-      <button class="btn btn-primary" onclick="showStep1()">
-        🌱 เริ่มลงทะเบียนการปลูก
-      </button>
+      <div class="no-cycle-text">ลงทะเบียนแปลงเกษตรของคุณและเริ่มรอบการตรวจสอบ<br>เพื่อรับ AgriCoins เมื่อไม่มีการเผาหลังเก็บเกี่ยว</div>
+      <button class="btn btn-primary" onclick="showStep1()">🌱 เริ่มลงทะเบียนการปลูก</button>
     </div>
 
-    <!-- Step 1: Start Farming -->
+    <!-- STEP 1 -->
     <div class="step-card" id="step1Card">
       <div class="step-card-header">
         <div class="step-card-icon step1">🌱</div>
@@ -697,16 +245,19 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">📍 ระบุขอบเขตแปลง (คลิกบนแผนที่)</label>
-        <div id="farmingMap"></div>
-        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-          <button class="btn btn-secondary" onclick="useCurrentLocation()" style="flex: 1;">
-            📍 ตำแหน่งปัจจุบัน
-          </button>
-          <button class="btn btn-secondary" onclick="enableDrawing()" style="flex: 1;">
-            ✏️ วาดขอบเขต
-          </button>
+        <label class="form-label">📍 เลือกวิธีระบุขอบเขตแปลง</label>
+        <!-- Explicit toolbar — map click does NOTHING until a mode is chosen -->
+        <div class="map-toolbar">
+          <button class="map-tool-btn tool-saved" id="btnLoadSaved"   onclick="setMapMode('saved')">💾 แปลงของฉัน</button>
+          <button class="map-tool-btn tool-auto"  id="btnAutoDetect"  onclick="setMapMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
+          <button class="map-tool-btn tool-draw"  id="btnDraw"        onclick="setMapMode('draw')">✏️ วาดเอง</button>
+          <button class="map-tool-btn tool-loc"   id="btnMyLocation"  onclick="useCurrentLocation()">📍 ตำแหน่งฉัน</button>
         </div>
+        <div class="map-hint" id="mapHint">เลือกวิธีระบุขอบเขตแปลงด้านบนก่อน</div>
+        <div id="farmingMap"></div>
+        <button class="btn btn-secondary" style="width:100%;margin-top:0.5rem;display:none;" id="clearPolygonBtn" onclick="clearPolygon()">
+          🗑️ ล้างขอบเขต
+        </button>
       </div>
 
       <div class="form-group">
@@ -725,32 +276,28 @@
         <input type="text" class="form-input" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
       </div>
 
-      <div class="info-box">
-        <div class="info-box-title"><span>💡</span> ข้อมูลสำคัญ</div>
-        <div class="info-box-text">
-          หลังจากลงทะเบียนแล้ว คุณจะต้อง<strong>รออย่างน้อย 30 วัน</strong>ก่อนที่จะสามารถตรวจสอบพืชได้
-          ระบบจะใช้ภาพถ่ายดาวเทียมเพื่อยืนยันว่ามีพืชเติบโตในแปลงจริง
-          <br><br>
-          <em>💡 เปิด Demo Mode เพื่อข้ามเวลารอในการทดสอบ</em>
-        </div>
-      </div>
-
-      <div id="step1FieldInfo" style="display: none;">
+      <div id="step1FieldInfo" style="display:none;">
         <div class="info-box success">
-          <div class="info-box-title"><span>✅</span> ข้อมูลแปลง</div>
+          <div class="info-box-title"><span>✅</span> ข้อมูลแปลงที่เลือก</div>
           <div class="info-box-text">
             <strong>ขนาด:</strong> <span id="step1AreaDisplay">-</span> ไร่<br>
-            <strong>AgriCoins ที่คาดว่าจะได้รับ:</strong> ~<span id="step1CoinsPreview">-</span> coins
+            <strong>AgriCoins คาดการณ์:</strong> ~<span id="step1CoinsPreview">-</span> coins
           </div>
         </div>
       </div>
 
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep1()" id="step1SubmitBtn" disabled>
+      <!-- Shows real backend error message -->
+      <div class="info-box error" id="step1Error" style="display:none;">
+        <div class="info-box-title"><span>⚠️</span> เกิดข้อผิดพลาด</div>
+        <div class="info-box-text" id="step1ErrorText"></div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="submitStep1()" id="step1SubmitBtn" disabled>
         🌱 ลงทะเบียนเริ่มปลูก
       </button>
     </div>
 
-    <!-- Step 2: Verify Crops -->
+    <!-- STEP 2 -->
     <div class="step-card" id="step2Card">
       <div class="step-card-header">
         <div class="step-card-icon step2">🌾</div>
@@ -759,37 +306,24 @@
           <div class="step-card-subtitle">ยืนยันว่ามีพืชเติบโตในแปลง</div>
         </div>
       </div>
-
       <div class="info-box" id="step2WaitInfo">
         <div class="info-box-title"><span>⏳</span> รอการตรวจสอบ</div>
-        <div class="info-box-text">
-          ต้องรออีก <strong id="step2DaysRemaining">-</strong> วัน ก่อนตรวจสอบพืช<br>
-          <small>รอให้พืชเติบโตเพียงพอเพื่อให้ดาวเทียมสามารถตรวจจับได้</small>
-        </div>
+        <div class="info-box-text">ต้องรออีก <strong id="step2DaysRemaining">-</strong> วัน ก่อนตรวจสอบพืช<br><small>รอให้พืชเติบโตเพียงพอเพื่อให้ดาวเทียมสามารถตรวจจับได้</small></div>
       </div>
-
-      <div class="info-box success" id="step2ReadyInfo" style="display: none;">
-        <div class="info-box-title"><span>✅</span> พร้อมตรวจสอบ</div>
-        <div class="info-box-text">
-          คุณสามารถตรวจสอบพืชได้แล้ว!<br>
-          ระบบจะใช้ดัชนี NDVI จากภาพถ่ายดาวเทียมเพื่อยืนยันว่ามีพืชในแปลง
-        </div>
+      <div class="info-box success" id="step2ReadyInfo" style="display:none;">
+        <div class="info-box-title"><span>✅</span> พร้อมตรวจสอบแล้ว!</div>
+        <div class="info-box-text">ระบบจะใช้ NDVI จากภาพดาวเทียมยืนยันว่ามีพืชในแปลง</div>
       </div>
-
-      <!-- Skip button for demo mode -->
-      <div id="step2SkipSection" style="display: none;">
+      <div id="step2SkipSection" style="display:none;">
         <div class="skip-divider">หรือ</div>
-        <button class="btn btn-skip" style="width: 100%;" onclick="submitStep2(true)">
-          🚀 ข้าม 30 วัน & ตรวจสอบทันที (Demo)
-        </button>
+        <button class="btn btn-skip" style="width:100%;" onclick="submitStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบทันที (Demo)</button>
       </div>
-
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitStep2(false)" id="step2SubmitBtn" disabled>
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="submitStep2(false)" id="step2SubmitBtn" disabled>
         🔍 ตรวจสอบพืชด้วยดาวเทียม
       </button>
     </div>
 
-    <!-- Step 3: Harvest & Monitoring -->
+    <!-- STEP 3 -->
     <div class="step-card" id="step3Card">
       <div class="step-card-header">
         <div class="step-card-icon step3">🔥</div>
@@ -798,123 +332,78 @@
           <div class="step-card-subtitle">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div>
         </div>
       </div>
-
-      <!-- Before harvest declaration -->
       <div id="step3HarvestSection">
         <div class="info-box success">
           <div class="info-box-title"><span>🌾</span> พืชผ่านการตรวจสอบแล้ว!</div>
-          <div class="info-box-text">
-            เมื่อเก็บเกี่ยวเสร็จแล้ว กดปุ่มด้านล่างเพื่อเริ่มช่วงตรวจสอบ 60 วัน
-          </div>
+          <div class="info-box-text">เมื่อเก็บเกี่ยวเสร็จแล้ว กดปุ่มด้านล่างเพื่อเริ่มช่วงตรวจสอบ 60 วัน</div>
         </div>
-        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="declareHarvest()">
-          🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว
-        </button>
+        <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="declareHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
       </div>
-
-      <!-- During monitoring -->
-      <div id="step3MonitoringSection" style="display: none;">
+      <div id="step3MonitoringSection" style="display:none;">
         <div class="monitoring-card">
           <div class="monitoring-header">
             <div class="monitoring-title">🛰️ กำลังตรวจสอบ</div>
-            <div class="monitoring-status active" id="monitoringStatus">กำลังดำเนินการ</div>
+            <div class="monitoring-status active">กำลังดำเนินการ</div>
           </div>
           <div class="days-display">
             <div class="days-number" id="daysRemaining">60</div>
             <div class="days-label">วันที่เหลือ</div>
           </div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="monitoringProgress" style="width: 0%"></div>
-          </div>
-          <div class="progress-labels">
-            <span>เริ่มต้น</span>
-            <span>60 วัน</span>
-          </div>
+          <div class="progress-bar-container"><div class="progress-bar-fill" id="monitoringProgress" style="width:0%"></div></div>
+          <div class="progress-labels"><span>เริ่มต้น</span><span>60 วัน</span></div>
         </div>
-
-        <button class="btn btn-secondary" style="width: 100%;" onclick="checkBurnStatus(false)" id="checkBurnBtn">
-          🔍 ตรวจสอบสถานะการเผา
-        </button>
-
-        <!-- Skip button for demo mode -->
-        <div id="step3SkipSection" style="display: none;">
+        <button class="btn btn-secondary" style="width:100%;" onclick="checkBurnStatus(false)">🔍 ตรวจสอบสถานะการเผา</button>
+        <div id="step3SkipSection" style="display:none;">
           <div class="skip-divider">หรือ</div>
-          <button class="btn btn-skip" style="width: 100%;" onclick="checkBurnStatus(true)">
-            🚀 ข้าม 60 วัน & รับ AgriCoins ทันที (Demo)
-          </button>
+          <button class="btn btn-skip" style="width:100%;" onclick="checkBurnStatus(true)">🚀 ข้าม 60 วัน & รับ AgriCoins ทันที (Demo)</button>
         </div>
-
         <div class="reward-preview">
           <div class="reward-preview-title"><span>🎁</span> รางวัลที่จะได้รับเมื่อผ่าน</div>
           <div class="reward-preview-grid">
-            <div class="reward-preview-item">
-              <div class="reward-preview-value" id="previewPM25">-</div>
-              <div class="reward-preview-label">kg PM2.5 ลดได้</div>
-            </div>
-            <div class="reward-preview-item">
-              <div class="reward-preview-value" id="previewCO2">-</div>
-              <div class="reward-preview-label">kg CO₂ ลดได้</div>
-            </div>
-            <div class="reward-preview-item">
-              <div class="reward-preview-value" id="previewCoins">-</div>
-              <div class="reward-preview-label">AgriCoins</div>
-            </div>
+            <div class="reward-preview-item"><div class="reward-preview-value" id="previewPM25">-</div><div class="reward-preview-label">kg PM2.5 ลดได้</div></div>
+            <div class="reward-preview-item"><div class="reward-preview-value" id="previewCO2">-</div><div class="reward-preview-label">kg CO₂ ลดได้</div></div>
+            <div class="reward-preview-item"><div class="reward-preview-value" id="previewCoins">-</div><div class="reward-preview-label">AgriCoins</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Success Card -->
+    <!-- Success -->
     <div class="step-card" id="successCard">
       <div class="success-card">
         <div class="success-icon">🎉</div>
         <div class="success-title">ยินดีด้วย!</div>
-        <div class="success-subtitle" id="successSubtitle">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
+        <div class="success-subtitle">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
         <div class="success-reward">
           <div>คุณได้รับ</div>
-          <div class="success-reward-amount">
-            <span>🪙</span>
-            <span id="successCoins">+0</span>
-          </div>
+          <div class="success-reward-amount"><span>🪙</span><span id="successCoins">+0</span></div>
           <div>AgriCoins</div>
         </div>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startNewCycle()">
-        🌱 เริ่มรอบใหม่
-      </button>
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="startNewCycle()">🌱 เริ่มรอบใหม่</button>
     </div>
 
-    <!-- Failed Card -->
+    <!-- Failed -->
     <div class="step-card" id="failedCard">
-      <div style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; border-radius: var(--radius-xl); padding: 2rem; text-align: center;">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">😔</div>
-        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">พบการเผา</div>
-        <div style="font-size: 1rem; opacity: 0.95; margin-bottom: 1rem;">
-          ตรวจพบการเผาในแปลงของคุณ<br>ไม่ได้รับ AgriCoins ในรอบนี้
-        </div>
-        <div style="background: rgba(255,255,255,0.2); border-radius: var(--radius-lg); padding: 1rem;">
-          <div style="font-size: 0.875rem;">
-            💡 ลองใหม่อีกครั้งในฤดูกาลหน้า<br>
-            การไม่เผาช่วยลดมลพิษและรักษาสุขภาพของคุณและชุมชน
-          </div>
+      <div style="background:linear-gradient(135deg,#EF4444,#DC2626);color:white;border-radius:var(--radius-xl);padding:2rem;text-align:center;">
+        <div style="font-size:4rem;margin-bottom:1rem;">😔</div>
+        <div style="font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">พบการเผา</div>
+        <div style="font-size:1rem;opacity:0.95;margin-bottom:1rem;">ตรวจพบการเผาในแปลงของคุณ<br>ไม่ได้รับ AgriCoins ในรอบนี้</div>
+        <div style="background:rgba(255,255,255,0.2);border-radius:var(--radius-lg);padding:1rem;font-size:0.875rem;">
+          💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษและรักษาสุขภาพ
         </div>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="startNewCycle()">
-        🌱 เริ่มรอบใหม่
-      </button>
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="startNewCycle()">🌱 เริ่มรอบใหม่</button>
     </div>
 
     <!-- History -->
     <div class="history-section" id="historySection">
       <div class="history-title"><span>📋</span> ประวัติการตรวจสอบ</div>
-      <div id="historyList">
-        <!-- Filled by JS -->
-      </div>
+      <div id="historyList"></div>
     </div>
 
   </div><!-- /content-wrapper -->
 
-  <!-- Bottom Navigation -->
   <nav class="mobile-nav">
     <a href="home.html" class="mobile-nav-item"><div class="mobile-nav-icon">🏠</div><div class="mobile-nav-label">หน้าหลัก</div></a>
     <a href="burn-verification-v2.html" class="mobile-nav-item active"><div class="mobile-nav-icon">🌾</div><div class="mobile-nav-label">ตรวจสอบ</div></a>
@@ -923,64 +412,53 @@
   </nav>
 </div>
 
-<!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-content">
-    <div class="loading-spinner"></div>
-    <div id="loadingText">กำลังโหลด...</div>
-  </div>
+  <div class="loading-content"><div class="loading-spinner"></div><div id="loadingText">กำลังโหลด...</div></div>
 </div>
+<div id="toast" class="toast" style="display:none;"></div>
 
-<div id="toast" class="toast" style="display: none;"></div>
-
-<!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script src="utils.js"></script>
 <script src="api.js"></script>
 <script>
-  // Auth guard
+  // ── Auth ─────────────────────────────────────────────────────────────────
   const currentUser = Auth.getCurrentUser();
   if (!currentUser) window.location.href = 'index.html';
 
-  // Constants
+  // ── Constants ────────────────────────────────────────────────────────────
   const PM25_PER_RAI = 3.88;
-  const CO2_PER_RAI = 898;
-  const HA_TO_RAI = 6.25;
+  const CO2_PER_RAI  = 898;
+  const HA_TO_RAI    = 6.25;
+  const BACKEND      = 'https://agricall.onrender.com';
 
-  // State
-  let farmingMap = null;
-  let drawnItems = null;
-  let drawControl = null;
-  let selectedPolygon = null;
-  let activeCycle = null;
-  let demoMode = false;
+  // ── State ────────────────────────────────────────────────────────────────
+  let farmingMap      = null;
+  let drawnItems      = null;
+  let drawControl     = null;
+  let selectedPolygon = null;   // GeoJSON currently displayed
+  let activeCycle     = null;
+  let demoMode        = false;
+  let mapMode         = 'none'; // 'none' | 'auto' | 'draw' | 'saved'
+  let savedPolygon    = null;   // loaded from /api/user/get-polygon
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   // DEMO MODE
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   function toggleDemoMode() {
     demoMode = document.getElementById('demoModeToggle').checked;
-    document.getElementById('demoBadge').style.display = demoMode ? 'inline-flex' : 'none';
-    document.getElementById('demoInfoBox').style.display = demoMode ? 'block' : 'none';
-    
-    if (demoMode) {
-      Toast.info('🚀 Demo Mode เปิดใช้งาน - สามารถข้ามเวลารอได้');
-    } else {
-      Toast.info('Demo Mode ปิดใช้งาน');
-    }
-    
-    // Refresh UI to show/hide skip buttons
-    if (activeCycle) {
-      renderActiveCycle(activeCycle);
-    }
+    document.getElementById('demoBadge').style.display   = demoMode ? 'inline-flex' : 'none';
+    document.getElementById('demoInfoBox').style.display = demoMode ? 'block'       : 'none';
+    Toast.info(demoMode ? '🚀 Demo Mode เปิดใช้งาน' : 'Demo Mode ปิดใช้งาน');
+    if (activeCycle) renderActiveCycle(activeCycle);
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   // INIT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   async function init() {
     initMap();
+    loadSavedPolygon();           // non-blocking background fetch
     await loadFarmingStatus();
   }
 
@@ -990,29 +468,196 @@
     drawnItems = new L.FeatureGroup();
     farmingMap.addLayer(drawnItems);
 
+    // ── KEY FIX #1: click only fires when user explicitly chose 'auto' mode ──
     farmingMap.on('click', async (e) => {
-      await handleMapClick(e.latlng.lat, e.latlng.lng);
+      if (mapMode !== 'auto') return;
+      await handleAutoDetect(e.latlng.lat, e.latlng.lng);
     });
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LOAD STATUS
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ── KEY FIX #2: load saved polygon from server ──────────────────────────
+  async function loadSavedPolygon() {
+    try {
+      const res  = await fetch(BACKEND + '/api/user/get-polygon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id })
+      });
+      const data = await res.json();
+      if (data.success && data.has_polygon) {
+        savedPolygon = data.polygon;
+        const btn = document.getElementById('btnLoadSaved');
+        btn.textContent       = '💾 แปลงของฉัน ✓';
+        btn.style.borderColor = '#10B981';
+        btn.style.color       = '#059669';
+      }
+    } catch (e) {
+      console.warn('Could not load saved polygon:', e);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // MAP MODES — user must click a button; nothing happens automatically
+  // ════════════════════════════════════════════════════════════════════════
+  function setMapMode(mode) {
+    mapMode = mode;
+    document.querySelectorAll('.map-tool-btn').forEach(b => b.classList.remove('active'));
+    farmingMap.getContainer().classList.remove('mode-auto');
+
+    if (mode === 'saved') {
+      document.getElementById('btnLoadSaved').classList.add('active');
+      if (savedPolygon) {
+        displayPolygon(savedPolygon);
+        selectedPolygon = savedPolygon;
+        updateStep1Preview(computeAreaRai(savedPolygon));
+        document.getElementById('step1SubmitBtn').disabled = false;
+        document.getElementById('mapHint').textContent = '✅ โหลดแปลงที่บันทึกไว้แล้ว กดลงทะเบียนด้านล่าง';
+        Toast.success('โหลดแปลงที่บันทึกไว้สำเร็จ');
+      } else {
+        document.getElementById('mapHint').textContent = '⚠️ ยังไม่มีแปลงที่บันทึกไว้ กรุณาเลือกวิธีอื่น';
+        Toast.warning('ยังไม่มีแปลงที่บันทึกไว้');
+      }
+
+    } else if (mode === 'auto') {
+      document.getElementById('btnAutoDetect').classList.add('active');
+      farmingMap.getContainer().classList.add('mode-auto');
+      if (drawControl) { farmingMap.removeControl(drawControl); drawControl = null; }
+      document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ ระบบจะตรวจจับขอบเขตอัตโนมัติ';
+      Toast.info('คลิกบนแผนที่เพื่อตรวจจับแปลง');
+
+    } else if (mode === 'draw') {
+      document.getElementById('btnDraw').classList.add('active');
+      document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต แล้วกด Finish';
+      enableDrawingControl();
+    }
+  }
+
+  // ── Auto-detect — only reachable when mapMode === 'auto' ────────────────
+  async function handleAutoDetect(lat, lng) {
+    showLoading('กำลังตรวจจับแปลง...');
+    try {
+      const result = await API.callBackend('/api/burn-scar/analyze', {
+        mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id
+      });
+      hideLoading();
+      if (result.success && result.polygon) {
+        displayPolygon(result.polygon);
+        selectedPolygon = result.polygon;
+        updateStep1Preview(result.farm_area_ha * HA_TO_RAI);
+        document.getElementById('step1SubmitBtn').disabled = false;
+        document.getElementById('mapHint').textContent = '✅ ตรวจจับแปลงสำเร็จ กดลงทะเบียนด้านล่าง';
+        Toast.success('ตรวจจับแปลงสำเร็จ!');
+      } else {
+        Toast.error('ไม่พบแปลงในพื้นที่นี้ ลองคลิกตำแหน่งอื่น');
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('เกิดข้อผิดพลาด: ' + e.message);
+    }
+  }
+
+  // ── Leaflet Draw ─────────────────────────────────────────────────────────
+  function enableDrawingControl() {
+    if (drawControl) { farmingMap.removeControl(drawControl); drawControl = null; }
+    drawControl = new L.Control.Draw({
+      draw: {
+        polygon: {
+          allowIntersection: false, showArea: true,
+          shapeOptions: { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 }
+        },
+        polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
+      },
+      edit: { featureGroup: drawnItems, remove: true }
+    });
+    farmingMap.addControl(drawControl);
+    farmingMap.on(L.Draw.Event.CREATED, (e) => {
+      drawnItems.clearLayers();
+      drawnItems.addLayer(e.layer);
+      const latlngs = e.layer.getLatLngs()[0];
+      const coords  = latlngs.map(ll => [ll.lng, ll.lat]);
+      coords.push(coords[0]);
+      selectedPolygon = { type: 'Polygon', coordinates: [coords] };
+      const areaRai = (L.GeometryUtil.geodesicArea(latlngs) / 10000) * HA_TO_RAI;
+      updateStep1Preview(areaRai);
+      document.getElementById('step1SubmitBtn').disabled = false;
+      document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อย กดลงทะเบียนด้านล่าง';
+      Toast.success('วาดขอบเขตเรียบร้อย!');
+    });
+  }
+
+  function clearPolygon() {
+    drawnItems.clearLayers();
+    selectedPolygon = null;
+    mapMode = 'none';
+    document.getElementById('step1FieldInfo').style.display  = 'none';
+    document.getElementById('clearPolygonBtn').style.display = 'none';
+    document.getElementById('step1SubmitBtn').disabled       = true;
+    document.getElementById('mapHint').textContent = 'เลือกวิธีระบุขอบเขตแปลงด้านบนก่อน';
+    document.querySelectorAll('.map-tool-btn').forEach(b => b.classList.remove('active'));
+    Toast.info('ล้างขอบเขตแล้ว');
+  }
+
+  async function useCurrentLocation() {
+    showLoading('กำลังระบุตำแหน่ง...');
+    try {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 })
+      );
+      hideLoading();
+      const { latitude: lat, longitude: lng } = pos.coords;
+      farmingMap.setView([lat, lng], 17);
+      document.getElementById('btnMyLocation').classList.add('active');
+      // Only auto-detect if that mode is already active; otherwise just pan
+      if (mapMode === 'auto') {
+        await handleAutoDetect(lat, lng);
+      } else {
+        L.marker([lat, lng]).addTo(farmingMap).bindPopup('ตำแหน่งของคุณ').openPopup();
+        Toast.success('ปรับแผนที่ไปยังตำแหน่งของคุณแล้ว');
+      }
+    } catch (e) {
+      hideLoading();
+      Toast.error('ไม่สามารถระบุตำแหน่งได้');
+    }
+  }
+
+  function displayPolygon(geojson) {
+    drawnItems.clearLayers();
+    const latlngs = geojson.coordinates[0].map(c => [c[1], c[0]]);
+    const layer   = L.polygon(latlngs, { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 });
+    drawnItems.addLayer(layer);
+    farmingMap.fitBounds(layer.getBounds(), { padding: [30, 30] });
+  }
+
+  function computeAreaRai(geojson) {
+    try {
+      const latlngs = geojson.coordinates[0].map(c => L.latLng(c[1], c[0]));
+      return (L.GeometryUtil.geodesicArea(latlngs) / 10000) * HA_TO_RAI;
+    } catch { return 0; }
+  }
+
+  function updateStep1Preview(areaRai) {
+    document.getElementById('step1AreaDisplay').textContent  = areaRai.toFixed(2);
+    document.getElementById('step1CoinsPreview').textContent = calculateCoins(areaRai);
+    document.getElementById('step1FieldInfo').style.display  = 'block';
+    document.getElementById('clearPolygonBtn').style.display = 'block';
+  }
+
+  function calculateCoins(areaRai) {
+    return Math.floor(areaRai * PM25_PER_RAI * 10) + Math.floor(areaRai * CO2_PER_RAI / 100);
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // LOAD FARMING STATUS
+  // ════════════════════════════════════════════════════════════════════════
   async function loadFarmingStatus() {
     showLoading('กำลังโหลดข้อมูล...');
     try {
       const result = await API.callBackend('/api/farming/status', { user_id: currentUser.id });
       hideLoading();
-
       if (result.success) {
         activeCycle = result.active_cycle;
         renderHistory(result.history || []);
-
-        if (result.has_active_cycle) {
-          renderActiveCycle(activeCycle);
-        } else {
-          showNoCycle();
-        }
+        result.has_active_cycle ? renderActiveCycle(activeCycle) : showNoCycle();
       }
     } catch (e) {
       hideLoading();
@@ -1024,26 +669,18 @@
   function renderActiveCycle(cycle) {
     hideAllCards();
     updateStepProgress(cycle.current_step, cycle.final_status);
-
     if (cycle.final_status === 'completed') {
       document.getElementById('successCard').classList.add('active');
-      document.getElementById('successCoins').textContent = `+${Math.round(cycle.reward.agricoin_awarded)}`;
+      document.getElementById('successCoins').textContent = '+' + Math.round(cycle.reward?.agricoin_awarded || 0);
       return;
     }
-
     if (cycle.final_status === 'failed') {
       document.getElementById('failedCard').classList.add('active');
       return;
     }
-
-    // Show appropriate step
-    if (cycle.current_step === 1) {
-      showStep1();
-    } else if (cycle.current_step === 2) {
-      showStep2(cycle);
-    } else if (cycle.current_step === 3) {
-      showStep3(cycle);
-    }
+    if      (cycle.current_step === 1) showStep1();
+    else if (cycle.current_step === 2) showStep2(cycle);
+    else if (cycle.current_step === 3) showStep3(cycle);
   }
 
   function showNoCycle() {
@@ -1054,132 +691,104 @@
 
   function hideAllCards() {
     document.getElementById('noCycleCard').style.display = 'none';
-    ['step1Card', 'step2Card', 'step3Card', 'successCard', 'failedCard'].forEach(id => {
-      document.getElementById(id).classList.remove('active');
-    });
+    ['step1Card','step2Card','step3Card','successCard','failedCard']
+      .forEach(id => document.getElementById(id).classList.remove('active'));
   }
 
-  function updateStepProgress(currentStep, status) {
+  function updateStepProgress(cur, status) {
     for (let i = 1; i <= 3; i++) {
-      const item = document.getElementById(`stepItem${i}`);
-      item.classList.remove('active', 'completed', 'failed');
-
-      if (status === 'completed') {
-        item.classList.add('completed');
-      } else if (status === 'failed' && i <= currentStep) {
-        item.classList.add(i === currentStep ? 'failed' : 'completed');
-      } else if (i < currentStep) {
-        item.classList.add('completed');
-      } else if (i === currentStep) {
-        item.classList.add('active');
-      }
+      const el = document.getElementById('stepItem' + i);
+      el.classList.remove('active', 'completed', 'failed');
+      if      (status === 'completed')              el.classList.add('completed');
+      else if (status === 'failed' && i <= cur)     el.classList.add(i === cur ? 'failed' : 'completed');
+      else if (i < cur)                             el.classList.add('completed');
+      else if (i === cur)                           el.classList.add('active');
     }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   // STEP 1
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   function showStep1() {
     hideAllCards();
     document.getElementById('step1Card').classList.add('active');
     updateStepProgress(1, 'in_progress');
+    // Auto-load saved polygon on first visit if none selected yet
+    if (savedPolygon && !selectedPolygon) {
+      setTimeout(() => {
+        displayPolygon(savedPolygon);
+        selectedPolygon = savedPolygon;
+        updateStep1Preview(computeAreaRai(savedPolygon));
+        document.getElementById('step1SubmitBtn').disabled = false;
+        document.getElementById('mapHint').textContent = '✅ โหลดแปลงที่บันทึกไว้อัตโนมัติ';
+        document.getElementById('btnLoadSaved').classList.add('active');
+        mapMode = 'saved';
+      }, 200);
+    }
     setTimeout(() => farmingMap.invalidateSize(), 100);
   }
 
-  async function handleMapClick(lat, lng) {
-    showLoading('กำลังตรวจจับแปลง...');
-    try {
-      const result = await API.callBackend('/api/burn-scar/analyze', {
-        mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id
-      });
-      hideLoading();
-
-      if (result.success && result.polygon) {
-        displayPolygon(result.polygon);
-        selectedPolygon = result.polygon;
-        updateStep1Preview(result.farm_area_ha * HA_TO_RAI);
-        document.getElementById('step1SubmitBtn').disabled = false;
-        Toast.success('ตรวจจับแปลงสำเร็จ!');
-      } else {
-        Toast.error('ไม่พบแปลงในพื้นที่นี้');
-      }
-    } catch (e) {
-      hideLoading();
-      Toast.error('เกิดข้อผิดพลาด');
-    }
-  }
-
-  function displayPolygon(geojson) {
-    drawnItems.clearLayers();
-    const coords = geojson.coordinates[0];
-    const latlngs = coords.map(c => [c[1], c[0]]);
-    const layer = L.polygon(latlngs, {
-      color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3
-    });
-    drawnItems.addLayer(layer);
-    farmingMap.fitBounds(layer.getBounds(), { padding: [30, 30] });
-  }
-
-  function updateStep1Preview(areaRai) {
-    const coins = calculateCoins(areaRai);
-    document.getElementById('step1AreaDisplay').textContent = areaRai.toFixed(2);
-    document.getElementById('step1CoinsPreview').textContent = coins;
-    document.getElementById('step1FieldInfo').style.display = 'block';
-  }
-
-  function calculateCoins(areaRai) {
-    const pm25 = areaRai * PM25_PER_RAI;
-    const co2 = areaRai * CO2_PER_RAI;
-    return Math.floor(pm25 * 10) + Math.floor(co2 / 100);
-  }
-
   async function submitStep1() {
-    if (!selectedPolygon) { Toast.error('กรุณาเลือกแปลงก่อน'); return; }
+    document.getElementById('step1Error').style.display = 'none';
+    if (!selectedPolygon) { showStep1Error('กรุณาเลือกแปลงก่อน'); return; }
 
     showLoading('กำลังลงทะเบียน...');
     try {
-      const result = await API.callBackend('/api/farming/start', {
-        user_id: currentUser.id,
-        polygon: selectedPolygon,
-        crop_type: document.getElementById('cropType').value,
-        field_name: document.getElementById('fieldName').value || 'แปลงเกษตร'
+      // ── KEY FIX #3: raw fetch so we get the real error text on 4xx ──
+      const res = await fetch(BACKEND + '/api/farming/start', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id:    currentUser.id,
+          polygon:    selectedPolygon,
+          crop_type:  document.getElementById('cropType').value,
+          field_name: document.getElementById('fieldName').value.trim() || 'แปลงเกษตร'
+        })
       });
+      const result = await res.json();
       hideLoading();
 
       if (result.success) {
-        Toast.success(result.message);
+        Toast.success(result.message || 'ลงทะเบียนสำเร็จ!');
         await loadFarmingStatus();
       } else {
-        Toast.error(result.error);
+        showStep1Error(result.error || 'เกิดข้อผิดพลาด');
+        // If the user already has an active cycle, surface it instead
+        if (result.existing_cycle_id) {
+          Toast.warning('กำลังโหลดรอบการปลูกที่กำลังดำเนินการ...');
+          setTimeout(() => loadFarmingStatus(), 1500);
+        }
       }
     } catch (e) {
       hideLoading();
-      Toast.error('เกิดข้อผิดพลาด');
+      showStep1Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: ' + e.message);
     }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showStep1Error(msg) {
+    document.getElementById('step1ErrorText').textContent = msg;
+    document.getElementById('step1Error').style.display  = 'block';
+    Toast.error(msg);
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
   // STEP 2
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   function showStep2(cycle) {
     hideAllCards();
     document.getElementById('step2Card').classList.add('active');
     updateStepProgress(2, 'in_progress');
-
-    const daysUntilCheck = cycle.days_info?.days_until_crop_check || 0;
-
-    if (daysUntilCheck > 0) {
-      document.getElementById('step2WaitInfo').style.display = 'block';
-      document.getElementById('step2ReadyInfo').style.display = 'none';
-      document.getElementById('step2DaysRemaining').textContent = daysUntilCheck;
-      document.getElementById('step2SubmitBtn').disabled = true;
-      
-      // Show skip button in demo mode
+    const wait = cycle.days_info?.days_until_crop_check || 0;
+    if (wait > 0) {
+      document.getElementById('step2WaitInfo').style.display    = 'block';
+      document.getElementById('step2ReadyInfo').style.display   = 'none';
+      document.getElementById('step2DaysRemaining').textContent = wait;
+      document.getElementById('step2SubmitBtn').disabled        = true;
       document.getElementById('step2SkipSection').style.display = demoMode ? 'block' : 'none';
     } else {
-      document.getElementById('step2WaitInfo').style.display = 'none';
-      document.getElementById('step2ReadyInfo').style.display = 'block';
-      document.getElementById('step2SubmitBtn').disabled = false;
+      document.getElementById('step2WaitInfo').style.display    = 'none';
+      document.getElementById('step2ReadyInfo').style.display   = 'block';
+      document.getElementById('step2SubmitBtn').disabled        = false;
       document.getElementById('step2SkipSection').style.display = 'none';
     }
   }
@@ -1188,61 +797,42 @@
     showLoading(skipWait ? 'กำลังข้าม 30 วัน...' : 'กำลังตรวจสอบพืช...');
     try {
       const result = await API.callBackend('/api/farming/verify-crops', {
-        user_id: currentUser.id,
-        cycle_id: activeCycle.cycle_id,
-        skip_wait: skipWait || demoMode
+        user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skipWait || demoMode
       });
       hideLoading();
-
       if (result.crops_verified) {
         Toast.success(result.message + (result.demo_mode ? ' (Demo)' : ''));
         await loadFarmingStatus();
-      } else if (result.success === false && result.days_remaining) {
-        // Still need to wait
-        if (demoMode) {
-          // Auto-retry with skip in demo mode
-          submitStep2(true);
-        } else {
-          Toast.warning(result.error);
-        }
+      } else if (!result.success && result.days_remaining) {
+        if (demoMode) submitStep2(true);
+        else          Toast.warning(result.error);
       } else {
         Toast.warning(result.message || 'ไม่พบพืชในแปลง');
       }
-    } catch (e) {
-      hideLoading();
-      console.error(e);
-      Toast.error('เกิดข้อผิดพลาด');
-    }
+    } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   // STEP 3
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   function showStep3(cycle) {
     hideAllCards();
     document.getElementById('step3Card').classList.add('active');
     updateStepProgress(3, 'in_progress');
-
     if (cycle.steps.step3.status === 'monitoring') {
-      document.getElementById('step3HarvestSection').style.display = 'none';
+      document.getElementById('step3HarvestSection').style.display    = 'none';
       document.getElementById('step3MonitoringSection').style.display = 'block';
-
-      const daysRemaining = cycle.days_info?.days_remaining_monitoring || cycle.steps.step3.days_remaining || 60;
-      const progress = ((60 - daysRemaining) / 60) * 100;
-
-      document.getElementById('daysRemaining').textContent = daysRemaining;
-      document.getElementById('monitoringProgress').style.width = `${progress}%`;
-
-      // Preview rewards
-      const areaRai = cycle.area_rai;
-      document.getElementById('previewPM25').textContent = (areaRai * PM25_PER_RAI).toFixed(1);
-      document.getElementById('previewCO2').textContent = (areaRai * CO2_PER_RAI).toFixed(0);
-      document.getElementById('previewCoins').textContent = calculateCoins(areaRai);
-
-      // Show skip button in demo mode
+      const days     = cycle.days_info?.days_remaining_monitoring ?? cycle.steps.step3.days_remaining ?? 60;
+      const progress = Math.min(((60 - days) / 60) * 100, 100);
+      document.getElementById('daysRemaining').textContent      = days;
+      document.getElementById('monitoringProgress').style.width = progress + '%';
+      const r = cycle.area_rai;
+      document.getElementById('previewPM25').textContent  = (r * PM25_PER_RAI).toFixed(1);
+      document.getElementById('previewCO2').textContent   = Math.round(r * CO2_PER_RAI);
+      document.getElementById('previewCoins').textContent = calculateCoins(r);
       document.getElementById('step3SkipSection').style.display = demoMode ? 'block' : 'none';
     } else {
-      document.getElementById('step3HarvestSection').style.display = 'block';
+      document.getElementById('step3HarvestSection').style.display    = 'block';
       document.getElementById('step3MonitoringSection').style.display = 'none';
     }
   }
@@ -1250,154 +840,72 @@
   async function declareHarvest() {
     showLoading('กำลังบันทึก...');
     try {
-      const result = await API.callBackend('/api/farming/declare-harvest', {
-        user_id: currentUser.id,
-        cycle_id: activeCycle.cycle_id
-      });
+      const r = await API.callBackend('/api/farming/declare-harvest', { user_id: currentUser.id, cycle_id: activeCycle.cycle_id });
       hideLoading();
-
-      if (result.success) {
-        Toast.success(result.message);
-        await loadFarmingStatus();
-      } else {
-        Toast.error(result.error);
-      }
-    } catch (e) {
-      hideLoading();
-      Toast.error('เกิดข้อผิดพลาด');
-    }
+      if (r.success) { Toast.success(r.message); await loadFarmingStatus(); }
+      else Toast.error(r.error);
+    } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
   }
 
   async function checkBurnStatus(skipWait = false) {
     showLoading(skipWait ? 'กำลังข้าม 60 วัน...' : 'กำลังตรวจสอบการเผา...');
     try {
-      const result = await API.callBackend('/api/farming/check-burn-status', {
-        user_id: currentUser.id,
-        cycle_id: activeCycle.cycle_id,
-        skip_wait: skipWait
+      const r = await API.callBackend('/api/farming/check-burn-status', {
+        user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skipWait
       });
       hideLoading();
-
-      if (result.status === 'completed') {
-        Toast.success(result.message);
-      } else if (result.status === 'failed') {
-        Toast.error(result.message);
-      } else {
-        Toast.success(result.message);
-      }
-
+      if      (r.status === 'completed') Toast.success(r.message);
+      else if (r.status === 'failed')    Toast.error(r.message);
+      else                               Toast.success(r.message);
       await loadFarmingStatus();
-    } catch (e) {
-      hideLoading();
-      Toast.error('เกิดข้อผิดพลาด');
-    }
+    } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   // HISTORY
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ════════════════════════════════════════════════════════════════════════
   function renderHistory(history) {
-    const container = document.getElementById('historyList');
-
+    const c = document.getElementById('historyList');
     if (!history.length) {
-      container.innerHTML = '<div style="text-align: center; color: var(--text-medium); padding: 1rem;">ยังไม่มีประวัติ</div>';
+      c.innerHTML = '<div style="text-align:center;color:var(--text-medium);padding:1rem;">ยังไม่มีประวัติ</div>';
       return;
     }
-
-    container.innerHTML = history.map(h => `
-      <div class="history-item">
+    c.innerHTML = history.map(h => {
+      const icon   = h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳';
+      const reward = h.final_status === 'completed' ? '+' + Math.round(h.agricoin_awarded) : '-';
+      return `<div class="history-item">
         <div class="history-item-info">
-          <div class="history-item-icon ${h.final_status}">
-            ${h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳'}
-          </div>
+          <div class="history-item-icon ${h.final_status}">${icon}</div>
           <div>
             <div class="history-item-name">${h.field_name || 'แปลงเกษตร'}</div>
-            <div class="history-item-date">${h.area_rai?.toFixed(1) || '-'} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
+            <div class="history-item-date">${(h.area_rai || 0).toFixed(1)} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
           </div>
         </div>
-        <div class="history-item-reward">
-          ${h.final_status === 'completed' ? `+${Math.round(h.agricoin_awarded)}` : '-'}
-        </div>
-      </div>
-    `).join('');
+        <div class="history-item-reward">${reward}</div>
+      </div>`;
+    }).join('');
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // UTILITIES
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function useCurrentLocation() {
-    showLoading('กำลังระบุตำแหน่ง...');
-    try {
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 })
-      );
-      hideLoading();
-      farmingMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
-      await handleMapClick(pos.coords.latitude, pos.coords.longitude);
-    } catch (e) {
-      hideLoading();
-      Toast.error('ไม่สามารถระบุตำแหน่งได้');
-    }
-  }
-
-  function enableDrawing() {
-    if (drawControl) farmingMap.removeControl(drawControl);
-    drawControl = new L.Control.Draw({
-      draw: {
-        polygon: { allowIntersection: false, showArea: true,
-          shapeOptions: { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 } },
-        polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
-      },
-      edit: { featureGroup: drawnItems, remove: true }
-    });
-    farmingMap.addControl(drawControl);
-
-    farmingMap.on(L.Draw.Event.CREATED, (e) => {
-      drawnItems.clearLayers();
-      drawnItems.addLayer(e.layer);
-
-      const latlngs = e.layer.getLatLngs()[0];
-      const coords = latlngs.map(ll => [ll.lng, ll.lat]);
-      coords.push(coords[0]);
-      selectedPolygon = { type: 'Polygon', coordinates: [coords] };
-
-      const area = L.GeometryUtil.geodesicArea(latlngs);
-      const areaRai = (area / 10000) * HA_TO_RAI;
-      updateStep1Preview(areaRai);
-      document.getElementById('step1SubmitBtn').disabled = false;
-      Toast.success('วาดขอบเขตเรียบร้อย!');
-    });
-
-    Toast.info('คลิกบนแผนที่เพื่อวาดขอบเขต แล้วกด Finish');
-  }
-
+  // ════════════════════════════════════════════════════════════════════════
+  // MISC
+  // ════════════════════════════════════════════════════════════════════════
   function startNewCycle() {
-    activeCycle = null;
-    selectedPolygon = null;
-    drawnItems.clearLayers();
-    document.getElementById('step1FieldInfo').style.display = 'none';
-    document.getElementById('step1SubmitBtn').disabled = true;
-    document.getElementById('fieldName').value = '';
+    activeCycle = null; selectedPolygon = null;
+    drawnItems.clearLayers(); mapMode = 'none';
+    document.getElementById('step1FieldInfo').style.display  = 'none';
+    document.getElementById('step1Error').style.display      = 'none';
+    document.getElementById('clearPolygonBtn').style.display = 'none';
+    document.getElementById('step1SubmitBtn').disabled       = true;
+    document.getElementById('fieldName').value               = '';
+    document.getElementById('mapHint').textContent           = 'เลือกวิธีระบุขอบเขตแปลงด้านบนก่อน';
+    document.querySelectorAll('.map-tool-btn').forEach(b => b.classList.remove('active'));
     showStep1();
   }
 
-  function showLoading(text) {
-    document.getElementById('loadingText').textContent = text || 'กำลังโหลด...';
-    document.getElementById('loadingOverlay').classList.add('show');
-  }
+  function showLoading(t) { document.getElementById('loadingText').textContent = t || 'กำลังโหลด...'; document.getElementById('loadingOverlay').classList.add('show'); }
+  function hideLoading()  { document.getElementById('loadingOverlay').classList.remove('show'); }
+  function logout()       { if (confirm('ต้องการออกจากระบบ?')) { Auth.logout(); window.location.href = 'index.html'; } }
 
-  function hideLoading() {
-    document.getElementById('loadingOverlay').classList.remove('show');
-  }
-
-  function logout() {
-    if (confirm('ต้องการออกจากระบบ?')) {
-      Auth.logout();
-      window.location.href = 'index.html';
-    }
-  }
-
-  // Init
   window.addEventListener('load', init);
 </script>
 </body>
