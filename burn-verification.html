@@ -8,73 +8,84 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --step-pending: #64748B;
-      --step-active: #2563EB;
-      --step-completed: #059669;
-      --step-failed: #DC2626;
-      --surface: #FFFFFF;
-      --surface-dim: #F8FAFC;
-      --surface-warm: #FFFBEB;
-      --ink: #0F172A;
-      --ink-mid: #475569;
-      --ink-light: #94A3B8;
-      --border: #E2E8F0;
-      --green-500: #10B981;
-      --green-600: #059669;
-      --green-700: #047857;
-      --blue-500: #3B82F6;
-      --blue-600: #2563EB;
-      --amber-500: #F59E0B;
-      --red-500: #EF4444;
-      --red-600: #DC2626;
-      --purple-500: #8B5CF6;
-      --radius: 12px;
-      --radius-lg: 16px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+      --green:       #7FAD6B;
+      --green-dark:  #5a9447;
+      --green-light: #a5c995;
+      --cream:       #F7F5F0;
+      --white:       #FFFFFF;
+      --text-dark:   #1a2e1a;
+      --text-med:    #5a6b5a;
+      --text-light:  #9aaa9a;
+      --border:      #dde8dd;
+      --amber:       #e07b39;
+      --blue:        #5b8ac8;
+      --red:         #c0392b;
+      --red-light:   #e74c3c;
+      --purple:      #8B5CF6;
+      --shadow-sm:   0 2px 8px rgba(60,90,60,0.08);
+      --shadow-md:   0 4px 16px rgba(60,90,60,0.12);
+      --shadow-lg:   0 8px 32px rgba(60,90,60,0.16);
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 18px;
+      --r-xl: 24px;
     }
 
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Prompt', sans-serif;
-      background: var(--surface-dim);
-      margin: 0;
-      color: var(--ink);
+      background: var(--cream);
+      min-height: 100vh;
+      color: var(--text-dark);
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; top: -100px; right: -100px;
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(127,173,107,0.15) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
     }
 
-    /* ── Page Shell ─────────────────────────────────── */
-    .page { min-height: 100vh; padding-bottom: 90px; }
-
-    .page-header {
-      background: linear-gradient(135deg, #065F46 0%, #047857 50%, #059669 100%);
-      color: white;
-      padding: 1.25rem 1rem;
+    /* ── Topbar ───────────────────────────────────── */
+    .topbar {
       position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 20px rgba(6,95,70,0.3);
+      background: var(--white);
+      box-shadow: 0 1px 8px rgba(60,90,60,0.1);
+      padding: 0 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
     }
-    .page-header-inner { max-width: 800px; margin: 0 auto; }
-    .page-title { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .page-subtitle { font-size: 0.8rem; opacity: 0.85; margin-top: 0.25rem; line-height: 1.4; }
+    .topbar-logo {
+      font-family: 'Itim', cursive;
+      font-size: 1.5rem; color: var(--green);
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .topbar-logo span { font-size: 1.6rem; }
+    .topbar-right { font-size: .8125rem; color: var(--text-med); }
+    .topbar-right a { color: var(--green); font-weight: 700; text-decoration: none; }
 
-    .demo-pill {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: 0.35rem 0.8rem; border-radius: 99px;
-      margin-top: 0.6rem; cursor: pointer; transition: all 0.2s;
-      font-size: 0.8rem; font-weight: 500; color: white;
+    /* ── Demo Pill ─────────────────────────────────── */
+    .demo-pill-bar {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: .5rem 1rem; display: flex; align-items: center; justify-content: center;
     }
-    .demo-pill:hover { background: rgba(255,255,255,0.25); }
-    .demo-pill input { width: 16px; height: 16px; accent-color: var(--purple-500); cursor: pointer; }
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(139,92,246,0.06); border: 1.5px solid rgba(139,92,246,0.25);
+      padding: .35rem .8rem; border-radius: 99px; cursor: pointer;
+      font-size: .8rem; font-weight: 500; color: var(--purple); transition: all .2s;
+    }
+    .demo-pill:hover { background: rgba(139,92,246,0.12); }
+    .demo-pill input { width: 16px; height: 16px; accent-color: var(--purple); cursor: pointer; }
     .demo-badge {
-      background: var(--purple-500); font-size: 0.6rem; font-weight: 700;
-      padding: 0.15rem 0.5rem; border-radius: 99px; letter-spacing: 0.05em;
+      background: var(--purple); color: #fff; font-size: .6rem; font-weight: 700;
+      padding: .15rem .5rem; border-radius: 99px; letter-spacing: .05em;
       animation: pulse-badge 2s ease infinite;
     }
     @keyframes pulse-badge {
@@ -82,636 +93,651 @@
       50%     { box-shadow: 0 0 0 6px rgba(139,92,246,0); }
     }
 
-    .content { max-width: 800px; margin: 0 auto; padding: 1rem; }
-
-    /* ── Step Progress Bar ──────────────────────────── */
-    .stepper {
-      background: var(--surface); border-radius: var(--radius-lg);
-      padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow-sm);
+    /* ── Stepper ───────────────────────────────────── */
+    .stepper-wrap {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: .875rem 1rem; position: sticky; top: 56px; z-index: 99;
     }
-    .stepper-track { display: flex; align-items: center; justify-content: center; gap: 0; }
-    .stepper-step { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; position: relative; z-index: 1; }
-    .stepper-dot {
-      width: 44px; height: 44px; border-radius: 50%;
+    .stepper { display: flex; align-items: center; justify-content: center; gap: 0; max-width: 480px; margin: 0 auto; }
+    .st { display: flex; flex-direction: column; align-items: center; gap: .25rem; position: relative; z-index: 1; }
+    .st-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 2.5px solid var(--border); background: var(--white);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; font-weight: 700;
-      background: var(--surface-dim); border: 3px solid var(--border);
-      color: var(--ink-light); transition: all 0.4s cubic-bezier(.4,0,.2,1);
+      font-size: .9rem; font-weight: 700; color: var(--text-light); transition: all .3s;
     }
-    .stepper-step.active .stepper-dot {
-      background: var(--blue-600); border-color: var(--blue-600); color: white;
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
-      transform: scale(1.1);
-    }
-    .stepper-step.completed .stepper-dot {
-      background: var(--green-600); border-color: var(--green-600); color: white;
-    }
-    .stepper-step.failed .stepper-dot {
-      background: var(--red-600); border-color: var(--red-600); color: white;
-    }
-    .stepper-label {
-      font-size: 0.7rem; color: var(--ink-light); margin-top: 0.4rem;
-      text-align: center; max-width: 72px; font-weight: 500; transition: color 0.3s;
-    }
-    .stepper-step.active .stepper-label { color: var(--blue-600); font-weight: 600; }
-    .stepper-step.completed .stepper-label { color: var(--green-600); }
-    .stepper-line {
-      flex: 1; height: 3px; background: var(--border); min-width: 40px;
-      margin: 0 0.25rem; margin-bottom: 1.2rem; transition: background 0.4s;
-    }
-    .stepper-line.done { background: var(--green-600); }
+    .st-label { font-size: .65rem; color: var(--text-light); white-space: nowrap; transition: color .3s; font-weight: 500; }
+    .st-line { flex: 1; height: 2.5px; background: var(--border); margin-bottom: 18px; min-width: 28px; max-width: 60px; transition: background .3s; }
+    .st.active .st-circle { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 0 4px rgba(127,173,107,.2); transform: scale(1.08); }
+    .st.active .st-label { color: var(--green); font-weight: 700; }
+    .st.done .st-circle { background: var(--green-light); border-color: var(--green-light); color: var(--green-dark); }
+    .st.done .st-label { color: var(--green-dark); }
+    .st.failed .st-circle { background: var(--red); border-color: var(--red); color: #fff; }
+    .st.failed .st-label { color: var(--red); }
+    .st-line.done { background: var(--green-light); }
 
-    /* ── Cards ──────────────────────────────────────── */
+    /* ── Content ───────────────────────────────────── */
+    .content { max-width: 520px; margin: 0 auto; padding: 1.25rem 1rem 5.5rem; position: relative; z-index: 1; }
+
+    /* ── Card ──────────────────────────────────────── */
     .card {
-      background: var(--surface); border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm); overflow: hidden;
-      margin-bottom: 1rem; transition: opacity 0.3s, transform 0.3s;
+      background: var(--white); border-radius: var(--r-xl);
+      box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 1rem;
     }
     .card[hidden] { display: none; }
     .card-header {
-      padding: 1.25rem 1.25rem 1rem;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0.75rem;
+      display: flex; align-items: center; gap: .875rem;
+      padding: 1.25rem 1.25rem 1rem; border-bottom: 1.5px solid var(--border);
     }
     .card-icon {
-      width: 48px; height: 48px; border-radius: var(--radius);
+      width: 48px; height: 48px; border-radius: var(--r-lg);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; flex-shrink: 0; color: white;
+      font-size: 1.5rem; flex-shrink: 0; color: #fff;
     }
-    .card-icon.green  { background: linear-gradient(135deg, #059669, #10B981); }
-    .card-icon.blue   { background: linear-gradient(135deg, #2563EB, #3B82F6); }
-    .card-icon.amber  { background: linear-gradient(135deg, #D97706, #F59E0B); }
-    .card-icon.red    { background: linear-gradient(135deg, #DC2626, #EF4444); }
-    .card-icon.purple { background: linear-gradient(135deg, #7C3AED, #8B5CF6); }
-    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--ink); line-height: 1.3; }
-    .card-desc  { font-size: 0.8rem; color: var(--ink-mid); margin-top: 0.15rem; }
-    .card-body  { padding: 1.25rem; }
+    .ci-green  { background: linear-gradient(135deg, #10B981, #059669); }
+    .ci-blue   { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+    .ci-amber  { background: linear-gradient(135deg, #F59E0B, #D97706); }
+    .ci-red    { background: linear-gradient(135deg, #EF4444, #DC2626); }
+    .ci-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
+    .card-sub { font-size: .8rem; color: var(--text-med); margin-top: .15rem; }
+    .card-body { padding: 1.25rem; }
 
-    /* ── Alert Boxes ───────────────────────────────── */
+    /* ── Alert ─────────────────────────────────────── */
     .alert {
-      border-radius: var(--radius); padding: 0.875rem 1rem;
-      margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5;
-      display: flex; gap: 0.6rem; align-items: flex-start;
+      border-radius: var(--r-md); padding: .875rem 1rem;
+      margin-bottom: .75rem; font-size: .85rem; line-height: 1.5;
+      display: flex; gap: .6rem; align-items: flex-start;
     }
-    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
     .alert-content { flex: 1; }
-    .alert-title { font-weight: 600; margin-bottom: 0.2rem; }
-    .alert.info    { background: #EFF6FF; color: #1E40AF; border-left: 3px solid #3B82F6; }
-    .alert.success { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
-    .alert.warning { background: #FFFBEB; color: #92400E; border-left: 3px solid #F59E0B; }
-    .alert.error   { background: #FEF2F2; color: #991B1B; border-left: 3px solid #EF4444; }
-    .alert.purple  { background: #F5F3FF; color: #5B21B6; border-left: 3px solid #8B5CF6; }
+    .alert-title { font-weight: 600; margin-bottom: .2rem; }
+    .alert.info    { background: rgba(91,138,200,.08); color: #1E40AF; border-left: 3px solid var(--blue); }
+    .alert.success { background: rgba(127,173,107,.08); color: #065F46; border-left: 3px solid var(--green); }
+    .alert.warning { background: rgba(224,123,57,.08); color: #92400E; border-left: 3px solid var(--amber); }
+    .alert.error   { background: rgba(192,57,43,.08); color: #991B1B; border-left: 3px solid var(--red); }
+    .alert.purple  { background: rgba(139,92,246,.06); color: #5B21B6; border-left: 3px solid var(--purple); }
 
-    /* ── Map ────────────────────────────────────────── */
-    .map-wrapper { position: relative; border-radius: var(--radius); overflow: hidden; border: 2px solid var(--border); }
-    .map-wrapper.hero { border-color: var(--green-600); }
-    .map-wrapper.burn-detected { border-color: var(--red-500); }
-    #farmingMap { height: 280px; z-index: 0; }
-    .map-wrapper.hero #farmingMap { height: 400px; }
-
-    .map-toolbar { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-    .tool-btn {
-      flex: 1; min-width: 70px; padding: 0.5rem;
-      border: 2px solid var(--border); border-radius: var(--radius);
-      background: var(--surface); font-size: 0.75rem; font-weight: 500;
-      font-family: 'Prompt', sans-serif; cursor: pointer;
-      text-align: center; color: var(--ink); transition: all 0.15s;
+    /* ── Map ───────────────────────────────────────── */
+    .map-section { margin-top: .75rem; }
+    .map-toolbar { display: flex; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
+    .mbtn {
+      flex: 1; min-width: 70px; padding: .55rem .5rem;
+      border: 2px solid var(--border); border-radius: var(--r-md);
+      background: var(--white); font-family: 'Prompt', sans-serif;
+      font-size: .78rem; font-weight: 500; color: var(--text-dark);
+      cursor: pointer; text-align: center; transition: all .2s;
     }
-    .tool-btn:hover { border-color: var(--green-500); background: #F0FDF4; }
-    .tool-btn.active { background: var(--green-600); border-color: var(--green-600); color: white; }
-    .tool-btn.active-blue { background: var(--blue-600); border-color: var(--blue-600); color: white; }
-    .tool-btn.active-amber { background: var(--amber-500); border-color: var(--amber-500); color: white; }
-    .tool-btn.active-purple { background: var(--purple-500); border-color: var(--purple-500); color: white; }
+    .mbtn:hover { border-color: var(--green); background: #f0fdf4; }
+    .mbtn.ma { background: #3B82F6; border-color: #3B82F6; color: #fff; }
+    .mbtn.mg { background: var(--green); border-color: var(--green); color: #fff; }
+    .mbtn.md { background: #F59E0B; border-color: #F59E0B; color: #fff; }
+    .mbtn.ml { background: var(--purple); border-color: var(--purple); color: #fff; }
 
     .map-hint {
-      font-size: 0.8rem; color: var(--ink-mid); background: var(--surface-dim);
-      border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;
-      border-left: 3px solid var(--blue-500);
+      font-size: .8rem; color: var(--text-med); background: rgba(91,138,200,.06);
+      border-radius: var(--r-sm); padding: .45rem .7rem; margin-bottom: .5rem;
+      border-left: 3px solid var(--blue); min-height: 2rem;
     }
 
-    /* ── Burn Scar Layer Controls ──────────────────── */
+    #mainMap {
+      height: 320px; border-radius: var(--r-lg);
+      border: 2px solid var(--border); overflow: hidden;
+    }
+    #mainMap.crosshair { cursor: crosshair !important; }
+    #mainMap.burn-border { border-color: var(--red); }
+
+    .area-badge {
+      display: none; margin-top: .625rem;
+      background: rgba(16,185,129,.1); border: 1.5px solid rgba(16,185,129,.3);
+      border-radius: var(--r-md); padding: .75rem 1rem; font-size: .8125rem; color: var(--text-dark);
+    }
+    .area-badge.show { display: block; }
+    .area-badge strong { color: #059669; }
+
+    .clear-btn {
+      width: 100%; margin-top: .5rem; padding: .6rem;
+      border: 2px solid var(--border); border-radius: var(--r-md);
+      background: var(--white); font-family: 'Prompt', sans-serif;
+      font-size: .8rem; color: var(--text-med); cursor: pointer; display: none;
+    }
+    .clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── Burn Layer Panel ──────────────────────────── */
     .burn-layer-panel {
-      background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius);
-      padding: 0.875rem; margin-top: 0.75rem;
+      background: rgba(192,57,43,.06); border: 1.5px solid rgba(192,57,43,.2);
+      border-radius: var(--r-md); padding: .875rem; margin-top: .75rem;
     }
     .burn-layer-panel[hidden] { display: none; }
     .burn-layer-row { display: flex; align-items: center; justify-content: space-between; }
-    .burn-layer-title { font-weight: 600; font-size: 0.85rem; color: #991B1B; display: flex; align-items: center; gap: 0.4rem; }
+    .burn-layer-title { font-weight: 600; font-size: .85rem; color: var(--red); display: flex; align-items: center; gap: .4rem; }
     .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
       position: absolute; cursor: pointer; inset: 0;
-      background: #CBD5E1; border-radius: 24px; transition: 0.25s;
+      background: #CBD5E1; border-radius: 24px; transition: .25s;
     }
     .toggle-slider::before {
       content: ''; position: absolute; width: 18px; height: 18px;
-      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.25s;
+      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .25s;
     }
-    .toggle-switch input:checked + .toggle-slider { background: #EF4444; }
+    .toggle-switch input:checked + .toggle-slider { background: var(--red); }
     .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
-    .opacity-row { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--ink-mid); }
+    .opacity-row { margin-top: .5rem; display: flex; align-items: center; gap: .5rem; font-size: .8rem; color: var(--text-med); }
     .opacity-row input[type=range] {
       flex: 1; height: 4px; -webkit-appearance: none; border-radius: 2px;
-      background: linear-gradient(to right, rgba(239,68,68,0.2), rgba(239,68,68,1));
+      background: linear-gradient(to right, rgba(192,57,43,.2), rgba(192,57,43,1));
     }
     .opacity-row input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-      background: #EF4444; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
+      background: var(--red); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,.2); cursor: pointer;
     }
-    .burn-legend { display: flex; gap: 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--ink-mid); flex-wrap: wrap; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 0.2rem; }
+    .burn-legend { display: flex; gap: .75rem; margin-top: .5rem; font-size: .75rem; color: var(--text-med); flex-wrap: wrap; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: .2rem; }
 
-    /* ── Forms ──────────────────────────────────────── */
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-weight: 600; color: var(--ink); margin-bottom: 0.4rem; font-size: 0.875rem; }
-    .form-select, .form-input {
-      width: 100%; padding: 0.75rem 0.875rem;
-      border: 2px solid var(--border); border-radius: var(--radius);
-      font-size: 0.9rem; font-family: 'Prompt', sans-serif;
-      transition: border-color 0.2s; background: var(--surface);
+    /* ── Forms ─────────────────────────────────────── */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block; font-size: .8125rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: .4rem;
     }
-    .form-select:focus, .form-input:focus { outline: none; border-color: var(--green-500); }
+    .field select, .field input {
+      width: 100%; padding: .8rem 1rem;
+      border: 2px solid var(--border); border-radius: var(--r-md);
+      font-family: 'Prompt', sans-serif; font-size: .9375rem;
+      color: var(--text-dark); background: var(--white);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field select:focus, .field input:focus {
+      outline: none; border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(127,173,107,.12);
+    }
 
-    .field-info {
-      background: #ECFDF5; border-radius: var(--radius); padding: 0.75rem;
-      font-size: 0.85rem; color: #065F46;
+    /* ── Buttons ───────────────────────────────────── */
+    .btn-p {
+      width: 100%; padding: .95rem; border: none; border-radius: var(--r-md);
+      font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: transform .15s, box-shadow .15s; margin-top: .75rem;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
     }
-    .field-info[hidden] { display: none; }
-    .field-stat { display: flex; justify-content: space-between; padding: 0.2rem 0; }
-    .field-stat-val { font-weight: 600; }
+    .btn-p:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-p:active:not(:disabled) { transform: scale(.98); }
 
-    /* ── Buttons ────────────────────────────────────── */
-    .btn-main {
-      width: 100%; padding: 0.875rem; border: none; border-radius: var(--radius);
-      font-size: 0.95rem; font-weight: 600; font-family: 'Prompt', sans-serif;
-      cursor: pointer; transition: all 0.2s; display: flex; align-items: center;
-      justify-content: center; gap: 0.5rem;
+    .btn-green {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff; box-shadow: 0 4px 14px rgba(127,173,107,.35);
     }
-    .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-green { background: linear-gradient(135deg, #059669, #10B981); color: white; }
-    .btn-green:hover:not(:disabled) { box-shadow: 0 4px 14px rgba(16,185,129,0.4); transform: translateY(-1px); }
-    .btn-blue { background: linear-gradient(135deg, #2563EB, #3B82F6); color: white; }
-    .btn-blue:hover:not(:disabled) { box-shadow: 0 4px 14px rgba(37,99,235,0.4); transform: translateY(-1px); }
-    .btn-amber { background: linear-gradient(135deg, #D97706, #F59E0B); color: white; }
-    .btn-amber:hover:not(:disabled) { box-shadow: 0 4px 14px rgba(245,158,11,0.4); transform: translateY(-1px); }
-    .btn-purple { background: linear-gradient(135deg, #7C3AED, #8B5CF6); color: white; animation: pulse-badge 2s infinite; }
-    .btn-purple:hover:not(:disabled) { box-shadow: 0 4px 14px rgba(139,92,246,0.4); }
-    .btn-outline {
-      background: var(--surface); border: 2px solid var(--border); color: var(--ink-mid);
-    }
-    .btn-outline:hover:not(:disabled) { border-color: var(--ink-mid); color: var(--ink); }
+    .btn-green:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(127,173,107,.42); transform: translateY(-1px); }
 
-    .btn-clear { width: 100%; margin-top: 0.5rem; }
-    .btn-clear[hidden] { display: none; }
+    .btn-blue {
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,.3);
+    }
+    .btn-blue:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(59,130,246,.4); transform: translateY(-1px); }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,.3);
+    }
+    .btn-amber:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(245,158,11,.4); transform: translateY(-1px); }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+      color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,.3);
+      animation: pulse-badge 2s infinite;
+    }
+
+    .btn-o {
+      width: 100%; padding: .875rem; background: var(--white);
+      color: var(--green); border: 2px solid var(--green);
+      border-radius: var(--r-md); font-family: 'Prompt', sans-serif;
+      font-size: .9375rem; font-weight: 600; cursor: pointer;
+      transition: background .2s; margin-top: .625rem;
+    }
+    .btn-o:hover { background: rgba(127,173,107,.05); }
 
     .divider-or {
-      display: flex; align-items: center; gap: 0.75rem; margin: 0.75rem 0;
-      color: var(--ink-light); font-size: 0.8rem; font-weight: 500;
+      display: flex; align-items: center; gap: .75rem; margin: .75rem 0;
+      color: var(--text-light); font-size: .8rem; font-weight: 500;
     }
     .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    /* ── Satellite Evidence Panel ───────────────────── */
+    /* ── Satellite Evidence Panel ──────────────────── */
     .sat-panel {
-      background: #0F172A; color: #E2E8F0; border-radius: var(--radius);
-      padding: 1rem; margin-top: 0.75rem; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace, 'Prompt';
+      background: #1a2e1a; color: #dde8dd; border-radius: var(--r-md);
+      padding: 1rem; margin-top: .75rem; font-size: .8rem;
+      font-family: 'JetBrains Mono', monospace, 'Prompt';
     }
     .sat-panel[hidden] { display: none; }
-    .sat-panel-title { color: #34D399; font-weight: 700; margin-bottom: 0.6rem; font-family: 'Prompt'; font-size: 0.85rem; }
-    .sat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #1E293B; }
+    .sat-panel-title { color: var(--green-light); font-weight: 700; margin-bottom: .6rem; font-family: 'Prompt'; font-size: .85rem; }
+    .sat-row { display: flex; justify-content: space-between; padding: .3rem 0; border-bottom: 1px solid rgba(127,173,107,.15); }
     .sat-row:last-child { border-bottom: none; }
-    .sat-label { color: #94A3B8; }
+    .sat-label { color: var(--text-light); }
     .sat-val { font-weight: 600; }
-    .sat-val.pass { color: #34D399; }
-    .sat-val.fail { color: #F87171; }
-    .sat-val.warn { color: #FBBF24; }
-    .sat-reasons { margin-top: 0.6rem; font-size: 0.75rem; }
-    .sat-reason { padding: 0.2rem 0; color: #CBD5E1; line-height: 1.4; }
-    .sat-source { margin-top: 0.5rem; color: #64748B; font-size: 0.7rem; border-top: 1px solid #1E293B; padding-top: 0.4rem; }
+    .sat-val.pass { color: var(--green-light); }
+    .sat-val.fail { color: #e74c3c; }
+    .sat-val.warn { color: #F59E0B; }
+    .sat-reasons { margin-top: .6rem; font-size: .75rem; }
+    .sat-reason { padding: .2rem 0; color: #CBD5E1; line-height: 1.4; }
+    .sat-source { margin-top: .5rem; color: var(--text-light); font-size: .7rem; border-top: 1px solid rgba(127,173,107,.15); padding-top: .4rem; }
 
-    /* ── Monitoring Card ───────────────────────────── */
+    /* ── Monitor Card ─────────────────────────────── */
     .monitor-card {
-      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-      color: white; border-radius: var(--radius-lg); padding: 1.5rem;
-      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #1a2e1a, #2a4a2a);
+      color: #fff; border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1rem;
     }
     .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     .monitor-title { font-size: 1rem; font-weight: 600; }
-    .monitor-badge { padding: 0.25rem 0.6rem; border-radius: 99px; font-size: 0.7rem; font-weight: 600; background: var(--green-500); }
+    .monitor-badge { padding: .25rem .6rem; border-radius: 99px; font-size: .7rem; font-weight: 600; background: var(--green); }
     .days-hero { text-align: center; margin-bottom: 1.25rem; }
     .days-num {
       font-size: 3.5rem; font-weight: 800; line-height: 1;
-      background: linear-gradient(135deg, #10B981, #34D399);
+      background: linear-gradient(135deg, var(--green), var(--green-light));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .days-lbl { font-size: 0.9rem; opacity: 0.7; margin-top: 0.2rem; }
-    .progress-track { background: rgba(255,255,255,0.15); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #10B981, #34D399); border-radius: 99px; transition: width 0.6s ease; }
-    .progress-labels { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.6; }
+    .days-lbl { font-size: .9rem; opacity: .7; margin-top: .2rem; }
+    .progress-track { background: rgba(255,255,255,.15); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: .5rem; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--green-light)); border-radius: 99px; transition: width .6s ease; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: .7rem; opacity: .6; }
 
-    /* ── Burn Result Banner ─────────────────────────── */
+    /* ── Burn Banner ───────────────────────────────── */
     .burn-banner {
-      border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;
-      margin-bottom: 1rem; color: white;
+      border-radius: var(--r-lg); padding: 1.5rem; text-align: center;
+      margin-top: .75rem; color: #fff;
     }
     .burn-banner[hidden] { display: none; }
-    .burn-banner.clean   { background: linear-gradient(135deg, #059669, #10B981); }
-    .burn-banner.burned  { background: linear-gradient(135deg, #DC2626, #EF4444); }
-    .burn-banner-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .burn-banner.clean  { background: linear-gradient(135deg, var(--green-dark), var(--green)); }
+    .burn-banner.burned { background: linear-gradient(135deg, #991B1B, var(--red)); }
+    .burn-banner-icon { font-size: 2.5rem; margin-bottom: .5rem; }
     .burn-banner-title { font-size: 1.25rem; font-weight: 700; }
-    .burn-banner-sub { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
-    .burn-stats { background: rgba(255,255,255,0.15); border-radius: var(--radius); padding: 0.875rem; margin-top: 1rem; text-align: left; }
-    .burn-stat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .burn-banner-sub { font-size: .9rem; opacity: .9; margin-top: .25rem; }
+    .burn-stats { background: rgba(255,255,255,.15); border-radius: var(--r-md); padding: .875rem; margin-top: 1rem; text-align: left; }
+    .burn-stat-row { display: flex; justify-content: space-between; padding: .3rem 0; font-size: .85rem; border-bottom: 1px solid rgba(255,255,255,.1); }
     .burn-stat-row:last-child { border-bottom: none; }
 
-    /* ── Reward Preview ─────────────────────────────── */
+    /* ── Reward Strip ──────────────────────────────── */
     .reward-strip {
-      background: linear-gradient(135deg, #D97706, #F59E0B);
-      color: white; border-radius: var(--radius); padding: 1rem;
-      margin-top: 0.75rem;
+      background: linear-gradient(135deg, var(--amber), #D97706);
+      color: #fff; border-radius: var(--r-md); padding: 1rem; margin-top: .75rem;
     }
-    .reward-strip-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
-    .reward-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
-    .reward-cell { background: rgba(255,255,255,0.2); border-radius: 8px; padding: 0.6rem; text-align: center; }
+    .reward-strip-title { font-weight: 600; margin-bottom: .5rem; font-size: .9rem; }
+    .reward-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; }
+    .reward-cell { background: rgba(255,255,255,.2); border-radius: var(--r-sm); padding: .6rem; text-align: center; }
     .reward-val { font-size: 1.05rem; font-weight: 700; }
-    .reward-lbl { font-size: 0.65rem; opacity: 0.9; }
+    .reward-lbl { font-size: .65rem; opacity: .9; }
 
-    /* ── Impact Strip ──────────────────────────────── */
+    /* ── Impact Strip ─────────────────────────────── */
     .impact-strip {
-      background: linear-gradient(135deg, #059669, #10B981);
-      color: white; border-radius: var(--radius); padding: 1rem; margin-top: 0.75rem;
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: #fff; border-radius: var(--r-md); padding: 1rem; margin-top: .75rem;
     }
-    .impact-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
-    .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-    .impact-cell { background: rgba(255,255,255,0.2); border-radius: 8px; padding: 0.6rem; text-align: center; }
+    .impact-title { font-weight: 600; margin-bottom: .5rem; font-size: .9rem; }
+    .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .impact-cell { background: rgba(255,255,255,.2); border-radius: var(--r-sm); padding: .6rem; text-align: center; }
     .impact-val { font-size: 1.15rem; font-weight: 700; }
-    .impact-lbl { font-size: 0.7rem; opacity: 0.9; }
+    .impact-lbl { font-size: .7rem; opacity: .9; }
 
-    /* ── Success / Failed Finals ───────────────────── */
-    .final-card { border-radius: var(--radius-lg); padding: 2rem; text-align: center; color: white; }
-    .final-card.success { background: linear-gradient(135deg, #059669, #10B981); }
-    .final-card.failed  { background: linear-gradient(135deg, #DC2626, #EF4444); }
-    .final-icon { font-size: 3.5rem; margin-bottom: 0.75rem; }
+    /* ── Final Cards ──────────────────────────────── */
+    .final-card { border-radius: var(--r-xl); padding: 2rem; text-align: center; color: #fff; }
+    .final-card.success { background: linear-gradient(135deg, var(--green-dark), var(--green)); }
+    .final-card.failed  { background: linear-gradient(135deg, #991B1B, var(--red)); }
+    .final-icon { font-size: 3.5rem; margin-bottom: .75rem; animation: popIn .55s cubic-bezier(.175,.885,.32,1.275); }
+    @keyframes popIn { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
     .final-title { font-size: 1.5rem; font-weight: 700; }
-    .final-sub { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; margin-bottom: 1.25rem; }
-    .final-coins { background: rgba(255,255,255,0.2); border-radius: var(--radius); padding: 1.25rem; }
+    .final-sub { font-size: .9rem; opacity: .9; margin-top: .25rem; margin-bottom: 1.25rem; }
+    .final-coins { background: rgba(255,255,255,.2); border-radius: var(--r-md); padding: 1.25rem; }
     .final-coins-num { font-size: 2.5rem; font-weight: 800; }
-    .final-tip { background: rgba(255,255,255,0.15); border-radius: var(--radius); padding: 0.875rem; font-size: 0.85rem; margin-top: 1rem; }
+    .final-tip { background: rgba(255,255,255,.15); border-radius: var(--r-md); padding: .875rem; font-size: .85rem; margin-top: 1rem; }
 
-    /* ── No Cycle Card ─────────────────────────────── */
+    /* ── Mini Map (for results) ────────────────────── */
+    .mini-map {
+      height: 180px; border-radius: var(--r-md);
+      border: 2px solid var(--border); overflow: hidden; margin-top: .75rem;
+    }
+    .mini-map.burn-border { border-color: var(--red); }
+
+    /* ── Empty State ──────────────────────────────── */
     .empty-state {
-      background: var(--surface); border-radius: var(--radius-lg);
-      padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-sm);
+      background: var(--white); border-radius: var(--r-xl);
+      padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-md);
     }
     .empty-state[hidden] { display: none; }
-    .empty-icon { font-size: 3.5rem; margin-bottom: 0.75rem; }
-    .empty-title { font-size: 1.15rem; font-weight: 700; color: var(--ink); }
-    .empty-text { color: var(--ink-mid); margin: 0.5rem 0 1.25rem; line-height: 1.5; font-size: 0.9rem; }
+    .empty-icon { font-size: 3.5rem; margin-bottom: .75rem; }
+    .empty-title { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); }
+    .empty-text { color: var(--text-med); margin: .5rem 0 1.25rem; line-height: 1.5; font-size: .9rem; }
 
-    /* ── History ────────────────────────────────────── */
-    .history-card { margin-top: 0.5rem; }
-    .history-card .card-body { padding: 0.75rem 1rem; }
-    .history-title { font-weight: 600; font-size: 0.9rem; color: var(--ink); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
+    /* ── History ──────────────────────────────────── */
+    .history-title { font-weight: 600; font-size: .9rem; color: var(--text-dark); margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
     .history-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0.75rem; background: var(--surface-dim); border-radius: var(--radius);
-      margin-bottom: 0.4rem;
+      padding: .75rem; background: var(--cream); border-radius: var(--r-md);
+      margin-bottom: .4rem; border: 1.5px solid var(--border);
     }
-    .history-left { display: flex; align-items: center; gap: 0.6rem; }
-    .history-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-    .history-dot.completed { background: #D1FAE5; }
-    .history-dot.failed    { background: #FEE2E2; }
-    .history-dot.in_progress { background: #DBEAFE; }
-    .history-name { font-weight: 600; font-size: 0.875rem; }
-    .history-meta { font-size: 0.7rem; color: var(--ink-light); }
-    .history-reward { font-weight: 600; color: var(--green-600); font-size: 0.9rem; }
+    .history-left { display: flex; align-items: center; gap: .6rem; }
+    .history-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
+    .history-dot.completed { background: rgba(127,173,107,.15); }
+    .history-dot.failed    { background: rgba(192,57,43,.1); }
+    .history-dot.in_progress { background: rgba(91,138,200,.1); }
+    .history-name { font-weight: 600; font-size: .875rem; }
+    .history-meta { font-size: .7rem; color: var(--text-light); }
+    .history-reward { font-weight: 600; color: var(--green-dark); font-size: .9rem; }
 
-    /* ── Loading ────────────────────────────────────── */
+    /* ── Loading ──────────────────────────────────── */
     .loading-overlay {
-      position: fixed; inset: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(4px);
+      position: fixed; inset: 0; background: rgba(247,245,240,.92); backdrop-filter: blur(4px);
       display: none; align-items: center; justify-content: center; z-index: 3000;
     }
     .loading-overlay.show { display: flex; }
     .spinner {
       width: 48px; height: 48px; border: 4px solid var(--border);
-      border-top-color: var(--green-600); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem;
+      border-top-color: var(--green); border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 0 auto .75rem;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 0.9rem; color: var(--ink-mid); text-align: center; }
+    .loading-text { font-size: .9rem; color: var(--text-med); text-align: center; }
 
-    /* ── Mobile Nav ─────────────────────────────────── */
+    /* ── Toast ────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--text-dark); color: #fff; padding: .7rem 1.25rem; border-radius: var(--r-md);
+      font-size: .875rem; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 9999;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1); max-width: 90vw;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.green { background: var(--green); }
+    .toast.red { background: var(--red); }
+
+    /* ── Mobile Nav ────────────────────────────────── */
     .mobile-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--surface); border-top: 1px solid var(--border);
+      background: var(--white); border-top: 1.5px solid var(--border);
       display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom, 0);
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+      box-shadow: 0 -2px 10px rgba(60,90,60,.06);
     }
     .mobile-nav a {
       flex: 1; display: flex; flex-direction: column; align-items: center;
-      padding: 0.6rem 0; text-decoration: none; color: var(--ink-light);
-      font-size: 0.65rem; font-weight: 500; transition: color 0.15s;
+      padding: .6rem 0; text-decoration: none; color: var(--text-light);
+      font-size: .65rem; font-weight: 500; transition: color .15s;
     }
-    .mobile-nav a.active { color: var(--green-600); }
-    .mobile-nav a .nav-icon { font-size: 1.2rem; margin-bottom: 0.15rem; }
+    .mobile-nav a.active { color: var(--green); }
+    .mobile-nav a .nav-icon { font-size: 1.2rem; margin-bottom: .15rem; }
 
-    /* ── Auto-detect crosshair ─────────────────────── */
-    #farmingMap.crosshair { cursor: crosshair !important; }
-
-    @media (max-width: 480px) {
-      .stepper-dot { width: 38px; height: 38px; font-size: 1rem; }
-      .stepper-label { font-size: 0.65rem; max-width: 60px; }
-      #farmingMap { height: 240px; }
-      .map-wrapper.hero #farmingMap { height: 320px; }
+    @media (max-width: 400px) {
+      .st-circle { width: 34px; height: 34px; font-size: .8rem; }
+      .st-label { font-size: .6rem; }
+      #mainMap { height: 270px; }
       .reward-grid { grid-template-columns: 1fr; }
       .impact-grid { grid-template-columns: 1fr; }
       .days-num { font-size: 2.8rem; }
-      .tool-btn { font-size: 0.7rem; padding: 0.4rem; }
+      .mbtn { font-size: .72rem; padding: .45rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="page">
+<!-- ═══════════ TOPBAR ═══════════ -->
+<div class="topbar">
+  <div class="topbar-logo"><span>🌾</span> AgriCall</div>
+  <div class="topbar-right"><a href="#" onclick="logout()">ออกจากระบบ</a></div>
+</div>
 
-  <!-- ═══════════ HEADER ═══════════ -->
-  <div class="page-header">
-    <div class="page-header-inner">
-      <div class="page-title">🌾 ระบบตรวจสอบการเพาะปลูก</div>
-      <div class="page-subtitle">ลงทะเบียน → ตรวจพืช → รอ 60 วัน → รับ AgriCoins</div>
-      <label class="demo-pill">
-        <input type="checkbox" id="demoToggle" onchange="toggleDemo()">
-        <span>🚀 Demo Mode</span>
-        <span class="demo-badge" id="demoBadge" style="display:none;">DEMO</span>
-      </label>
+<!-- ═══════════ DEMO TOGGLE ═══════════ -->
+<div class="demo-pill-bar">
+  <label class="demo-pill">
+    <input type="checkbox" id="demoToggle" onchange="toggleDemo()">
+    <span>🚀 Demo Mode</span>
+    <span class="demo-badge" id="demoBadge" style="display:none;">DEMO</span>
+  </label>
+</div>
+
+<!-- ═══════════ STEPPER ═══════════ -->
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="st" id="sStep1"><div class="st-circle">🌱</div><div class="st-label">เริ่มปลูก</div></div>
+    <div class="st-line" id="sLine1"></div>
+    <div class="st" id="sStep2"><div class="st-circle">🌾</div><div class="st-label">ตรวจพืช</div></div>
+    <div class="st-line" id="sLine2"></div>
+    <div class="st" id="sStep3"><div class="st-circle">🔥</div><div class="st-label">ตรวจ 60 วัน</div></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Demo info -->
+  <div class="alert purple" id="demoAlert" hidden>
+    <div class="alert-icon">🚀</div>
+    <div class="alert-content">
+      <div class="alert-title">Demo Mode เปิดใช้งาน</div>
+      ข้ามเวลารอ 30/60 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง
     </div>
   </div>
 
-  <div class="content">
+  <!-- ═══════════ NO CYCLE ═══════════ -->
+  <div class="empty-state" id="noCycleCard" hidden>
+    <div class="empty-icon">🌱</div>
+    <div class="empty-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
+    <div class="empty-text">ลงทะเบียนแปลงเกษตรและเริ่มรอบตรวจสอบ<br>เพื่อรับ AgriCoins เมื่อไม่มีการเผา</div>
+    <button class="btn-p btn-green" onclick="showStep(1)" style="max-width:320px;margin:.75rem auto 0;">🌱 เริ่มลงทะเบียน</button>
+  </div>
 
-    <!-- Demo info -->
-    <div class="alert purple" id="demoAlert" hidden>
-      <div class="alert-icon">🚀</div>
-      <div class="alert-content">
-        <div class="alert-title">Demo Mode เปิดใช้งาน</div>
-        ข้ามเวลารอ 30/60 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง
-      </div>
+  <!-- ═══════════ STEP 1: Registration ═══════════ -->
+  <div class="card" id="step1Card" hidden>
+    <div class="card-header">
+      <div class="card-icon ci-green">🌱</div>
+      <div><div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div><div class="card-sub">ระบุแปลงและประเภทพืช</div></div>
     </div>
+    <div class="card-body">
 
-    <!-- ═══════════ STEPPER ═══════════ -->
-    <div class="stepper">
-      <div class="stepper-track">
-        <div class="stepper-step" id="sStep1">
-          <div class="stepper-dot">🌱</div>
-          <div class="stepper-label">เริ่มปลูก</div>
+      <!-- Map Section (same style as signup) -->
+      <div class="map-section">
+        <div style="font-size:.875rem;font-weight:700;color:var(--text-dark);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+          📍 ระบุขอบเขตแปลง
         </div>
-        <div class="stepper-line" id="sLine1"></div>
-        <div class="stepper-step" id="sStep2">
-          <div class="stepper-dot">🌾</div>
-          <div class="stepper-label">ตรวจพืช</div>
+        <div class="map-toolbar">
+          <button class="mbtn" id="btnSaved" onclick="setMode('saved')">💾 แปลงของฉัน</button>
+          <button class="mbtn" id="btnAuto"  onclick="setMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
+          <button class="mbtn" id="btnDraw"  onclick="setMode('draw')">✏️ วาดเอง</button>
+          <button class="mbtn" id="btnMyLoc" onclick="goToMyLocation()">📍 ตำแหน่งฉัน</button>
         </div>
-        <div class="stepper-line" id="sLine2"></div>
-        <div class="stepper-step" id="sStep3">
-          <div class="stepper-dot">🔥</div>
-          <div class="stepper-label">ตรวจ 60 วัน</div>
+        <div class="map-hint" id="mapHint">เลือกวิธีระบุขอบเขตแปลงด้านบน</div>
+        <div id="mainMap"></div>
+        <div class="area-badge" id="areaBadge">
+          ✅ เลือกแปลงแล้ว — <strong id="areaDisplay">0</strong> ไร่ · คาดว่าได้ ~<strong id="coinsPreview">0</strong> AgriCoins
         </div>
+        <button class="clear-btn" id="clearBtn" onclick="clearAll()">🗑️ ล้างขอบเขต</button>
       </div>
+
+      <div class="field" style="margin-top:1rem;">
+        <label>🌾 ประเภทพืช</label>
+        <select id="cropType">
+          <option value="rice">🌾 ข้าว</option>
+          <option value="corn">🌽 ข้าวโพด</option>
+          <option value="sugarcane">🎋 อ้อย</option>
+          <option value="cassava">🥔 มันสำปะหลัง</option>
+          <option value="other">🌿 อื่นๆ</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>📝 ชื่อแปลง (ไม่บังคับ)</label>
+        <input type="text" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
+      </div>
+
+      <div class="alert error" id="step1Err" hidden>
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content" id="step1ErrText"></div>
+      </div>
+
+      <button class="btn-p btn-green" id="step1Submit" disabled onclick="submitStep1()">🌱 ลงทะเบียนเริ่มปลูก</button>
     </div>
+  </div>
 
-    <!-- ═══════════ NO CYCLE ═══════════ -->
-    <div class="empty-state" id="noCycleCard" hidden>
-      <div class="empty-icon">🌱</div>
-      <div class="empty-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
-      <div class="empty-text">ลงทะเบียนแปลงเกษตรและเริ่มรอบตรวจสอบ<br>เพื่อรับ AgriCoins เมื่อไม่มีการเผา</div>
-      <button class="btn-main btn-green" onclick="showStep(1)" style="max-width:320px;margin:0 auto;">🌱 เริ่มลงทะเบียน</button>
+  <!-- ═══════════ STEP 2: Crop Verification ═══════════ -->
+  <div class="card" id="step2Card" hidden>
+    <div class="card-header">
+      <div class="card-icon ci-blue">🌾</div>
+      <div><div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div><div class="card-sub">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div></div>
     </div>
-
-    <!-- ═══════════ STEP 1 ═══════════ -->
-    <div class="card" id="step1Card" hidden>
-      <div class="card-header">
-        <div class="card-icon green">🌱</div>
-        <div><div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div><div class="card-desc">ระบุแปลงและประเภทพืช</div></div>
+    <div class="card-body">
+      <div class="alert info" id="step2Wait">
+        <div class="alert-icon">⏳</div>
+        <div class="alert-content">
+          <div class="alert-title">รอการตรวจสอบ</div>
+          ต้องรออีก <strong id="step2Days">-</strong> วัน ก่อนตรวจสอบพืช
+        </div>
       </div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">📍 เลือกวิธีระบุขอบเขตแปลง</label>
-          <div class="map-toolbar">
-            <button class="tool-btn" id="btnSaved"  onclick="setMode('saved')">💾 แปลงของฉัน</button>
-            <button class="tool-btn" id="btnAuto"   onclick="setMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
-            <button class="tool-btn" id="btnDraw"   onclick="setMode('draw')">✏️ วาดเอง</button>
-            <button class="tool-btn" id="btnMyLoc"  onclick="goToMyLocation()">📍 ตำแหน่งฉัน</button>
-          </div>
-          <div class="map-hint" id="mapHint">เลือกวิธีระบุขอบเขตแปลงด้านบน</div>
-          <div class="map-wrapper" id="mapWrapper">
-            <div id="farmingMap"></div>
-          </div>
-          <button class="btn-main btn-outline btn-clear" id="clearBtn" hidden onclick="clearAll()">🗑️ ล้างขอบเขต</button>
+      <div class="alert success" id="step2Ready" hidden>
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+          <div class="alert-title">พร้อมตรวจสอบแล้ว!</div>
+          ระบบจะวิเคราะห์ NDVI, EVI, ESA WorldCover, NDWI จาก Sentinel-2
         </div>
-
-        <div class="field-info" id="fieldInfo" hidden>
-          <div class="field-stat"><span>📐 ขนาด:</span><span class="field-stat-val"><span id="areaDisplay">-</span> ไร่</span></div>
-          <div class="field-stat"><span>🪙 AgriCoins คาดการณ์:</span><span class="field-stat-val">~<span id="coinsPreview">-</span></span></div>
-        </div>
-
-        <div class="form-group" style="margin-top:0.75rem;">
-          <label class="form-label">🌾 ประเภทพืช</label>
-          <select class="form-select" id="cropType">
-            <option value="rice">🌾 ข้าว</option>
-            <option value="corn">🌽 ข้าวโพด</option>
-            <option value="sugarcane">🎋 อ้อย</option>
-            <option value="cassava">🥔 มันสำปะหลัง</option>
-            <option value="other">🌿 อื่นๆ</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">📝 ชื่อแปลง (ไม่บังคับ)</label>
-          <input type="text" class="form-input" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
-        </div>
-
-        <div class="alert error" id="step1Err" hidden>
-          <div class="alert-icon">⚠️</div>
-          <div class="alert-content" id="step1ErrText"></div>
-        </div>
-
-        <button class="btn-main btn-green" id="step1Submit" disabled onclick="submitStep1()">🌱 ลงทะเบียนเริ่มปลูก</button>
       </div>
+
+      <div id="step2Evidence" hidden></div>
+
+      <div id="step2SkipSection" hidden>
+        <div class="divider-or">Demo Mode</div>
+        <button class="btn-p btn-purple" onclick="doStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบ</button>
+      </div>
+
+      <button class="btn-p btn-blue" id="step2Submit" disabled onclick="doStep2(false)">🛰️ ตรวจสอบพืชด้วยดาวเทียม</button>
     </div>
+  </div>
 
-    <!-- ═══════════ STEP 2 ═══════════ -->
-    <div class="card" id="step2Card" hidden>
-      <div class="card-header">
-        <div class="card-icon blue">🌾</div>
-        <div><div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div><div class="card-desc">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div></div>
-      </div>
-      <div class="card-body">
-        <div class="alert info" id="step2Wait">
-          <div class="alert-icon">⏳</div>
+  <!-- ═══════════ STEP 3: Post-harvest Monitoring ═══════════ -->
+  <div class="card" id="step3Card" hidden>
+    <div class="card-header">
+      <div class="card-icon ci-amber">🔥</div>
+      <div><div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div><div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div></div>
+    </div>
+    <div class="card-body">
+
+      <!-- Pre-harvest -->
+      <div id="harvestSection">
+        <div class="alert success">
+          <div class="alert-icon">🌾</div>
           <div class="alert-content">
-            <div class="alert-title">รอการตรวจสอบ</div>
-            ต้องรออีก <strong id="step2Days">-</strong> วัน ก่อนตรวจสอบพืช
+            <div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>
+            เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่าง
           </div>
         </div>
-        <div class="alert success" id="step2Ready" hidden>
-          <div class="alert-icon">✅</div>
-          <div class="alert-content">
-            <div class="alert-title">พร้อมตรวจสอบแล้ว!</div>
-            ระบบจะวิเคราะห์ NDVI, EVI, ESA WorldCover, NDWI จาก Sentinel-2
+        <button class="btn-p btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
+      </div>
+
+      <!-- Monitoring -->
+      <div id="monitorSection" hidden>
+        <div class="monitor-card">
+          <div class="monitor-header">
+            <div class="monitor-title">🛰️ กำลังตรวจสอบ</div>
+            <div class="monitor-badge">กำลังดำเนินการ</div>
+          </div>
+          <div class="days-hero">
+            <div class="days-num" id="daysLeft">60</div>
+            <div class="days-lbl">วันที่เหลือ</div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+          <div class="progress-labels"><span>เริ่มต้น</span><span>60 วัน</span></div>
+        </div>
+
+        <!-- Map for monitoring — uses main map -->
+        <div id="monitorMapContainer"></div>
+
+        <!-- Burn scar layer controls -->
+        <div class="burn-layer-panel" id="burnLayerPanel" hidden>
+          <div class="burn-layer-row">
+            <div class="burn-layer-title">🔥 ข้อมูลการเผาจากดาวเทียม</div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="burnToggle" checked onchange="toggleBurnLayer()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="opacity-row">
+            <span>ความโปร่งใส:</span>
+            <input type="range" id="burnOpacity" min="10" max="100" value="70" oninput="setBurnOpacity(this.value)">
+            <span id="opacityVal">70%</span>
+          </div>
+          <div class="burn-legend">
+            <span><span class="legend-dot" style="background:rgba(255,0,0,.85);"></span> สูง</span>
+            <span><span class="legend-dot" style="background:rgba(255,165,0,.8);"></span> ปานกลาง</span>
+            <span><span class="legend-dot" style="background:rgba(255,255,0,.7);"></span> ต่ำ</span>
           </div>
         </div>
 
-        <div id="step2Evidence" hidden></div>
+        <!-- Burn result banner -->
+        <div id="burnBanner" hidden></div>
 
-        <div id="step2SkipSection" hidden>
+        <button class="btn-p btn-blue" onclick="doCheckBurn(false)">🔍 ตรวจสอบสถานะการเผา</button>
+
+        <div id="step3SkipSection" hidden>
           <div class="divider-or">Demo Mode</div>
-          <button class="btn-main btn-purple" onclick="doStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบ</button>
+          <button class="btn-p btn-purple" onclick="doCheckBurn(true)">🚀 ข้าม 60 วัน & รับ AgriCoins</button>
         </div>
 
-        <button class="btn-main btn-blue" id="step2Submit" disabled onclick="doStep2(false)" style="margin-top:0.75rem;">🛰️ ตรวจสอบพืชด้วยดาวเทียม</button>
-      </div>
-    </div>
-
-    <!-- ═══════════ STEP 3 ═══════════ -->
-    <div class="card" id="step3Card" hidden>
-      <div class="card-header">
-        <div class="card-icon amber">🔥</div>
-        <div><div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div><div class="card-desc">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div></div>
-      </div>
-      <div class="card-body">
-
-        <!-- Pre-harvest -->
-        <div id="harvestSection">
-          <div class="alert success">
-            <div class="alert-icon">🌾</div>
-            <div class="alert-content">
-              <div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>
-              เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่าง
-            </div>
-          </div>
-          <button class="btn-main btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
-        </div>
-
-        <!-- Monitoring -->
-        <div id="monitorSection" hidden>
-          <div class="monitor-card">
-            <div class="monitor-header">
-              <div class="monitor-title">🛰️ กำลังตรวจสอบ</div>
-              <div class="monitor-badge">กำลังดำเนินการ</div>
-            </div>
-            <div class="days-hero">
-              <div class="days-num" id="daysLeft">60</div>
-              <div class="days-lbl">วันที่เหลือ</div>
-            </div>
-            <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
-            <div class="progress-labels"><span>เริ่มต้น</span><span>60 วัน</span></div>
-          </div>
-
-          <!-- THE MAP — hero size for burn results -->
-          <div class="map-wrapper hero" id="burnMapWrapper">
-            <div id="farmingMap"></div>
-          </div>
-
-          <!-- Burn scar layer controls -->
-          <div class="burn-layer-panel" id="burnLayerPanel" hidden>
-            <div class="burn-layer-row">
-              <div class="burn-layer-title">🔥 ข้อมูลการเผาจากดาวเทียม</div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="burnToggle" checked onchange="toggleBurnLayer()">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="opacity-row">
-              <span>ความโปร่งใส:</span>
-              <input type="range" id="burnOpacity" min="10" max="100" value="70" oninput="setBurnOpacity(this.value)">
-              <span id="opacityVal">70%</span>
-            </div>
-            <div class="burn-legend">
-              <span><span class="legend-dot" style="background:rgba(255,0,0,0.85);"></span> สูง</span>
-              <span><span class="legend-dot" style="background:rgba(255,165,0,0.8);"></span> ปานกลาง</span>
-              <span><span class="legend-dot" style="background:rgba(255,255,0,0.7);"></span> ต่ำ</span>
-            </div>
-          </div>
-
-          <!-- Burn result banner -->
-          <div id="burnBanner" hidden></div>
-
-          <button class="btn-main btn-blue" style="margin-top:0.75rem;" onclick="doCheckBurn(false)">🔍 ตรวจสอบสถานะการเผา</button>
-
-          <div id="step3SkipSection" hidden>
-            <div class="divider-or">Demo Mode</div>
-            <button class="btn-main btn-purple" onclick="doCheckBurn(true)">🚀 ข้าม 60 วัน & รับ AgriCoins</button>
-          </div>
-
-          <div class="reward-strip" style="margin-top:0.75rem;">
-            <div class="reward-strip-title">🎁 รางวัลที่จะได้รับเมื่อผ่าน</div>
-            <div class="reward-grid">
-              <div class="reward-cell"><div class="reward-val" id="prevPM25">-</div><div class="reward-lbl">kg PM2.5 ลดได้</div></div>
-              <div class="reward-cell"><div class="reward-val" id="prevCO2">-</div><div class="reward-lbl">kg CO₂ ลดได้</div></div>
-              <div class="reward-cell"><div class="reward-val" id="prevCoins">-</div><div class="reward-lbl">AgriCoins</div></div>
-            </div>
+        <div class="reward-strip">
+          <div class="reward-strip-title">🎁 รางวัลที่จะได้รับเมื่อผ่าน</div>
+          <div class="reward-grid">
+            <div class="reward-cell"><div class="reward-val" id="prevPM25">-</div><div class="reward-lbl">kg PM2.5 ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val" id="prevCO2">-</div><div class="reward-lbl">kg CO₂ ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val" id="prevCoins">-</div><div class="reward-lbl">AgriCoins</div></div>
           </div>
         </div>
-
       </div>
     </div>
+  </div>
 
-    <!-- ═══════════ SUCCESS ═══════════ -->
-    <div class="card" id="successCard" hidden>
-      <div class="final-card success">
-        <div class="final-icon">🎉</div>
-        <div class="final-title">ยินดีด้วย!</div>
-        <div class="final-sub">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
-        <div class="final-coins">
-          <div>คุณได้รับ</div>
-          <div class="final-coins-num">🪙 +<span id="successCoins">0</span></div>
-          <div>AgriCoins</div>
-        </div>
-      </div>
-      <!-- Show burn-free map -->
-      <div class="map-wrapper hero" id="successMapWrapper" style="margin-top:1rem;">
-        <div id="farmingMap"></div>
-      </div>
-      <div id="successImpact"></div>
-      <button class="btn-main btn-green" style="margin-top:1rem;" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
-    </div>
-
-    <!-- ═══════════ FAILED ═══════════ -->
-    <div class="card" id="failedCard" hidden>
-      <div class="final-card failed">
-        <div class="final-icon">😔</div>
-        <div class="final-title">พบการเผา</div>
-        <div class="final-sub">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
-        <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ</div>
-      </div>
-      <div class="map-wrapper hero burn-detected" id="failedMapWrapper" style="margin-top:1rem;">
-        <div id="farmingMap"></div>
-      </div>
-      <button class="btn-main btn-green" style="margin-top:1rem;" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
-    </div>
-
-    <!-- ═══════════ HISTORY ═══════════ -->
-    <div class="card history-card" id="historyCard">
-      <div class="card-body">
-        <div class="history-title">📋 ประวัติการตรวจสอบ</div>
-        <div id="historyList"></div>
+  <!-- ═══════════ SUCCESS ═══════════ -->
+  <div class="card" id="successCard" hidden>
+    <div class="final-card success">
+      <div class="final-icon">🎉</div>
+      <div class="final-title">ยินดีด้วย!</div>
+      <div class="final-sub">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
+      <div class="final-coins">
+        <div>คุณได้รับ</div>
+        <div class="final-coins-num">🪙 +<span id="successCoins">0</span></div>
+        <div>AgriCoins</div>
       </div>
     </div>
+    <div class="mini-map" id="successMiniMap"></div>
+    <div id="successImpact"></div>
+    <button class="btn-p btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+  </div>
 
-  </div><!-- /content -->
+  <!-- ═══════════ FAILED ═══════════ -->
+  <div class="card" id="failedCard" hidden>
+    <div class="final-card failed">
+      <div class="final-icon">😔</div>
+      <div class="final-title">พบการเผา</div>
+      <div class="final-sub">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
+      <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ</div>
+    </div>
+    <div class="mini-map burn-border" id="failedMiniMap"></div>
+    <button class="btn-p btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+  </div>
 
-  <!-- Nav -->
-  <nav class="mobile-nav">
-    <a href="home.html"><div class="nav-icon">🏠</div>หน้าหลัก</a>
-    <a href="burn-verification-v2.html" class="active"><div class="nav-icon">🌾</div>ตรวจสอบ</a>
-    <a href="Stat.html"><div class="nav-icon">📊</div>สถิติ</a>
-    <a href="#" onclick="logout()"><div class="nav-icon">🚪</div>ออก</a>
-  </nav>
-</div>
+  <!-- ═══════════ HISTORY ═══════════ -->
+  <div class="card" id="historyCard">
+    <div class="card-body">
+      <div class="history-title">📋 ประวัติการตรวจสอบ</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- Nav -->
+<nav class="mobile-nav">
+  <a href="home.html"><div class="nav-icon">🏠</div>หน้าหลัก</a>
+  <a href="burn-verification-v2.html" class="active"><div class="nav-icon">🌾</div>ตรวจสอบ</a>
+  <a href="Stat.html"><div class="nav-icon">📊</div>สถิติ</a>
+  <a href="#" onclick="logout()"><div class="nav-icon">🚪</div>ออก</a>
+</nav>
 
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div><div class="spinner"></div><div class="loading-text" id="loadingText">กำลังโหลด...</div></div>
 </div>
-<div id="toast" class="toast" style="display:none;"></div>
+<div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
@@ -740,57 +766,23 @@ let demoMode       = false;
 let mapMode        = 'none';
 let savedPoly      = null;
 let burnScarLayer  = null;
-
-// The single map div — we move it between containers
-let mapDiv         = null;
-let mapMounted     = null; // which wrapper currently holds the map
+let mapInited      = false;
 
 // ═══════════════════════════════════════════════════════════════
-// MAP MANAGEMENT — single map, moved between containers
+// MAP — single map, stays in #mainMap (like signup page)
 // ═══════════════════════════════════════════════════════════════
-function mountMap(wrapperId) {
-  const wrapper = document.getElementById(wrapperId);
-  if (!wrapper || mapMounted === wrapperId) {
-    if (map) setTimeout(() => map.invalidateSize(), 50);
-    return;
-  }
-  // Detach from old parent
-  if (mapDiv && mapDiv.parentNode) mapDiv.parentNode.removeChild(mapDiv);
-  // Attach to new parent
-  const target = wrapper.querySelector('#farmingMap') || wrapper;
-  if (target.id === 'farmingMap') {
-    // Replace placeholder div
-    target.parentNode.insertBefore(mapDiv, target);
-    target.remove();
-  } else {
-    wrapper.appendChild(mapDiv);
-  }
-  mapMounted = wrapperId;
-  if (map) setTimeout(() => map.invalidateSize(), 80);
-}
-
 function initMap() {
-  // Create the actual map div
-  mapDiv = document.createElement('div');
-  mapDiv.id = 'farmingMap';
-  mapDiv.style.width = '100%';
-  mapDiv.style.height = '100%';
+  if (mapInited) { if (map) setTimeout(() => map.invalidateSize(), 100); return; }
+  mapInited = true;
 
-  // Mount into the step1 wrapper initially
-  const initWrapper = document.getElementById('mapWrapper');
-  const placeholder = initWrapper.querySelector('#farmingMap');
-  initWrapper.insertBefore(mapDiv, placeholder);
-  placeholder.remove();
-  mapMounted = 'mapWrapper';
-
-  map = L.map(mapDiv).setView([18.7883, 98.9853], 13);
+  map = L.map('mainMap').setView([18.7883, 98.9853], 13);
 
   const gHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
   const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '© Esri' });
   const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OSM' });
 
   gHybrid.addTo(map);
-  L.control.layers({ 'ดาวเทียม (Google)': gHybrid, 'ดาวเทียม (Esri)': esri, 'แผนที่ถนน': osm }, null, { position: 'topright', collapsed: true }).addTo(map);
+  L.control.layers({ '🛰️ ดาวเทียม (Google)': gHybrid, '🛰️ ดาวเทียม (Esri)': esri, '🗺️ แผนที่ถนน': osm }, null, { position: 'topright', collapsed: true }).addTo(map);
   L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
 
   drawnItems = new L.FeatureGroup();
@@ -800,6 +792,51 @@ function initMap() {
     if (mapMode !== 'auto') return;
     await autoDetect(e.latlng.lat, e.latlng.lng);
   });
+
+  setTimeout(() => map.invalidateSize(), 150);
+}
+
+/**
+ * Move the main map element into a different container (for monitoring view).
+ * If containerId is null, move it back to the step1 location.
+ */
+function moveMapTo(containerId) {
+  const mapEl = document.getElementById('mainMap');
+  if (!mapEl) return;
+  const target = containerId ? document.getElementById(containerId) : null;
+
+  if (target) {
+    target.innerHTML = '';
+    target.appendChild(mapEl);
+  } else {
+    // Move back to step 1 (before the area badge)
+    const badge = document.getElementById('areaBadge');
+    if (badge && badge.parentNode) {
+      badge.parentNode.insertBefore(mapEl, badge);
+    }
+  }
+  if (map) setTimeout(() => map.invalidateSize(), 80);
+}
+
+/**
+ * Create a mini Leaflet map for result views (like signup review map)
+ */
+function createMiniMap(containerId, polygon, style) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const mm = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, attributionControl: false }).setView([18.7883, 98.9853], 13);
+  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(mm);
+
+  if (polygon) {
+    const latlngs = polygon.coordinates[0].map(c => [c[1], c[0]]);
+    const s = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.4 };
+    const layer = L.polygon(latlngs, s);
+    layer.addTo(mm);
+    mm.fitBounds(layer.getBounds(), { padding: [10, 10] });
+  }
+  return mm;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -809,7 +846,7 @@ function toggleDemo() {
   demoMode = document.getElementById('demoToggle').checked;
   document.getElementById('demoBadge').style.display = demoMode ? 'inline' : 'none';
   document.getElementById('demoAlert').hidden = !demoMode;
-  Toast.info(demoMode ? '🚀 Demo Mode ON' : 'Demo Mode OFF');
+  showToast(demoMode ? '🚀 Demo Mode ON' : 'Demo Mode OFF', '');
   if (activeCycle) renderCycle(activeCycle);
 }
 
@@ -858,7 +895,7 @@ function removeBurnScar() {
 // ═══════════════════════════════════════════════════════════════
 function displayPoly(geojson, style) {
   drawnItems.clearLayers();
-  const s = style || { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 };
+  const s = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 };
   const latlngs = geojson.coordinates[0].map(c => [c[1], c[0]]);
   const layer = L.polygon(latlngs, s);
   drawnItems.addLayer(layer);
@@ -880,43 +917,44 @@ function calcCoins(rai) {
 function updatePreview(rai) {
   document.getElementById('areaDisplay').textContent = rai.toFixed(2);
   document.getElementById('coinsPreview').textContent = calcCoins(rai);
-  document.getElementById('fieldInfo').hidden = false;
-  document.getElementById('clearBtn').hidden = false;
+  document.getElementById('areaBadge').classList.add('show');
+  document.getElementById('clearBtn').style.display = 'block';
   document.getElementById('step1Submit').disabled = false;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAP MODES
+// MAP MODES (same approach as signup page)
 // ═══════════════════════════════════════════════════════════════
 function setMode(mode) {
   mapMode = mode;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active', 'active-blue', 'active-amber', 'active-purple'));
-  map.getContainer().classList.remove('crosshair');
+  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
+  const mapEl = document.getElementById('mainMap');
+  mapEl.classList.remove('crosshair');
   if (drawControl) { map.removeControl(drawControl); drawControl = null; }
 
   if (mode === 'saved') {
-    document.getElementById('btnSaved').classList.add('active');
+    document.getElementById('btnSaved').classList.add('mg');
     if (savedPoly) {
       displayPoly(savedPoly);
       selectedPoly = savedPoly;
       updatePreview(computeRai(savedPoly));
       document.getElementById('mapHint').textContent = '✅ โหลดแปลงที่บันทึกไว้แล้ว';
-      Toast.success('โหลดแปลงสำเร็จ');
+      showToast('โหลดแปลงสำเร็จ', 'green');
     } else {
       document.getElementById('mapHint').textContent = '⚠️ ยังไม่มีแปลงที่บันทึกไว้';
-      Toast.warning('ยังไม่มีแปลง');
+      showToast('ยังไม่มีแปลง', 'red');
     }
   } else if (mode === 'auto') {
-    document.getElementById('btnAuto').classList.add('active-blue');
-    map.getContainer().classList.add('crosshair');
-    document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลง';
-    Toast.info('คลิกบนแผนที่เพื่อตรวจจับแปลง');
+    document.getElementById('btnAuto').classList.add('ma');
+    mapEl.classList.add('crosshair');
+    document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ';
+    showToast('คลิกบนแผนที่เพื่อตรวจจับแปลง', '');
   } else if (mode === 'draw') {
-    document.getElementById('btnDraw').classList.add('active-amber');
-    document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต แล้วกด Finish';
+    document.getElementById('btnDraw').classList.add('md');
+    document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต กด "Finish" เมื่อเสร็จ';
     drawControl = new L.Control.Draw({
       draw: {
-        polygon: { allowIntersection: false, showArea: true, shapeOptions: { color: '#10B981', weight: 3, fillColor: '#34D399', fillOpacity: 0.3 } },
+        polygon: { allowIntersection: false, showArea: true, shapeOptions: { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 } },
         polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
       },
       edit: { featureGroup: drawnItems, remove: true }
@@ -931,7 +969,7 @@ function setMode(mode) {
       selectedPoly = { type: 'Polygon', coordinates: [coords] };
       updatePreview((L.GeometryUtil.geodesicArea(ll) / 10000) * HA_TO_RAI);
       document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อย';
-      Toast.success('วาดขอบเขตเรียบร้อย!');
+      showToast('✅ วาดขอบเขตสำเร็จ', 'green');
     });
   }
 }
@@ -946,9 +984,9 @@ async function autoDetect(lat, lng) {
       selectedPoly = r.polygon;
       updatePreview(r.farm_area_ha * HA_TO_RAI);
       document.getElementById('mapHint').textContent = '✅ ตรวจจับสำเร็จ';
-      Toast.success('ตรวจจับแปลงสำเร็จ!');
-    } else { Toast.error('ไม่พบแปลง ลองคลิกตำแหน่งอื่น'); }
-  } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
+      showToast('🛰️ ตรวจจับแปลงสำเร็จ', 'green');
+    } else { showToast('ไม่พบแปลง ลองคลิกตำแหน่งอื่น', 'red'); }
+  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
 }
 
 async function goToMyLocation() {
@@ -958,11 +996,11 @@ async function goToMyLocation() {
     hideLoading();
     const { latitude: lat, longitude: lng } = pos.coords;
     map.setView([lat, lng], 17);
-    document.getElementById('btnMyLoc').classList.add('active-purple');
-    L.marker([lat, lng]).addTo(map).bindPopup('ตำแหน่งของคุณ').openPopup();
+    document.getElementById('btnMyLoc').classList.add('ml');
+    L.marker([lat, lng]).addTo(map).bindPopup('📍 ตำแหน่งของคุณ').openPopup();
     if (mapMode === 'auto') await autoDetect(lat, lng);
-    else Toast.success('ปรับแผนที่ไปยังตำแหน่งของคุณ');
-  } catch { hideLoading(); Toast.error('ไม่สามารถระบุตำแหน่งได้'); }
+    else showToast('📍 ปรับแผนที่ไปยังตำแหน่งของคุณ', 'green');
+  } catch { hideLoading(); showToast('ไม่สามารถระบุตำแหน่งได้', 'red'); }
 }
 
 function clearAll() {
@@ -970,18 +1008,28 @@ function clearAll() {
   selectedPoly = null;
   mapMode = 'none';
   removeBurnScar();
-  document.getElementById('fieldInfo').hidden = true;
-  document.getElementById('clearBtn').hidden = true;
+  document.getElementById('areaBadge').classList.remove('show');
+  document.getElementById('clearBtn').style.display = 'none';
   document.getElementById('step1Submit').disabled = true;
   document.getElementById('mapHint').textContent = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active', 'active-blue', 'active-amber', 'active-purple'));
+  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
+  document.getElementById('mainMap').classList.remove('crosshair');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// LOADING / HIDING
+// LOADING / TOAST
 // ═══════════════════════════════════════════════════════════════
 function showLoading(t) { document.getElementById('loadingText').textContent = t || 'กำลังโหลด...'; document.getElementById('loadingOverlay').classList.add('show'); }
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type === 'green' ? ' green' : type === 'red' ? ' red' : '');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // RENDER SATELLITE EVIDENCE
@@ -1009,7 +1057,7 @@ function renderEvidence(v, id) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// RENDER BURN RESULT (map coloring + banner)
+// RENDER BURN RESULT
 // ═══════════════════════════════════════════════════════════════
 function renderBurn(result) {
   const ba = result.burn_analysis || result;
@@ -1021,19 +1069,16 @@ function renderBurn(result) {
   drawnItems.eachLayer(layer => {
     if (!layer.setStyle) return;
     layer.setStyle(burned
-      ? { color: '#EF4444', fillColor: '#FCA5A5', fillOpacity: 0.4 }
-      : { color: '#10B981', fillColor: '#6EE7B7', fillOpacity: 0.35 });
+      ? { color: '#c0392b', fillColor: '#e74c3c', fillOpacity: 0.4 }
+      : { color: '#7FAD6B', fillColor: '#a5c995', fillOpacity: 0.35 });
     layer.bindPopup(burned
       ? `⚠️ พบการเผา ${ba.burn_percentage || 0}%`
       : `✅ ไม่พบการเผา — แปลงสะอาด`).openPopup();
   });
 
-  // Update map wrapper border
-  const mw = document.getElementById('burnMapWrapper');
-  if (mw) {
-    mw.classList.toggle('burn-detected', burned);
-    mw.classList.toggle('hero', true);
-  }
+  // Update map border
+  const mapEl = document.getElementById('mainMap');
+  mapEl.classList.toggle('burn-border', burned);
 
   // Banner
   const banner = document.getElementById('burnBanner');
@@ -1051,7 +1096,6 @@ function renderBurn(result) {
     </div>`;
   banner.hidden = false;
 
-  // Load GeoTIFF overlay
   loadBurnScar();
 }
 
@@ -1062,18 +1106,20 @@ function hideAll() {
   ['noCycleCard', 'step1Card', 'step2Card', 'step3Card', 'successCard', 'failedCard'].forEach(id => {
     document.getElementById(id).hidden = true;
   });
+  // Always move map back to step1 container when switching views
+  moveMapTo(null);
 }
 
 function updateStepper(cur, status) {
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById('sStep' + i);
     const line = document.getElementById('sLine' + (i - 1));
-    el.classList.remove('active', 'completed', 'failed');
+    el.classList.remove('active', 'done', 'failed');
     if (line) line.classList.remove('done');
 
-    if (status === 'completed') { el.classList.add('completed'); if (line) line.classList.add('done'); }
-    else if (status === 'failed' && i <= cur) { el.classList.add(i === cur ? 'failed' : 'completed'); if (line && i <= cur) line.classList.add('done'); }
-    else if (i < cur) { el.classList.add('completed'); if (line) line.classList.add('done'); }
+    if (status === 'completed') { el.classList.add('done'); if (line) line.classList.add('done'); }
+    else if (status === 'failed' && i <= cur) { el.classList.add(i === cur ? 'failed' : 'done'); if (line && i <= cur) line.classList.add('done'); }
+    else if (i < cur) { el.classList.add('done'); if (line) line.classList.add('done'); }
     else if (i === cur) { el.classList.add('active'); if (line) line.classList.add('done'); }
   }
 }
@@ -1083,14 +1129,15 @@ function showStep(n) {
   updateStepper(n, 'in_progress');
   if (n === 1) {
     document.getElementById('step1Card').hidden = false;
-    mountMap('mapWrapper');
+    moveMapTo(null); // ensure map is in step1
+    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
     if (savedPoly && !selectedPoly) {
       setTimeout(() => {
         displayPoly(savedPoly);
         selectedPoly = savedPoly;
         updatePreview(computeRai(savedPoly));
         document.getElementById('mapHint').textContent = '✅ โหลดแปลงอัตโนมัติ';
-        document.getElementById('btnSaved').classList.add('active');
+        document.getElementById('btnSaved').classList.add('mg');
         mapMode = 'saved';
       }, 150);
     }
@@ -1126,14 +1173,14 @@ function renderCycle(c) {
   if (c.final_status === 'completed') {
     document.getElementById('successCard').hidden = false;
     document.getElementById('successCoins').textContent = Math.round(c.reward?.agricoin_awarded || 0);
-    mountMap('successMapWrapper');
-    if (c.polygon) {
-      displayPoly(c.polygon, { color: '#10B981', weight: 3, fillColor: '#6EE7B7', fillOpacity: 0.35 });
-    }
+    // Create mini map for success
+    setTimeout(() => {
+      createMiniMap('successMiniMap', c.polygon, { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.35 });
+    }, 200);
     const rai = c.area_rai || 0;
     if (rai > 0) {
       document.getElementById('successImpact').innerHTML = `
-        <div class="impact-strip" style="margin-top:0.75rem;">
+        <div class="impact-strip">
           <div class="impact-title">🌍 ผลกระทบเชิงบวก</div>
           <div class="impact-grid">
             <div class="impact-cell"><div class="impact-val">${(rai * PM25_PER_RAI).toFixed(1)} kg</div><div class="impact-lbl">PM2.5 ลดได้</div></div>
@@ -1143,10 +1190,12 @@ function renderCycle(c) {
     }
     return;
   }
+
   if (c.final_status === 'failed') {
     document.getElementById('failedCard').hidden = false;
-    mountMap('failedMapWrapper');
-    if (c.polygon) displayPoly(c.polygon, { color: '#EF4444', weight: 3, fillColor: '#FCA5A5', fillOpacity: 0.4 });
+    setTimeout(() => {
+      createMiniMap('failedMiniMap', c.polygon, { color: '#c0392b', weight: 3, fillColor: '#e74c3c', fillOpacity: 0.4 });
+    }, 200);
     return;
   }
 
@@ -1182,8 +1231,9 @@ function renderCycle(c) {
       document.getElementById('harvestSection').hidden = true;
       document.getElementById('monitorSection').hidden = false;
 
-      // Mount map into the burn map wrapper
-      mountMap('burnMapWrapper');
+      // Move map into the monitor container
+      moveMapTo('monitorMapContainer');
+      document.getElementById('mainMap').style.height = '380px';
       if (c.polygon) displayPoly(c.polygon);
 
       const days = c.days_info?.days_remaining_monitoring ?? c.steps.step3.days_remaining ?? 60;
@@ -1197,7 +1247,6 @@ function renderCycle(c) {
       document.getElementById('prevCoins').textContent = calcCoins(rai);
       document.getElementById('step3SkipSection').hidden = !demoMode;
 
-      // Clear previous burn result
       document.getElementById('burnBanner').hidden = true;
     } else {
       document.getElementById('harvestSection').hidden = false;
@@ -1226,7 +1275,7 @@ async function submitStep1() {
     const r = await res.json();
     hideLoading();
     if (r.success) {
-      Toast.success(r.message || 'ลงทะเบียนสำเร็จ!');
+      showToast(r.message || 'ลงทะเบียนสำเร็จ!', 'green');
       await loadStatus();
     } else {
       showErr(r.error || 'เกิดข้อผิดพลาด');
@@ -1238,7 +1287,7 @@ async function submitStep1() {
 function showErr(msg) {
   document.getElementById('step1ErrText').textContent = msg;
   document.getElementById('step1Err').hidden = false;
-  Toast.error(msg);
+  showToast(msg, 'red');
 }
 
 async function doStep2(skip) {
@@ -1255,18 +1304,18 @@ async function doStep2(skip) {
     if (r.verification) renderEvidence(r.verification, 'step2Evidence');
 
     if (r.success && r.crops_verified) {
-      Toast.success('✅ ตรวจพบพืช!' + (r.demo_mode ? ' (Demo)' : ''));
+      showToast('✅ ตรวจพบพืช!' + (r.demo_mode ? ' (Demo)' : ''), 'green');
       document.getElementById('step2Submit').disabled = true;
       document.getElementById('step2Submit').textContent = '✅ ผ่าน — กำลังไปขั้นตอนถัดไป...';
       setTimeout(() => loadStatus(), 3000);
     } else if (!r.success && r.days_remaining) {
-      Toast.warning(`⏳ ต้องรออีก ${r.days_remaining} วัน`);
+      showToast(`⏳ ต้องรออีก ${r.days_remaining} วัน`, '');
       document.getElementById('step2Days').textContent = r.days_remaining;
       if (demoMode) document.getElementById('step2SkipSection').hidden = false;
     } else {
-      Toast.warning('⚠️ ' + (r.message || r.error || 'ไม่พบพืชในแปลง'));
+      showToast('⚠️ ' + (r.message || r.error || 'ไม่พบพืชในแปลง'), 'red');
     }
-  } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
+  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
 }
 
 async function doHarvest() {
@@ -1279,15 +1328,15 @@ async function doHarvest() {
     if (r.success) {
       if (r.harvest_satellite_check) {
         const h = r.harvest_satellite_check;
-        Toast.info(h.harvest_detected
+        showToast(h.harvest_detected
           ? `🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop || 0).toFixed(2)})`
-          : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว แต่รับคำแจ้งแล้ว');
+          : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว', '');
       }
-      Toast.success(r.message);
+      showToast(r.message, 'green');
       document.getElementById('harvestSection').hidden = true;
       setTimeout(() => loadStatus(), 2000);
-    } else { Toast.error(r.error); }
-  } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
+    } else { showToast(r.error, 'red'); }
+  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
 }
 
 async function doCheckBurn(skip) {
@@ -1298,24 +1347,22 @@ async function doCheckBurn(skip) {
     });
     hideLoading();
 
-    // Render burn analysis on the map (BIG MAP, hero size)
     if (r.burn_analysis) renderBurn(r);
 
     if (r.status === 'completed') {
-      Toast.success(r.message);
+      showToast(r.message, 'green');
       setTimeout(() => loadStatus(), 3500);
     } else if (r.status === 'failed') {
-      Toast.error(r.message);
+      showToast(r.message, 'red');
       setTimeout(() => loadStatus(), 3500);
     } else {
-      // Still monitoring — update in-place, don't reload
-      Toast.success(r.message);
+      showToast(r.message, 'green');
       if (r.monitoring) {
         document.getElementById('daysLeft').textContent = r.monitoring.days_remaining;
         document.getElementById('progressBar').style.width = Math.min(((60 - r.monitoring.days_remaining) / 60) * 100, 100) + '%';
       }
     }
-  } catch (e) { hideLoading(); Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
+  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1323,7 +1370,7 @@ async function doCheckBurn(skip) {
 // ═══════════════════════════════════════════════════════════════
 function renderHistory(list) {
   const el = document.getElementById('historyList');
-  if (!list.length) { el.innerHTML = '<div style="text-align:center;color:var(--ink-light);padding:1rem;">ยังไม่มีประวัติ</div>'; return; }
+  if (!list.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:1rem;">ยังไม่มีประวัติ</div>'; return; }
   el.innerHTML = list.map(h => {
     const icon = h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳';
     const reward = h.final_status === 'completed' ? '+' + Math.round(h.agricoin_awarded) : '-';
@@ -1345,15 +1392,18 @@ function renderHistory(list) {
 // ═══════════════════════════════════════════════════════════════
 function startNew() {
   activeCycle = null; selectedPoly = null;
-  drawnItems.clearLayers(); mapMode = 'none';
+  if (drawnItems) drawnItems.clearLayers();
+  mapMode = 'none';
   removeBurnScar();
-  document.getElementById('fieldInfo').hidden = true;
-  document.getElementById('clearBtn').hidden = true;
+  document.getElementById('areaBadge').classList.remove('show');
+  document.getElementById('clearBtn').style.display = 'none';
   document.getElementById('step1Err').hidden = true;
   document.getElementById('step1Submit').disabled = true;
   document.getElementById('fieldName').value = '';
   document.getElementById('mapHint').textContent = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active', 'active-blue', 'active-amber', 'active-purple'));
+  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
+  document.getElementById('mainMap').classList.remove('crosshair', 'burn-border');
+  document.getElementById('mainMap').style.height = '320px';
   document.getElementById('step2Evidence').hidden = true;
   document.getElementById('burnBanner').hidden = true;
   showStep(1);
@@ -1377,7 +1427,7 @@ async function init() {
       savedPoly = data.polygon;
       const btn = document.getElementById('btnSaved');
       btn.textContent = '💾 แปลงของฉัน ✓';
-      btn.style.borderColor = '#10B981';
+      btn.style.borderColor = '#7FAD6B';
     }
   } catch (e) { console.warn('No saved polygon:', e); }
 
