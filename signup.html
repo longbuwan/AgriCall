@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AgriCall - สมัครสมาชิก</title>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <style>
+    :root {
+      --green:       #7FAD6B;
+      --green-dark:  #5a9447;
+      --green-light: #a5c995;
+      --cream:       #F7F5F0;
+      --white:       #FFFFFF;
+      --text-dark:   #1a2e1a;
+      --text-med:    #5a6b5a;
+      --text-light:  #9aaa9a;
+      --border:      #dde8dd;
+      --amber:       #e07b39;
+      --blue:        #5b8ac8;
+      --shadow-md:   0 4px 16px rgba(60,90,60,0.12);
+      --shadow-lg:   0 8px 32px rgba(60,90,60,0.16);
+      --r-sm:8px; --r-md:12px; --r-lg:18px; --r-xl:24px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Prompt',sans-serif;background:var(--cream);min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;top:-100px;right:-100px;width:360px;height:360px;
+      background:radial-gradient(circle,rgba(127,173,107,0.15) 0%,transparent 65%);pointer-events:none;z-index:0;}
+
+    /* TOPBAR */
+    .topbar{position:sticky;top:0;z-index:100;background:var(--white);
+      box-shadow:0 1px 8px rgba(60,90,60,0.1);padding:0 1rem;
+      display:flex;align-items:center;justify-content:space-between;height:56px;}
+    .topbar-logo{font-family:'Itim',cursive;font-size:1.5rem;color:var(--green);display:flex;align-items:center;gap:.4rem;}
+    .topbar-logo span{font-size:1.6rem;}
+    .topbar-right{font-size:.8125rem;color:var(--text-med);}
+    .topbar-right a{color:var(--green);font-weight:700;text-decoration:none;}
+
+    /* STEPPER */
+    .stepper-wrap{background:var(--white);border-bottom:1px solid var(--border);
+      padding:.875rem 1rem;position:sticky;top:56px;z-index:99;}
+    .stepper{display:flex;align-items:center;justify-content:center;gap:0;max-width:480px;margin:0 auto;}
+    .st{display:flex;flex-direction:column;align-items:center;gap:.25rem;position:relative;z-index:1;}
+    .st-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:var(--white);
+      display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;
+      color:var(--text-light);transition:all .3s;}
+    .st-label{font-size:.6rem;color:var(--text-light);white-space:nowrap;transition:color .3s;}
+    .st-line{flex:1;height:2px;background:var(--border);margin-bottom:18px;min-width:24px;max-width:56px;transition:background .3s;}
+    .st.active .st-circle{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 0 4px rgba(127,173,107,.2);}
+    .st.active .st-label{color:var(--green);font-weight:700;}
+    .st.done .st-circle{background:var(--green-light);border-color:var(--green-light);color:var(--green-dark);}
+    .st.done .st-label{color:var(--green-dark);}
+    .st.done+.st-line{background:var(--green-light);}
+
+    /* CONTENT */
+    .content{max-width:520px;margin:0 auto;padding:1.25rem 1rem 4rem;position:relative;z-index:1;}
+
+    /* FORM STEPS */
+    .form-step{display:none;}
+    .form-step.active{display:block;animation:slideUp .3s ease;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+    /* CARD */
+    .card{background:var(--white);border-radius:var(--r-xl);box-shadow:var(--shadow-md);overflow:hidden;}
+    .card-header{display:flex;align-items:center;gap:.875rem;padding:1.25rem 1.25rem 1rem;border-bottom:1.5px solid var(--border);}
+    .card-icon{width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+    .ci-green {background:linear-gradient(135deg,#10B981,#059669);}
+    .ci-blue  {background:linear-gradient(135deg,#3B82F6,#2563EB);}
+    .ci-amber {background:linear-gradient(135deg,#F59E0B,#D97706);}
+    .ci-purple{background:linear-gradient(135deg,#8B5CF6,#7C3AED);}
+    .card-title{font-size:1.1rem;font-weight:700;color:var(--text-dark);margin-bottom:.15rem;}
+    .card-sub{font-size:.8rem;color:var(--text-med);}
+    .card-body{padding:1.25rem;}
+
+    /* TYPE SELECTOR */
+    .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;}
+    .type-opt input{position:absolute;opacity:0;width:0;height:0;}
+    .type-card{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:1rem .5rem;border:2px solid var(--border);border-radius:var(--r-md);
+      cursor:pointer;transition:all .25s;text-align:center;min-height:105px;position:relative;}
+    .type-card:hover{border-color:var(--green-light);}
+    .type-icon{font-size:2.2rem;margin-bottom:.3rem;filter:grayscale(100%);transition:filter .25s;}
+    .type-name{font-size:.78rem;font-weight:600;color:var(--text-med);}
+    .type-sub{font-size:.66rem;color:var(--text-light);margin-top:.1rem;}
+    .chk{position:absolute;top:5px;right:5px;width:17px;height:17px;border-radius:50%;
+      background:var(--green);color:#fff;display:none;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;}
+    .type-opt input:checked+.type-card{border-color:var(--green);background:rgba(127,173,107,.06);}
+    .type-opt input:checked+.type-card .type-icon{filter:grayscale(0%);}
+    .type-opt input:checked+.type-card .type-name{color:var(--green);font-weight:700;}
+    .type-opt input:checked+.type-card .chk{display:flex;}
+    .role-desc{border-radius:var(--r-md);padding:.875rem 1rem;border:1.5px solid rgba(127,173,107,.25);
+      background:rgba(127,173,107,.04);font-size:.82rem;color:var(--text-med);line-height:1.6;margin-top:1rem;}
+    .role-desc strong{color:var(--green);display:block;margin-bottom:.2rem;font-size:.875rem;}
+
+    /* FIELDS */
+    .field{margin-bottom:1rem;}
+    .field label{display:block;font-size:.8125rem;font-weight:600;color:var(--text-dark);margin-bottom:.4rem;}
+    .field input,.field select,.field textarea{
+      width:100%;padding:.8rem 1rem;border:2px solid var(--border);border-radius:var(--r-md);
+      font-family:'Prompt',sans-serif;font-size:.9375rem;color:var(--text-dark);background:var(--white);
+      transition:border-color .2s,box-shadow .2s;appearance:none;}
+    .field input:focus,.field select:focus,.field textarea:focus{
+      outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(127,173,107,.12);}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    .phone-row{display:flex;gap:.5rem;}
+    .cc{width:68px!important;min-width:68px!important;max-width:68px!important;
+      text-align:center;background:var(--cream)!important;font-weight:700;font-size:.875rem!important;}
+    .hint{font-size:.72rem;color:var(--text-light);margin-top:.3rem;}
+
+    /* FARMER / BALER SECTIONS */
+    .extra-section{border-radius:var(--r-md);padding:1rem;margin-top:.75rem;}
+    .extra-section.farmer{background:rgba(127,173,107,.05);border:1.5px dashed rgba(127,173,107,.4);}
+    .extra-section.baler{background:rgba(224,123,57,.05);border:1.5px dashed rgba(224,123,57,.4);}
+    .extra-title{font-size:.8rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.35rem;}
+    .extra-title.farmer{color:var(--green);}
+    .extra-title.baler{color:var(--amber);}
+
+    /* MAP */
+    .map-section{margin-top:1.25rem;}
+    .map-section-title{font-size:.875rem;font-weight:700;color:var(--text-dark);
+      margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+    .map-section-title small{font-size:.68rem;color:var(--text-light);font-weight:400;}
+    .map-toolbar{display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;}
+    .mbtn{flex:1;min-width:75px;padding:.55rem .5rem;border:2px solid var(--border);border-radius:var(--r-md);
+      background:var(--white);font-family:'Prompt',sans-serif;font-size:.78rem;font-weight:500;
+      color:var(--text-dark);cursor:pointer;text-align:center;transition:all .2s;}
+    .mbtn:hover{border-color:var(--green);background:#f0fdf4;}
+    .mbtn.ma{background:#3B82F6;border-color:#3B82F6;color:#fff;}
+    .mbtn.md{background:#F59E0B;border-color:#F59E0B;color:#fff;}
+    .mbtn.ml{background:#8B5CF6;border-color:#8B5CF6;color:#fff;}
+    .map-hint{font-size:.8rem;color:var(--text-med);background:#F0F9FF;border-radius:var(--r-sm);
+      padding:.45rem .7rem;margin-bottom:.5rem;border-left:3px solid #3B82F6;min-height:2rem;}
+    #signupMap{height:320px;border-radius:var(--r-lg);border:2px solid var(--border);overflow:hidden;}
+    #signupMap.mode-auto{cursor:crosshair!important;}
+    .area-badge{display:none;margin-top:.625rem;background:rgba(16,185,129,.1);
+      border:1.5px solid rgba(16,185,129,.3);border-radius:var(--r-md);padding:.75rem 1rem;
+      font-size:.8125rem;color:var(--text-dark);}
+    .area-badge.show{display:block;}
+    .area-badge strong{color:#059669;}
+    .clear-btn{width:100%;margin-top:.5rem;padding:.6rem;border:2px solid var(--border);
+      border-radius:var(--r-md);background:var(--white);font-family:'Prompt',sans-serif;
+      font-size:.8rem;color:var(--text-med);cursor:pointer;transition:all .2s;display:none;}
+    .clear-btn:hover{border-color:#EF4444;color:#EF4444;}
+
+    /* REVIEW */
+    .rev-block{background:var(--cream);border-radius:var(--r-md);padding:1rem 1.125rem;border:1.5px solid var(--border);}
+    .rev-block+.rev-block{margin-top:.75rem;}
+    .rev-label{font-size:.68rem;font-weight:700;color:var(--text-light);text-transform:uppercase;
+      letter-spacing:.06em;margin-bottom:.5rem;}
+    .rev-row{display:flex;justify-content:space-between;align-items:center;font-size:.8125rem;padding:.225rem 0;}
+    .rev-row span:first-child{color:var(--text-med);}
+    .rev-row span:last-child{color:var(--text-dark);font-weight:500;}
+    .rev-map{height:140px;border-radius:var(--r-sm);border:1.5px solid var(--border);overflow:hidden;margin-top:.5rem;}
+
+    /* TERMS */
+    .terms-row{display:flex;align-items:flex-start;gap:.625rem;cursor:pointer;margin:1rem 0 0;}
+    .terms-row input[type=checkbox]{width:17px;height:17px;min-width:17px;margin-top:2px;accent-color:var(--green);cursor:pointer;}
+    .terms-row span{font-size:.8rem;color:var(--text-med);line-height:1.5;}
+    .terms-row a{color:var(--green);font-weight:700;text-decoration:none;}
+
+    /* BUTTONS */
+    .btn-p{width:100%;padding:.95rem;background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);
+      color:#fff;border:none;border-radius:var(--r-md);font-family:'Prompt',sans-serif;font-size:1rem;font-weight:600;
+      cursor:pointer;box-shadow:0 4px 14px rgba(127,173,107,.35);transition:transform .15s,box-shadow .15s;margin-top:1rem;}
+    .btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(127,173,107,.42);}
+    .btn-p:active{transform:scale(.98);}
+    .btn-o{width:100%;padding:.875rem;background:var(--white);color:var(--green);
+      border:2px solid var(--green);border-radius:var(--r-md);font-family:'Prompt',sans-serif;
+      font-size:.9375rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:.625rem;}
+    .btn-o:hover{background:rgba(127,173,107,.05);}
+    .btn-row{display:flex;gap:.75rem;margin-top:.75rem;}
+    .btn-row .btn-p,.btn-row .btn-o{margin-top:0;flex:1;}
+
+    /* OTP */
+    .otp-info{background:rgba(91,138,200,.08);border:1px solid rgba(91,138,200,.2);
+      border-radius:var(--r-md);padding:1rem;text-align:center;margin-bottom:1rem;}
+    .otp-info-icon{font-size:2rem;margin-bottom:.4rem;}
+    .otp-info-text{font-size:.875rem;color:var(--text-med);line-height:1.5;}
+    .otp-info-phone{font-weight:700;color:var(--text-dark);font-size:1.1rem;margin-top:.2rem;}
+    .otp-row{display:flex;gap:.625rem;justify-content:center;margin:1.25rem 0;}
+    .otp-box{width:56px;height:62px;text-align:center;font-size:1.5rem;font-weight:700;
+      border:2px solid var(--border);border-radius:var(--r-md);font-family:'Prompt',sans-serif;transition:all .25s;}
+    .otp-box:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(127,173,107,.15);}
+    .otp-box.filled{border-color:var(--green);background:rgba(127,173,107,.05);}
+    .resend{text-align:center;font-size:.8125rem;color:var(--text-med);margin-top:.75rem;}
+    .resend a{color:var(--green);font-weight:700;cursor:pointer;}
+    .resend a.off{color:var(--text-light);cursor:not-allowed;}
+
+    /* SUCCESS */
+    .success-screen{background:var(--white);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);padding:2.5rem 1.5rem;text-align:center;}
+    .success-anim{font-size:5rem;display:inline-block;animation:popIn .55s cubic-bezier(.175,.885,.32,1.275);margin-bottom:.75rem;}
+    @keyframes popIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}100%{transform:scale(1) rotate(0);opacity:1;}}
+    .success-screen h2{font-family:'Itim',cursive;font-size:1.75rem;color:var(--green);margin-bottom:.5rem;}
+    .success-screen p{font-size:.9rem;color:var(--text-med);line-height:1.7;}
+    .user-pill{display:inline-flex;align-items:center;gap:.5rem;background:rgba(127,173,107,.1);
+      border:1.5px solid rgba(127,173,107,.3);border-radius:99px;padding:.5rem 1.25rem;
+      margin:1rem 0;font-weight:700;color:var(--green);font-size:.9375rem;}
+
+    /* AVATAR */
+    .avatar-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
+    .avatar-circle{width:64px;height:64px;border-radius:50%;flex-shrink:0;
+      background:rgba(127,173,107,.1);border:2.5px dashed var(--green-light);
+      display:flex;align-items:center;justify-content:center;font-size:1.75rem;
+      cursor:pointer;transition:background .2s;overflow:hidden;}
+    .avatar-circle:hover{background:rgba(127,173,107,.18);}
+    .avatar-text strong{display:block;font-size:.8125rem;color:var(--text-dark);margin-bottom:.15rem;}
+    .avatar-text span{font-size:.72rem;color:var(--text-light);}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%) translateY(80px);
+      background:var(--text-dark);color:#fff;padding:.7rem 1.25rem;border-radius:var(--r-md);
+      font-size:.875rem;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-width:90vw;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.green{background:var(--green);}
+    .toast.red{background:#c0392b;}
+
+    @media(max-width:400px){
+      .field-row{grid-template-columns:1fr;}
+      .type-grid{gap:.4rem;}
+      .type-card{padding:.75rem .25rem;min-height:95px;}
+      .type-icon{font-size:1.9rem;}
+      #signupMap{height:270px;}
+      .otp-box{width:48px;height:55px;font-size:1.25rem;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo"><span>🌾</span> AgriCall</div>
+  <div class="topbar-right">มีบัญชีแล้ว? <a href="#">เข้าสู่ระบบ</a></div>
+</div>
+
+<div class="stepper-wrap" id="stepperWrap">
+  <div class="stepper">
+    <div class="st active" id="dot1"><div class="st-circle">1</div><div class="st-label">ประเภท</div></div>
+    <div class="st-line" id="line1"></div>
+    <div class="st" id="dot2"><div class="st-circle">2</div><div class="st-label">ข้อมูล</div></div>
+    <div class="st-line" id="line2"></div>
+    <div class="st" id="dot3"><div class="st-circle">3</div><div class="st-label">OTP</div></div>
+    <div class="st-line" id="line3"></div>
+    <div class="st" id="dot4"><div class="st-circle">4</div><div class="st-label">ยืนยัน</div></div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ══════ STEP 1: Role ══════ -->
+  <div class="form-step active" id="s1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon ci-green">👤</div>
+        <div>
+          <div class="card-title">สมัครสมาชิก AgriCall</div>
+          <div class="card-sub">เลือกประเภทผู้ใช้ก่อนเริ่มต้น</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:.8125rem;font-weight:600;color:var(--text-med);margin-bottom:.625rem;">เลือกประเภทผู้ใช้ / Choose your role</div>
+        <div class="type-grid">
+          <div class="type-opt"><input type="radio" name="utype" id="tc" value="customer"><label for="tc" class="type-card"><span class="chk">✓</span><span class="type-icon">👨‍💼</span><span class="type-name">ลูกค้า</span><span class="type-sub">Customer</span></label></div>
+          <div class="type-opt"><input type="radio" name="utype" id="tf" value="farmer" checked><label for="tf" class="type-card"><span class="chk">✓</span><span class="type-icon">👨‍🌾</span><span class="type-name">เกษตรกร</span><span class="type-sub">Farmer</span></label></div>
+          <div class="type-opt"><input type="radio" name="utype" id="tb" value="baler"><label for="tb" class="type-card"><span class="chk">✓</span><span class="type-icon">🚜</span><span class="type-name">คนอัดฟาง</span><span class="type-sub">Baler</span></label></div>
+        </div>
+        <div class="role-desc"><strong id="rdTitle">👨‍🌾 เกษตรกร / Farmer</strong><span id="rdBody">ลงทะเบียนที่ดินและผลผลิตของคุณ รับการเสนอจากคนอัดฟาง และขายฟางให้ลูกค้าในพื้นที่</span></div>
+        <button class="btn-p" onclick="goStep(2)">ถัดไป / Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ STEP 2: Info + Map ══════ -->
+  <div class="form-step" id="s2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon ci-blue">✏️</div>
+        <div><div class="card-title">ข้อมูลส่วนตัว</div><div class="card-sub">กรอกข้อมูลให้ครบถ้วน</div></div>
+      </div>
+      <div class="card-body">
+
+        <div class="avatar-row">
+          <div class="avatar-circle" onclick="showToast('📷 Prototype — ยังไม่เชื่อมต่อจริง','')">📷</div>
+          <div class="avatar-text">
+            <strong>รูปโปรไฟล์ (ไม่บังคับ)</strong>
+            <span>JPG, PNG · ไม่เกิน 5 MB</span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field"><label>ชื่อ / First Name *</label><input type="text" id="fname" placeholder="สมชาย"></div>
+          <div class="field"><label>นามสกุล / Last Name *</label><input type="text" id="lname" placeholder="ใจดี"></div>
+        </div>
+
+        <div class="field">
+          <label>เบอร์โทรศัพท์ / Phone *</label>
+          <div class="phone-row">
+            <input type="text" class="cc" value="+66" readonly>
+            <input type="tel" id="phone" placeholder="812345678" maxlength="10" style="flex:1;">
+          </div>
+          <p class="hint">ใช้สำหรับเข้าสู่ระบบ OTP · ไม่ต้องใช้รหัสผ่าน 🔓</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>จังหวัด *</label>
+            <select id="province">
+              <option value="">เลือกจังหวัด</option>
+              <option>เชียงใหม่</option><option>เชียงราย</option><option>ลำพูน</option>
+              <option>ลำปาง</option><option>แม่ฮ่องสอน</option><option>พะเยา</option>
+              <option>แพร่</option><option>น่าน</option><option>อื่นๆ</option>
+            </select>
+          </div>
+          <div class="field"><label>อำเภอ</label><input type="text" id="district" placeholder="เมือง"></div>
+        </div>
+
+        <!-- Farmer extras -->
+        <div id="farmerSection" style="display:none;">
+          <div class="extra-section farmer">
+            <div class="extra-title farmer">🌾 ข้อมูลฟาร์ม / Farm Details</div>
+            <div class="field"><label>ชื่อฟาร์ม</label><input type="text" id="farmName" placeholder="ฟาร์มสมชาย"></div>
+            <div class="field-row">
+              <div class="field"><label>พื้นที่โดยประมาณ (ไร่)</label><input type="number" id="farmRai" placeholder="15" min="1"></div>
+              <div class="field"><label>พืชหลัก</label>
+                <select id="cropType"><option value="">เลือก</option><option>ข้าว</option><option>ข้าวโพด</option><option>อ้อย</option><option>มันสำปะหลัง</option><option>อื่นๆ</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAP FOR FARMER -->
+          <div class="map-section">
+            <div class="map-section-title">📍 วาดขอบเขตแปลงเกษตร <small>(ไม่บังคับ — ช่วยให้ตรวจสอบดาวเทียมได้)</small></div>
+            <div class="map-toolbar">
+              <button class="mbtn" id="btnAuto" onclick="setMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
+              <button class="mbtn" id="btnDraw" onclick="setMode('draw')">✏️ วาดเอง</button>
+              <button class="mbtn" id="btnLoc"  onclick="goToMyLoc()">📍 ตำแหน่งฉัน</button>
+            </div>
+            <div class="map-hint" id="mapHint">🛰️ คลิก <strong>"ตรวจจับอัตโนมัติ"</strong> แล้วแตะตรงแปลง หรือ <strong>"วาดเอง"</strong> เพื่อลากขอบเขต</div>
+            <div id="signupMap"></div>
+            <div class="area-badge" id="areaBadge">
+              ✅ เลือกแปลงแล้ว — <strong id="areaRai">0</strong> ไร่ · คาดว่าได้ <strong id="areaCoins">0</strong> AgriCoins
+            </div>
+            <button class="clear-btn" id="mapClearBtn" onclick="clearPoly()">🗑️ ล้างขอบเขต</button>
+          </div>
+        </div>
+
+        <!-- Baler extras -->
+        <div id="balerSection" style="display:none;">
+          <div class="extra-section baler">
+            <div class="extra-title baler">🚜 ข้อมูลเครื่องอัดฟาง / Baler Details</div>
+            <div class="field-row">
+              <div class="field"><label>ยี่ห้อเครื่อง</label><input type="text" id="machBrand" placeholder="John Deere"></div>
+              <div class="field"><label>จำนวนเครื่อง</label><input type="number" id="machCount" placeholder="1" min="1"></div>
+            </div>
+            <div class="field"><label>รัศมีให้บริการ (กม.)</label><input type="number" id="machRadius" placeholder="50" min="5"></div>
+          </div>
+
+          <!-- MAP FOR BALER -->
+          <div class="map-section">
+            <div class="map-section-title">📍 วาดพื้นที่ให้บริการของคุณ</div>
+            <div class="map-toolbar">
+              <button class="mbtn" id="btnAuto" onclick="setMode('auto')">🛰️ ตรวจจับ</button>
+              <button class="mbtn" id="btnDraw" onclick="setMode('draw')">✏️ วาดพื้นที่</button>
+              <button class="mbtn" id="btnLoc"  onclick="goToMyLoc()">📍 ตำแหน่งฉัน</button>
+            </div>
+            <div class="map-hint" id="mapHint">วาดขอบเขตพื้นที่ที่คุณให้บริการอัดฟาง</div>
+            <div id="signupMap"></div>
+            <div class="area-badge" id="areaBadge">✅ กำหนดพื้นที่แล้ว — <strong id="areaRai">0</strong> ไร่</div>
+            <button class="clear-btn" id="mapClearBtn" onclick="clearPoly()">🗑️ ล้างขอบเขต</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-o" onclick="goStep(1)">← กลับ</button>
+          <button class="btn-p" onclick="goStep(3)">ถัดไป →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ STEP 3: OTP ══════ -->
+  <div class="form-step" id="s3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon ci-amber">📱</div>
+        <div><div class="card-title">ยืนยันเบอร์โทรศัพท์</div><div class="card-sub">กรอก OTP 4 หลักที่ส่งไป SMS</div></div>
+      </div>
+      <div class="card-body">
+        <div class="otp-info">
+          <div class="otp-info-icon">📲</div>
+          <p class="otp-info-text">ส่ง OTP ไปยังเบอร์</p>
+          <p class="otp-info-phone" id="displayPhone">08x-xxx-xxxx</p>
+          <p style="font-size:.72rem;color:var(--text-light);margin-top:.4rem;">Prototype: OTP คือ <strong>1234</strong></p>
+        </div>
+        <div class="otp-row">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+        </div>
+        <button class="btn-p" style="margin-top:0;" onclick="verifyOTP()">✓ ยืนยัน OTP</button>
+        <button class="btn-o" onclick="goStep(2)">← กลับแก้ไข</button>
+        <div class="resend">ไม่ได้รับ OTP? <a id="resendLink" onclick="doResend()">ส่งอีกครั้ง</a><span id="resendTimer"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ STEP 4: Review ══════ -->
+  <div class="form-step" id="s4">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon ci-purple">📋</div>
+        <div><div class="card-title">ตรวจสอบข้อมูล</div><div class="card-sub">ยืนยันก่อนสร้างบัญชี</div></div>
+      </div>
+      <div class="card-body">
+        <div id="reviewContent"></div>
+        <label class="terms-row"><input type="checkbox" id="terms"><span>ฉันยอมรับ <a href="#">ข้อกำหนดการใช้งาน</a> และ <a href="#">นโยบายความเป็นส่วนตัว</a> ของ AgriCall</span></label>
+        <label class="terms-row" style="margin-top:.5rem;"><input type="checkbox" id="smsCheck"><span>รับแจ้งเตือนและข่าวสาร AgriCall ผ่าน SMS (ไม่บังคับ)</span></label>
+        <button class="btn-p" onclick="submitForm()">🌾 สร้างบัญชี / Create Account</button>
+        <button class="btn-o" onclick="goStep(3)">← กลับ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ SUCCESS ══════ -->
+  <div class="form-step" id="s5">
+    <div class="success-screen">
+      <div class="success-anim">🎉</div>
+      <h2>ยินดีต้อนรับ!</h2>
+      <p>บัญชีของคุณถูกสร้างเรียบร้อยแล้ว<br>Welcome to AgriCall</p>
+      <div class="user-pill"><span id="successIcon">👨‍🌾</span><span id="successName">—</span></div>
+      <p style="font-size:.82rem;color:var(--text-light);">เข้าสู่ระบบด้วยเบอร์โทร + OTP<br>ไม่ต้องจำรหัสผ่าน 🔓</p>
+      <button class="btn-p" onclick="showToast('🚧 Prototype — ไม่มี backend จริง','red')" style="margin-top:1.5rem;">📱 เข้าสู่ระบบ / Go to App</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script>
+const PM25 = 3.88, CO2 = 898, HA2R = 6.25;
+let step = 1, map = null, drawnItems, drawControl, selectedPoly = null, mapMode = 'none', resendCD = 0;
+let mapInited = false;
+
+const roles = {
+  customer:{ title:'👨‍💼 ลูกค้า / Customer', body:'ค้นหาและซื้อฟางจากเกษตรกรในพื้นที่ ลดค่าใช้จ่ายและสนับสนุนการไม่เผาซังข้าว', icon:'👨‍💼', name:'ลูกค้า' },
+  farmer:  { title:'👨‍🌾 เกษตรกร / Farmer', body:'ลงทะเบียนที่ดินและผลผลิตของคุณ รับการเสนอจากคนอัดฟาง และขายฟางให้ลูกค้าในพื้นที่', icon:'👨‍🌾', name:'เกษตรกร' },
+  baler:   { title:'🚜 คนอัดฟาง / Baler', body:'รับงานอัดฟางจากเกษตรกรในรัศมีที่กำหนด จัดการตารางงานและรับเงินผ่านแอปได้เลย', icon:'🚜', name:'คนอัดฟาง' }
+};
+
+document.querySelectorAll('input[name="utype"]').forEach(r => {
+  r.addEventListener('change', () => { document.getElementById('rdTitle').textContent = roles[r.value].title; document.getElementById('rdBody').textContent = roles[r.value].body; });
+});
+
+function getRole(){ return document.querySelector('input[name="utype"]:checked')?.value||'farmer'; }
+
+function goStep(n){
+  if(n===2){
+    const role = getRole();
+    document.getElementById('farmerSection').style.display = role==='farmer'?'block':'none';
+    document.getElementById('balerSection').style.display  = role==='baler' ?'block':'none';
+    setTimeout(()=>{ initMap(); }, 250);
+  }
+  if(n===3){
+    const fn = document.getElementById('fname').value.trim();
+    const ph = document.getElementById('phone').value.trim();
+    if(!fn){ showToast('⚠️ กรุณากรอกชื่อ','red'); return; }
+    if(!/^0?[0-9]{9,10}$/.test(ph.replace(/\D/g,''))){ showToast('⚠️ เบอร์โทรไม่ถูกต้อง','red'); return; }
+    let p = ph.replace(/^0/,'');
+    document.getElementById('displayPhone').textContent = `0${p.slice(0,2)}-${p.slice(2,5)}-${p.slice(5)}`;
+    startResend();
+  }
+  if(n===4){ buildReview(); }
+
+  document.getElementById('s'+step).classList.remove('active');
+  document.getElementById('s'+n).classList.add('active');
+  step = n;
+  updateStepper(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStepper(n){
+  for(let i=1;i<=4;i++){
+    const d = document.getElementById('dot'+i);
+    d.classList.remove('active','done');
+    if(i<n) d.classList.add('done');
+    else if(i===n) d.classList.add('active');
+  }
+  for(let i=1;i<=3;i++){
+    const l = document.getElementById('line'+i);
+    if(l) l.style.background = i<n ? 'var(--green-light)' : 'var(--border)';
+  }
+}
+
+/* MAP */
+function initMap(){
+  if(mapInited){ setTimeout(()=>map&&map.invalidateSize(),100); return; }
+  mapInited = true;
+
+  map = L.map('signupMap').setView([18.7883,98.9853],13);
+  const sat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:20,attribution:'© Google'});
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'});
+  sat.addTo(map);
+  L.control.layers({'🛰️ ดาวเทียม':sat,'🗺️ แผนที่':osm},null,{position:'topright',collapsed:true}).addTo(map);
+  L.control.scale({metric:true,imperial:false}).addTo(map);
+
+  drawnItems = new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  map.on('click', e => { if(mapMode==='auto') fakeAutoDetect(e.latlng.lat, e.latlng.lng); });
+  setTimeout(()=>map.invalidateSize(),150);
+}
+
+function setMode(m){
+  mapMode = m;
+  ['btnAuto','btnDraw','btnLoc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='mbtn'; });
+  if(!map) return;
+  map.getContainer().classList.remove('mode-auto');
+
+  if(m==='auto'){
+    const el=document.getElementById('btnAuto'); if(el) el.classList.add('ma');
+    map.getContainer().classList.add('mode-auto');
+    if(drawControl){ map.removeControl(drawControl); drawControl=null; }
+    document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณเพื่อตรวจจับอัตโนมัติ';
+  } else if(m==='draw'){
+    const el=document.getElementById('btnDraw'); if(el) el.classList.add('md');
+    document.getElementById('mapHint').textContent = '✏️ คลิกวางจุดบนแผนที่เพื่อวาดขอบเขต กด "Finish" เมื่อเสร็จ';
+    enableDraw();
+  }
+}
+
+function enableDraw(){
+  if(drawControl){ map.removeControl(drawControl); drawControl=null; }
+  drawControl = new L.Control.Draw({
+    draw:{
+      polygon:{allowIntersection:false,showArea:true,shapeOptions:{color:'#10B981',weight:3,fillColor:'#34D399',fillOpacity:0.3}},
+      polyline:false,rectangle:false,circle:false,marker:false,circlemarker:false
+    },
+    edit:{featureGroup:drawnItems,remove:true}
+  });
+  map.addControl(drawControl);
+  map.off(L.Draw.Event.CREATED);
+  map.on(L.Draw.Event.CREATED, e => {
+    drawnItems.clearLayers();
+    drawnItems.addLayer(e.layer);
+    const lls = e.layer.getLatLngs()[0];
+    const coords = lls.map(ll=>[ll.lng,ll.lat]);
+    coords.push(coords[0]);
+    selectedPoly = {type:'Polygon',coordinates:[coords]};
+    const rai = (L.GeometryUtil.geodesicArea(lls)/10000)*HA2R;
+    showAreaBadge(rai);
+    document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อยแล้ว!';
+    showToast('✅ วาดขอบเขตสำเร็จ','green');
+  });
+}
+
+function fakeAutoDetect(lat, lng){
+  // Prototype: generate a small realistic polygon around click
+  const d = 0.0028 + Math.random()*0.0015;
+  const angle = Math.random()*Math.PI*2;
+  const pts = [];
+  for(let i=0;i<6;i++){
+    const a = angle + (i/6)*Math.PI*2;
+    const r = d*(0.7+Math.random()*0.3);
+    pts.push([lng + Math.cos(a)*r, lat + Math.sin(a)*r*0.75]);
+  }
+  pts.push(pts[0]);
+  selectedPoly = {type:'Polygon',coordinates:[pts]};
+  drawnItems.clearLayers();
+  const latlngs = pts.slice(0,-1).map(c=>[c[1],c[0]]);
+  const layer = L.polygon(latlngs,{color:'#10B981',weight:3,fillColor:'#34D399',fillOpacity:0.35});
+  drawnItems.addLayer(layer);
+  map.fitBounds(layer.getBounds(),{padding:[30,30]});
+  const rai = 6 + Math.random()*16;
+  showAreaBadge(rai);
+  document.getElementById('mapHint').textContent = '✅ ตรวจจับแปลงสำเร็จ! (Prototype)';
+  showToast('🛰️ ตรวจจับแปลงสำเร็จ','green');
+}
+
+function showAreaBadge(rai){
+  document.getElementById('areaRai').textContent   = rai.toFixed(2);
+  document.getElementById('areaCoins').textContent = Math.floor(rai*PM25*10)+Math.floor(rai*CO2/100);
+  document.getElementById('areaBadge').classList.add('show');
+  document.getElementById('mapClearBtn').style.display = 'block';
+}
+
+function clearPoly(){
+  if(drawnItems) drawnItems.clearLayers();
+  selectedPoly=null; mapMode='none';
+  document.getElementById('areaBadge').classList.remove('show');
+  document.getElementById('mapClearBtn').style.display='none';
+  document.getElementById('mapHint').textContent='🛰️ คลิก "ตรวจจับอัตโนมัติ" แล้วแตะตรงแปลง หรือ "วาดเอง" เพื่อลากขอบเขต';
+  ['btnAuto','btnDraw','btnLoc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='mbtn'; });
+  if(map) map.getContainer().classList.remove('mode-auto');
+  showToast('ล้างขอบเขตแล้ว','');
+}
+
+async function goToMyLoc(){
+  const el=document.getElementById('btnLoc'); if(el) el.classList.add('ml');
+  showToast('📍 กำลังระบุตำแหน่ง...','');
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
+    const {latitude:lat,longitude:lng} = pos.coords;
+    map.setView([lat,lng],17);
+    L.marker([lat,lng]).addTo(map).bindPopup('📍 ตำแหน่งของคุณ').openPopup();
+    showToast('📍 ปรับแผนที่แล้ว','green');
+    if(mapMode==='auto') fakeAutoDetect(lat,lng);
+  }catch{
+    showToast('⚠️ ไม่สามารถระบุตำแหน่งได้','red');
+    if(el) el.classList.remove('ml');
+  }
+}
+
+/* OTP */
+const otpBoxes = document.querySelectorAll('.otp-box');
+otpBoxes.forEach((b,i)=>{
+  b.addEventListener('input',e=>{
+    e.target.value=e.target.value.replace(/\D/g,'');
+    b.classList.toggle('filled',!!b.value);
+    if(b.value&&i<otpBoxes.length-1) otpBoxes[i+1].focus();
+    if([...otpBoxes].every(x=>x.value)) verifyOTP();
+  });
+  b.addEventListener('keydown',e=>{ if(e.key==='Backspace'&&!b.value&&i>0) otpBoxes[i-1].focus(); });
+  b.addEventListener('paste',e=>{
+    e.preventDefault();
+    const d=e.clipboardData.getData('text').replace(/\D/g,'');
+    d.split('').forEach((c,j)=>{ if(otpBoxes[j]){otpBoxes[j].value=c;otpBoxes[j].classList.add('filled');} });
+    otpBoxes[Math.min(d.length,otpBoxes.length-1)].focus();
+  });
+});
+
+function verifyOTP(){
+  const otp = [...otpBoxes].map(b=>b.value).join('');
+  if(otp.length<4){ showToast('⚠️ กรุณากรอก OTP 4 หลัก','red'); return; }
+  if(otp==='1234'){ showToast('✅ ยืนยัน OTP สำเร็จ!','green'); goStep(4); }
+  else{
+    showToast('❌ OTP ไม่ถูกต้อง','red');
+    otpBoxes.forEach(b=>{ b.value=''; b.classList.remove('filled'); });
+    otpBoxes[0].focus();
+  }
+}
+
+function startResend(){
+  resendCD=30;
+  const lk=document.getElementById('resendLink'), tm=document.getElementById('resendTimer');
+  lk.className='off'; lk.style.display='none';
+  const iv=setInterval(()=>{
+    resendCD--;
+    tm.textContent=` (${resendCD}s)`;
+    if(resendCD<=0){ clearInterval(iv); lk.className=''; lk.style.display='inline'; tm.textContent=''; }
+  },1000);
+}
+
+function doResend(){
+  if(resendCD>0) return;
+  showToast('📨 ส่ง OTP ใหม่แล้ว','green');
+  startResend();
+}
+
+/* REVIEW */
+function buildReview(){
+  const role=getRole(), ri=roles[role];
+  const fn=document.getElementById('fname').value||'—';
+  const ln=document.getElementById('lname').value||'—';
+  const ph=document.getElementById('phone').value||'—';
+  const pv=document.getElementById('province').value||'—';
+  const di=document.getElementById('district').value||'—';
+
+  let extra='';
+  if(role==='farmer'){
+    const fn2=document.getElementById('farmName').value;
+    const fr=document.getElementById('farmRai').value;
+    const ct=document.getElementById('cropType').value;
+    const polyStatus = selectedPoly
+      ? `✅ เลือกแล้ว · ${document.getElementById('areaRai').textContent} ไร่`
+      : '— ยังไม่ได้เลือก';
+    extra=`<div class="rev-block" style="margin-top:.75rem;">
+      <div class="rev-label">🌾 ข้อมูลฟาร์ม</div>
+      ${fn2?rr('ชื่อฟาร์ม',fn2):''}
+      ${fr?rr('พื้นที่',fr+' ไร่'):''}
+      ${ct?rr('พืชหลัก',ct):''}
+      ${rr('แปลงบนแผนที่',polyStatus)}
+    </div>`;
+  } else if(role==='baler'){
+    const mb=document.getElementById('machBrand').value;
+    const mr=document.getElementById('machRadius').value;
+    extra=`<div class="rev-block" style="margin-top:.75rem;">
+      <div class="rev-label">🚜 เครื่องอัดฟาง</div>
+      ${mb?rr('ยี่ห้อ',mb):''}
+      ${mr?rr('รัศมีบริการ',mr+' กม.'):''}
+    </div>`;
+  }
+
+  document.getElementById('reviewContent').innerHTML=`
+    <div class="rev-block">
+      <div class="rev-label">👤 ข้อมูลส่วนตัว</div>
+      <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0 .75rem;">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(127,173,107,.12);display:flex;align-items:center;justify-content:center;font-size:1.6rem;">${ri.icon}</div>
+        <div>
+          <div style="font-weight:700;color:var(--text-dark);">${fn} ${ln}</div>
+          <div style="font-size:.78rem;color:var(--green);font-weight:600;">${ri.name}</div>
+        </div>
+      </div>
+      ${rr('📱 เบอร์','0'+ph.replace(/^0/,''))}
+      ${rr('📍 พื้นที่',pv!=='—'?di+' · '+pv:di)}
+    </div>
+    ${extra}
+    ${selectedPoly?'<div class="rev-block" style="margin-top:.75rem;"><div class="rev-label">🗺️ แผนที่แปลง</div><div class="rev-map" id="miniMap"></div></div>':''}
+  `;
+
+  if(selectedPoly){
+    setTimeout(()=>{
+      const mm=L.map('miniMap',{zoomControl:false,dragging:false,scrollWheelZoom:false,attributionControl:false}).setView([18.7883,98.9853],13);
+      L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:20}).addTo(mm);
+      const ll=selectedPoly.coordinates[0].slice(0,-1).map(c=>[c[1],c[0]]);
+      const ly=L.polygon(ll,{color:'#10B981',weight:2,fillColor:'#34D399',fillOpacity:.4});
+      ly.addTo(mm);
+      mm.fitBounds(ly.getBounds(),{padding:[10,10]});
+    },200);
+  }
+
+  document.getElementById('successName').textContent=`${fn} (${ri.name})`;
+  document.getElementById('successIcon').textContent=ri.icon;
+}
+
+function rr(k,v){ return `<div class="rev-row"><span>${k}</span><span>${v}</span></div>`; }
+
+function submitForm(){
+  if(!document.getElementById('terms').checked){ showToast('⚠️ กรุณายอมรับข้อกำหนด','red'); return; }
+  showToast('🎉 สร้างบัญชีสำเร็จ! (Prototype)','green');
+  document.getElementById('s'+step).classList.remove('active');
+  document.getElementById('s5').classList.add('active');
+  document.getElementById('stepperWrap').style.display='none';
+  step=5;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type==='green'?' green':type==='red'?' red':'');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+updateStepper(1);
+</script>
+</body>
+</html>
