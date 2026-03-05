@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ═══ DESIGN TOKENS (matching home page) ═══ */
     :root {
       --primary-green:   #7FAD6B;
       --secondary-green: #5a9447;
@@ -27,89 +26,36 @@
       --shadow-sm:  0 2px 8px rgba(60,90,60,0.08);
       --shadow-md:  0 4px 16px rgba(60,90,60,0.12);
       --shadow-lg:  0 8px 32px rgba(60,90,60,0.16);
-      --radius-sm:  8px;
-      --radius-md:  12px;
-      --radius-lg:  18px;
-      --radius-xl:  24px;
-      --radius-full: 9999px;
+      --radius-sm:  8px; --radius-md:  12px; --radius-lg:  18px;
+      --radius-xl:  24px; --radius-full: 9999px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Prompt', sans-serif; background: var(--light-cream); min-height: 100vh; color: var(--text-dark); -webkit-font-smoothing: antialiased; }
 
-    body {
-      font-family: 'Prompt', sans-serif;
-      background: var(--light-cream);
-      min-height: 100vh;
-      color: var(--text-dark);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Header (matches home page) ─────────────── */
-    .dashboard-header {
-      background: var(--white);
-      box-shadow: var(--shadow-sm);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .dashboard-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.875rem 1.25rem; max-width: 1200px; margin: 0 auto;
-    }
-    .dashboard-logo {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-family: 'Itim', cursive; font-size: 1.5rem;
-      color: var(--primary-green); text-decoration: none;
-    }
+    /* Header */
+    .dashboard-header { background: var(--white); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+    .dashboard-nav { display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; max-width: 1200px; margin: 0 auto; }
+    .dashboard-logo { display: flex; align-items: center; gap: 0.5rem; font-family: 'Itim', cursive; font-size: 1.5rem; color: var(--primary-green); text-decoration: none; }
     .dashboard-logo .logo-icon { font-size: 1.6rem; }
     .dashboard-user { display: flex; align-items: center; gap: 0.75rem; }
     .dashboard-user .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
     .dashboard-user .user-type { font-size: 0.75rem; color: var(--text-medium); }
-    .logout-btn {
-      background: rgba(127,173,107,0.1); border: 1.5px solid rgba(127,173,107,0.3);
-      color: var(--primary-green); border-radius: var(--radius-md);
-      padding: 0.45rem 0.875rem; font-family: 'Prompt', sans-serif;
-      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
+    .logout-btn { background: rgba(127,173,107,0.1); border: 1.5px solid rgba(127,173,107,0.3); color: var(--primary-green); border-radius: var(--radius-md); padding: 0.45rem 0.875rem; font-family: 'Prompt', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .logout-btn:hover { background: rgba(127,173,107,0.2); }
 
-    /* ── Demo Pill ─────────────────────────────── */
-    .demo-pill-bar {
-      background: var(--white); border-bottom: 1px solid var(--border);
-      padding: 0.5rem 1.25rem; display: flex; align-items: center; justify-content: center;
-    }
-    .demo-pill {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(139,92,246,0.06); border: 1.5px solid rgba(139,92,246,0.25);
-      padding: 0.35rem 0.875rem; border-radius: var(--radius-full); cursor: pointer;
-      font-size: 0.8rem; font-weight: 500; color: var(--purple); transition: all 0.2s;
-    }
+    /* Demo Pill */
+    .demo-pill-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .demo-pill { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(139,92,246,0.06); border: 1.5px solid rgba(139,92,246,0.25); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); cursor: pointer; font-size: 0.8rem; font-weight: 500; color: var(--purple); transition: all 0.2s; }
     .demo-pill:hover { background: rgba(139,92,246,0.12); }
     .demo-pill input { width: 16px; height: 16px; accent-color: var(--purple); cursor: pointer; }
-    .demo-badge {
-      background: var(--purple); color: #fff; font-size: 0.6rem; font-weight: 700;
-      padding: 0.15rem 0.5rem; border-radius: var(--radius-full); letter-spacing: 0.05em;
-      animation: pulseBadge 2s ease infinite;
-    }
-    @keyframes pulseBadge {
-      0%,100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.5); }
-      50%      { box-shadow: 0 0 0 6px rgba(139,92,246,0); }
-    }
+    .demo-badge { background: var(--purple); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); letter-spacing: 0.05em; animation: pulseBadge 2s ease infinite; }
+    @keyframes pulseBadge { 0%,100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.5); } 50% { box-shadow: 0 0 0 6px rgba(139,92,246,0); } }
 
-    /* ── Stepper ────────────────────────────────── */
-    .stepper-wrap {
-      background: var(--white); border-bottom: 1px solid var(--border);
-      padding: 0.875rem 1.25rem; position: sticky; top: 56px; z-index: 99;
-    }
-    .stepper {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0; max-width: 480px; margin: 0 auto;
-    }
+    /* Stepper */
+    .stepper-wrap { background: var(--white); border-bottom: 1px solid var(--border); padding: 0.875rem 1.25rem; position: sticky; top: 56px; z-index: 99; }
+    .stepper { display: flex; align-items: center; justify-content: center; gap: 0; max-width: 480px; margin: 0 auto; }
     .st { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; position: relative; z-index: 1; }
-    .st-circle {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 2.5px solid var(--border); background: var(--white);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; font-weight: 700; color: var(--text-light); transition: all 0.3s;
-    }
+    .st-circle { width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; color: var(--text-light); transition: all 0.3s; }
     .st-label { font-size: 0.65rem; color: var(--text-light); white-space: nowrap; font-weight: 500; transition: color 0.3s; }
     .st-line { flex: 1; height: 2.5px; background: var(--border); margin-bottom: 18px; min-width: 28px; max-width: 60px; transition: background 0.3s; }
     .st.active .st-circle { background: var(--primary-green); border-color: var(--primary-green); color: #fff; box-shadow: 0 0 0 4px rgba(127,173,107,0.2); transform: scale(1.08); }
@@ -120,257 +66,138 @@
     .st.failed .st-label  { color: var(--red); }
     .st-line.done         { background: var(--green-light); }
 
-    /* ── Page Content ────────────────────────────── */
-    .page-content {
-      max-width: 600px; margin: 0 auto;
-      padding: 1.25rem 1rem 2rem;
-    }
+    /* Page content */
+    .page-content { max-width: 600px; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
 
-    /* ── Section Title (matches home page) ──────── */
-    .section-title {
-      font-size: 1.125rem; font-weight: 600;
-      color: var(--text-dark); margin-bottom: 0.75rem; padding: 0 0.25rem;
-    }
-
-    /* ── Card (matches home page) ────────────────── */
-    .card {
-      background: var(--white); border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 1rem;
-    }
+    /* Card */
+    .card { background: var(--white); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 1rem; }
     .card[hidden] { display: none; }
-
-    /* Card Header with gradient icon (matches home nav-card.primary style) */
-    .card-header {
-      display: flex; align-items: center; gap: 0.875rem;
-      padding: 1.25rem 1.25rem 1rem; border-bottom: 1.5px solid var(--border);
-    }
-    .card-icon {
-      width: 52px; height: 52px; border-radius: var(--radius-lg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; flex-shrink: 0; color: #fff;
-    }
+    .card-header { display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem 1.25rem 1rem; border-bottom: 1.5px solid var(--border); }
+    .card-icon { width: 52px; height: 52px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; color: #fff; }
     .ci-green  { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); }
     .ci-blue   { background: linear-gradient(135deg, #3B82F6, #2563EB); }
     .ci-amber  { background: linear-gradient(135deg, #F59E0B, #D97706); }
     .ci-red    { background: linear-gradient(135deg, #EF4444, #DC2626); }
     .ci-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
-
     .card-title { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
     .card-sub   { font-size: 0.8rem; color: var(--text-medium); margin-top: 0.15rem; }
     .card-body  { padding: 1.25rem; }
 
-    /* ── Alert Boxes ─────────────────────────────── */
-    .alert {
-      border-radius: var(--radius-md); padding: 0.875rem 1rem;
-      margin-bottom: 0.75rem; font-size: 0.85rem; line-height: 1.5;
-      display: flex; gap: 0.6rem; align-items: flex-start;
-    }
-    .alert-icon    { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    /* Alerts */
+    .alert { border-radius: var(--radius-md); padding: 0.875rem 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; line-height: 1.5; display: flex; gap: 0.6rem; align-items: flex-start; }
+    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
     .alert-content { flex: 1; }
-    .alert-title   { font-weight: 600; margin-bottom: 0.2rem; }
-    .alert.info    { background: rgba(91,138,200,0.08); color: #1E40AF; border-left: 3px solid var(--blue); }
+    .alert-title { font-weight: 600; margin-bottom: 0.2rem; }
+    .alert.info    { background: rgba(91,138,200,0.08);  color: #1E40AF; border-left: 3px solid var(--blue); }
     .alert.success { background: rgba(127,173,107,0.1);  color: #065F46; border-left: 3px solid var(--primary-green); }
     .alert.warning { background: rgba(224,123,57,0.08);  color: #92400E; border-left: 3px solid var(--accent-gold); }
     .alert.error   { background: rgba(192,57,43,0.08);   color: #991B1B; border-left: 3px solid var(--red); }
     .alert.purple  { background: rgba(139,92,246,0.06);  color: #5B21B6; border-left: 3px solid var(--purple); }
 
-    /* ── Map Tools ───────────────────────────────── */
+    /* Mode selector */
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; margin-bottom: 0.875rem; }
+    .mode-opt { padding: 0.875rem; border: 2px solid var(--border); background: var(--white); border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s; text-align: center; font-family: 'Prompt', sans-serif; }
+    .mode-opt:hover { border-color: var(--primary-green); background: #f0fdf4; }
+    .mode-opt.active { border-color: var(--primary-green); background: rgba(127,173,107,0.08); }
+    .mode-opt-icon { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .mode-opt-name { font-weight: 600; font-size: 0.8rem; color: var(--text-dark); }
+    .mode-opt-desc { font-size: 0.7rem; color: var(--text-medium); margin-top: 0.15rem; line-height: 1.3; }
+
+    /* Map */
     .map-section { margin-top: 0.75rem; }
     .map-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-    .mbtn {
-      flex: 1; min-width: 70px; padding: 0.55rem 0.5rem;
-      border: 2px solid var(--border); border-radius: var(--radius-md);
-      background: var(--white); font-family: 'Prompt', sans-serif;
-      font-size: 0.78rem; font-weight: 500; color: var(--text-dark);
-      cursor: pointer; text-align: center; transition: all 0.2s;
-    }
+    .mbtn { flex: 1; min-width: 70px; padding: 0.55rem 0.5rem; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--white); font-family: 'Prompt', sans-serif; font-size: 0.78rem; font-weight: 500; color: var(--text-dark); cursor: pointer; text-align: center; transition: all 0.2s; }
     .mbtn:hover { border-color: var(--primary-green); background: #f0fdf4; }
     .mbtn.ma { background: #3B82F6; border-color: #3B82F6; color: #fff; }
     .mbtn.mg { background: var(--primary-green); border-color: var(--primary-green); color: #fff; }
     .mbtn.md { background: #F59E0B; border-color: #F59E0B; color: #fff; }
     .mbtn.ml { background: var(--purple); border-color: var(--purple); color: #fff; }
-
-    .map-hint {
-      font-size: 0.8rem; color: var(--text-medium);
-      background: rgba(91,138,200,0.06); border-radius: var(--radius-sm);
-      padding: 0.45rem 0.7rem; margin-bottom: 0.5rem;
-      border-left: 3px solid var(--blue); min-height: 2rem;
-    }
-    #mainMap {
-      height: 320px; border-radius: var(--radius-lg);
-      border: 2px solid var(--border); overflow: hidden;
-    }
+    .map-hint { font-size: 0.8rem; color: var(--text-medium); background: rgba(91,138,200,0.06); border-radius: var(--radius-sm); padding: 0.45rem 0.7rem; margin-bottom: 0.5rem; border-left: 3px solid var(--blue); min-height: 2rem; }
+    #mainMap { height: 320px; border-radius: var(--radius-lg); border: 2px solid var(--border); overflow: hidden; }
     #mainMap.crosshair { cursor: crosshair !important; }
     #mainMap.burn-border { border-color: var(--red); }
-
-    .area-badge {
-      display: none; margin-top: 0.625rem;
-      background: rgba(16,185,129,0.1); border: 1.5px solid rgba(16,185,129,0.3);
-      border-radius: var(--radius-md); padding: 0.75rem 1rem;
-      font-size: 0.8125rem; color: var(--text-dark);
-    }
+    .area-badge { display: none; margin-top: 0.625rem; background: rgba(16,185,129,0.1); border: 1.5px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 0.8125rem; color: var(--text-dark); }
     .area-badge.show { display: block; }
     .area-badge strong { color: #059669; }
-    .clear-btn {
-      width: 100%; margin-top: 0.5rem; padding: 0.6rem;
-      border: 2px solid var(--border); border-radius: var(--radius-md);
-      background: var(--white); font-family: 'Prompt', sans-serif;
-      font-size: 0.8rem; color: var(--text-medium); cursor: pointer; display: none;
-    }
+    .clear-btn { width: 100%; margin-top: 0.5rem; padding: 0.6rem; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--white); font-family: 'Prompt', sans-serif; font-size: 0.8rem; color: var(--text-medium); cursor: pointer; display: none; }
     .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
-    /* ── Form Fields ─────────────────────────────── */
+    /* Form fields */
     .field { margin-bottom: 1rem; }
     .field label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.4rem; }
-    .field select, .field input {
-      width: 100%; padding: 0.8rem 1rem;
-      border: 2px solid var(--border); border-radius: var(--radius-md);
-      font-family: 'Prompt', sans-serif; font-size: 0.9375rem;
-      color: var(--text-dark); background: var(--white);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .field select:focus, .field input:focus {
-      outline: none; border-color: var(--primary-green);
-      box-shadow: 0 0 0 3px rgba(127,173,107,0.12);
-    }
+    .field select, .field input { width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-md); font-family: 'Prompt', sans-serif; font-size: 0.9375rem; color: var(--text-dark); background: var(--white); transition: border-color 0.2s, box-shadow 0.2s; }
+    .field select:focus, .field input:focus { outline: none; border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(127,173,107,0.12); }
 
-    /* ── Buttons (matching home page nav-card style) ─ */
-    .btn {
-      width: 100%; padding: 0.95rem; border: none; border-radius: var(--radius-lg);
-      font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 0.75rem;
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-    }
+    /* Buttons */
+    .btn { width: 100%; padding: 0.95rem; border: none; border-radius: var(--radius-lg); font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn:active:not(:disabled) { transform: scale(0.98); }
-
-    .btn-green {
-      background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-      color: #fff; box-shadow: 0 4px 14px rgba(127,173,107,0.35);
-    }
-    .btn-green:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(127,173,107,0.42); transform: translateY(-1px); }
-
-    .btn-blue {
-      background: linear-gradient(135deg, #3B82F6, #2563EB);
-      color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,0.3);
-    }
-    .btn-blue:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(59,130,246,0.4); transform: translateY(-1px); }
-
-    .btn-amber {
-      background: linear-gradient(135deg, #F59E0B, #D97706);
-      color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,0.3);
-    }
-    .btn-amber:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(245,158,11,0.4); transform: translateY(-1px); }
-
-    .btn-purple {
-      background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-      color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.3);
-      animation: pulseBadge 2s infinite;
-    }
-
-    .btn-outline {
-      background: var(--white); color: var(--primary-green);
-      border: 2px solid var(--primary-green); border-radius: var(--radius-lg);
-      font-family: 'Prompt', sans-serif; font-size: 0.9375rem; font-weight: 600;
-      cursor: pointer; transition: background 0.2s; margin-top: 0.625rem;
-      width: 100%; padding: 0.875rem;
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-    }
+    .btn-green  { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: #fff; box-shadow: 0 4px 14px rgba(127,173,107,0.35); }
+    .btn-green:hover:not(:disabled)  { box-shadow: 0 6px 18px rgba(127,173,107,0.42); transform: translateY(-1px); }
+    .btn-blue   { background: linear-gradient(135deg, #3B82F6, #2563EB); color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
+    .btn-blue:hover:not(:disabled)   { box-shadow: 0 6px 18px rgba(59,130,246,0.4); transform: translateY(-1px); }
+    .btn-amber  { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+    .btn-amber:hover:not(:disabled)  { box-shadow: 0 6px 18px rgba(245,158,11,0.4); transform: translateY(-1px); }
+    .btn-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.3); animation: pulseBadge 2s infinite; }
+    .btn-outline { background: var(--white); color: var(--primary-green); border: 2px solid var(--primary-green); border-radius: var(--radius-lg); font-family: 'Prompt', sans-serif; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 0.625rem; width: 100%; padding: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
     .btn-outline:hover { background: rgba(127,173,107,0.05); }
-
-    .divider-or {
-      display: flex; align-items: center; gap: 0.75rem; margin: 0.75rem 0;
-      color: var(--text-light); font-size: 0.8rem; font-weight: 500;
-    }
+    .divider-or { display: flex; align-items: center; gap: 0.75rem; margin: 0.75rem 0; color: var(--text-light); font-size: 0.8rem; font-weight: 500; }
     .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    /* ── Satellite Evidence Panel ───────────────── */
-    .sat-panel {
-      background: #1a2e1a; color: #dde8dd; border-radius: var(--radius-md);
-      padding: 1rem; margin-top: 0.75rem; font-size: 0.8rem;
-    }
+    /* Satellite panel */
+    .sat-panel { background: #1a2e1a; color: #dde8dd; border-radius: var(--radius-md); padding: 1rem; margin-top: 0.75rem; font-size: 0.8rem; }
     .sat-panel[hidden] { display: none; }
     .sat-panel-title { color: var(--green-light); font-weight: 700; margin-bottom: 0.6rem; font-size: 0.85rem; }
     .sat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid rgba(127,173,107,0.15); }
     .sat-row:last-child { border-bottom: none; }
     .sat-label { color: var(--text-light); }
-    .sat-val   { font-weight: 600; }
-    .sat-val.pass { color: var(--green-light); }
-    .sat-val.fail { color: #e74c3c; }
-    .sat-val.warn { color: #F59E0B; }
-    .sat-reasons  { margin-top: 0.6rem; font-size: 0.75rem; }
-    .sat-reason   { padding: 0.2rem 0; color: #CBD5E1; line-height: 1.4; }
-    .sat-source   { margin-top: 0.5rem; color: var(--text-light); font-size: 0.7rem; border-top: 1px solid rgba(127,173,107,0.15); padding-top: 0.4rem; }
+    .sat-val { font-weight: 600; }
+    .sat-val.pass { color: var(--green-light); } .sat-val.fail { color: #e74c3c; } .sat-val.warn { color: #F59E0B; }
+    .sat-reasons { margin-top: 0.6rem; font-size: 0.75rem; }
+    .sat-reason { padding: 0.2rem 0; color: #CBD5E1; line-height: 1.4; }
+    .sat-source { margin-top: 0.5rem; color: var(--text-light); font-size: 0.7rem; border-top: 1px solid rgba(127,173,107,0.15); padding-top: 0.4rem; }
 
-    /* ── Crop Verified Success Banner ───────────── */
-    .verified-banner {
-      background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-      border-radius: var(--radius-xl); padding: 1.5rem; color: #fff;
-      text-align: center; margin-bottom: 0.75rem;
-    }
+    /* Crop verified banner */
+    .verified-banner { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); border-radius: var(--radius-xl); padding: 1.5rem; color: #fff; text-align: center; margin-bottom: 0.75rem; }
     .verified-banner[hidden] { display: none; }
-    .verified-icon  { font-size: 3rem; margin-bottom: 0.5rem; animation: popIn 0.55s cubic-bezier(0.175,0.885,0.32,1.275); }
+    .verified-icon { font-size: 3rem; margin-bottom: 0.5rem; animation: popIn 0.55s cubic-bezier(0.175,0.885,0.32,1.275); }
     .verified-title { font-size: 1.3rem; font-weight: 700; }
-    .verified-sub   { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
-    .verified-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; margin-top: 1rem;
-    }
-    .verified-stat {
-      background: rgba(255,255,255,0.2); border-radius: var(--radius-md); padding: 0.6rem;
-      text-align: center;
-    }
+    .verified-sub { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
+    .verified-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; margin-top: 1rem; }
+    .verified-stat { background: rgba(255,255,255,0.2); border-radius: var(--radius-md); padding: 0.6rem; text-align: center; }
     .verified-stat-val { font-size: 1.05rem; font-weight: 700; }
     .verified-stat-lbl { font-size: 0.65rem; opacity: 0.9; }
 
-    /* ── Monitor Card ────────────────────────────── */
-    .monitor-card {
-      background: linear-gradient(135deg, #1a2e1a, #2a4a2a);
-      color: #fff; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem;
-    }
+    /* Monitor card */
+    .monitor-card { background: linear-gradient(135deg, #1a2e1a, #2a4a2a); color: #fff; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
     .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .monitor-title  { font-size: 1rem; font-weight: 600; }
-    .monitor-badge  { padding: 0.25rem 0.625rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; background: var(--primary-green); }
-    .days-hero  { text-align: center; margin-bottom: 1.25rem; }
-    .days-num   {
-      font-size: 3.5rem; font-weight: 800; line-height: 1;
-      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
+    .monitor-title { font-size: 1rem; font-weight: 600; }
+    .monitor-badge { padding: 0.25rem 0.625rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; background: var(--primary-green); }
+    .days-hero { text-align: center; margin-bottom: 1.25rem; }
+    .days-num { font-size: 3.5rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, var(--primary-green), var(--green-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .days-lbl { font-size: 0.9rem; opacity: 0.7; margin-top: 0.2rem; }
     .progress-track { background: rgba(255,255,255,0.15); border-radius: var(--radius-full); height: 10px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-fill  { height: 100%; background: linear-gradient(90deg, var(--primary-green), var(--green-light)); border-radius: var(--radius-full); transition: width 0.6s ease; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-green), var(--green-light)); border-radius: var(--radius-full); transition: width 0.6s ease; }
     .progress-labels { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.6; }
 
-    /* ── Burn Layer Panel ────────────────────────── */
-    .burn-layer-panel {
-      background: rgba(192,57,43,0.06); border: 1.5px solid rgba(192,57,43,0.2);
-      border-radius: var(--radius-md); padding: 0.875rem; margin-top: 0.75rem;
-    }
+    /* Burn layer panel */
+    .burn-layer-panel { background: rgba(192,57,43,0.06); border: 1.5px solid rgba(192,57,43,0.2); border-radius: var(--radius-md); padding: 0.875rem; margin-top: 0.75rem; }
     .burn-layer-panel[hidden] { display: none; }
-    .burn-layer-row  { display: flex; align-items: center; justify-content: space-between; }
+    .burn-layer-row { display: flex; align-items: center; justify-content: space-between; }
     .burn-layer-title { font-weight: 600; font-size: 0.85rem; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
-    .toggle-switch   { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute; cursor: pointer; inset: 0;
-      background: #CBD5E1; border-radius: 24px; transition: 0.25s;
-    }
-    .toggle-slider::before {
-      content: ''; position: absolute; width: 18px; height: 18px;
-      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.25s;
-    }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #CBD5E1; border-radius: 24px; transition: 0.25s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.25s; }
     .toggle-switch input:checked + .toggle-slider { background: var(--red); }
     .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
     .opacity-row { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-medium); }
     .opacity-row input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; border-radius: 2px; background: linear-gradient(to right, rgba(192,57,43,0.2), rgba(192,57,43,1)); }
-    .opacity-row input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-      background: var(--red); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
-    }
+    .opacity-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--red); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer; }
     .burn-legend { display: flex; gap: 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-medium); flex-wrap: wrap; }
     .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 0.2rem; }
 
-    /* ── Burn Result Banner ──────────────────────── */
+    /* Burn result banner */
     .burn-banner { border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-top: 0.75rem; color: #fff; }
     .burn-banner[hidden] { display: none; }
     .burn-banner.clean  { background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); }
@@ -382,18 +209,20 @@
     .burn-stat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .burn-stat-row:last-child { border-bottom: none; }
 
-    /* ── Reward / Impact Strips ─────────────────── */
-    .reward-strip {
-      background: linear-gradient(135deg, #F59E0B, #D97706);
-      color: #fff; border-radius: var(--radius-md); padding: 1rem; margin-top: 0.75rem;
-    }
+    /* Reward strip */
+    .reward-strip { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; border-radius: var(--radius-md); padding: 1rem; margin-top: 0.75rem; }
     .reward-strip-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
     .reward-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
     .reward-cell { background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); padding: 0.6rem; text-align: center; }
-    .reward-val  { font-size: 1.05rem; font-weight: 700; }
-    .reward-lbl  { font-size: 0.65rem; opacity: 0.9; }
+    .reward-val { font-size: 1.05rem; font-weight: 700; }
+    .reward-lbl { font-size: 0.65rem; opacity: 0.9; }
+    .reward-breakdown { background: rgba(255,255,255,0.15); border-radius: var(--radius-md); padding: 0.875rem; margin-top: 0.75rem; text-align: left; }
+    .reward-breakdown-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem; }
+    .reward-breakdown-row { display: flex; justify-content: space-between; padding: 0.35rem 0; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.15); }
+    .reward-breakdown-row:last-child { border-bottom: none; border-top: 1.5px solid rgba(255,255,255,0.3); padding-top: 0.6rem; margin-top: 0.2rem; font-weight: 700; font-size: 0.875rem; }
+    .reward-explanation { font-size: 0.72rem; opacity: 0.9; margin-top: 0.75rem; text-align: center; line-height: 1.5; }
 
-    /* ── Final Cards ─────────────────────────────── */
+    /* Final cards */
     .final-card { border-radius: var(--radius-xl); padding: 2rem; text-align: center; color: #fff; }
     .final-card.success { background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); }
     .final-card.failed  { background: linear-gradient(135deg, #991B1B, var(--red)); }
@@ -405,29 +234,22 @@
     .final-coins-num { font-size: 2.5rem; font-weight: 800; }
     .final-tip { background: rgba(255,255,255,0.15); border-radius: var(--radius-md); padding: 0.875rem; font-size: 0.85rem; margin-top: 1rem; }
 
-    /* ── Mini Map ────────────────────────────────── */
+    /* Mini map */
     .mini-map { height: 180px; border-radius: var(--radius-md); border: 2px solid var(--border); overflow: hidden; margin-top: 0.75rem; }
     .mini-map.burn-border { border-color: var(--red); }
 
-    /* ── Empty State ─────────────────────────────── */
-    .empty-state {
-      background: var(--white); border-radius: var(--radius-xl);
-      padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-md);
-    }
+    /* Empty state */
+    .empty-state { background: var(--white); border-radius: var(--radius-xl); padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-md); }
     .empty-state[hidden] { display: none; }
     .empty-icon  { font-size: 3.5rem; margin-bottom: 0.75rem; }
     .empty-title { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); }
     .empty-text  { color: var(--text-medium); margin: 0.5rem 0 1.25rem; line-height: 1.5; font-size: 0.9rem; }
 
-    /* ── History ─────────────────────────────────── */
+    /* History */
     .history-title { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
-    .history-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0.75rem; background: var(--light-cream); border-radius: var(--radius-md);
-      margin-bottom: 0.4rem; border: 1.5px solid var(--border);
-    }
-    .history-left   { display: flex; align-items: center; gap: 0.6rem; }
-    .history-dot    { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--light-cream); border-radius: var(--radius-md); margin-bottom: 0.4rem; border: 1.5px solid var(--border); }
+    .history-left { display: flex; align-items: center; gap: 0.6rem; }
+    .history-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
     .history-dot.completed   { background: rgba(127,173,107,0.15); }
     .history-dot.failed      { background: rgba(192,57,43,0.1); }
     .history-dot.in_progress { background: rgba(91,138,200,0.1); }
@@ -435,31 +257,15 @@
     .history-meta   { font-size: 0.7rem; color: var(--text-light); }
     .history-reward { font-weight: 600; color: var(--secondary-green); font-size: 0.9rem; }
 
-
-
-    /* ── Loading Overlay ─────────────────────────── */
-    .loading-overlay {
-      position: fixed; inset: 0; background: rgba(247,245,240,0.92);
-      backdrop-filter: blur(4px); display: none;
-      align-items: center; justify-content: center; z-index: 3000;
-    }
+    /* Loading */
+    .loading-overlay { position: fixed; inset: 0; background: rgba(247,245,240,0.92); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 3000; }
     .loading-overlay.show { display: flex; }
-    .spinner {
-      width: 48px; height: 48px; border: 4px solid var(--border);
-      border-top-color: var(--primary-green); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem;
-    }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { font-size: 0.9rem; color: var(--text-medium); text-align: center; }
 
-    /* ── Toast ───────────────────────────────────── */
-    .toast {
-      position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: var(--text-dark); color: #fff; padding: 0.7rem 1.25rem;
-      border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500;
-      box-shadow: var(--shadow-lg); z-index: 9999;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); max-width: 90vw;
-    }
+    /* Toast */
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text-dark); color: #fff; padding: 0.7rem 1.25rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 9999; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); max-width: 90vw; }
     .toast.show  { transform: translateX(-50%) translateY(0); }
     .toast.green { background: var(--primary-green); }
     .toast.red   { background: var(--red); }
@@ -473,13 +279,9 @@
 </head>
 <body>
 
-<!-- ═══ HEADER (matches home.html) ═══ -->
 <header class="dashboard-header">
   <nav class="dashboard-nav">
-    <a href="home.html" class="dashboard-logo">
-      <span class="logo-icon">🌾</span>
-      <span>AgriCall</span>
-    </a>
+    <a href="home.html" class="dashboard-logo"><span class="logo-icon">🌾</span><span>AgriCall</span></a>
     <div class="dashboard-user">
       <div>
         <div class="user-name" id="headerUserName">Loading...</div>
@@ -490,7 +292,6 @@
   </nav>
 </header>
 
-<!-- ═══ DEMO TOGGLE ═══ -->
 <div class="demo-pill-bar">
   <label class="demo-pill">
     <input type="checkbox" id="demoToggle" onchange="toggleDemo()">
@@ -499,7 +300,6 @@
   </label>
 </div>
 
-<!-- ═══ STEPPER ═══ -->
 <div class="stepper-wrap">
   <div class="stepper">
     <div class="st" id="sStep1"><div class="st-circle">🌱</div><div class="st-label">เริ่มปลูก</div></div>
@@ -510,19 +310,14 @@
   </div>
 </div>
 
-<!-- ═══ PAGE CONTENT ═══ -->
 <div class="page-content">
 
-  <!-- Demo alert -->
   <div class="alert purple" id="demoAlert" hidden>
     <div class="alert-icon">🚀</div>
-    <div class="alert-content">
-      <div class="alert-title">Demo Mode เปิดใช้งาน</div>
-      ข้ามเวลารอ 30/60 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง
-    </div>
+    <div class="alert-content"><div class="alert-title">Demo Mode เปิดใช้งาน</div>ข้ามเวลารอ 30/60 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง</div>
   </div>
 
-  <!-- ═══ NO CYCLE ═══ -->
+  <!-- NO CYCLE -->
   <div class="empty-state" id="noCycleCard" hidden>
     <div class="empty-icon">🌱</div>
     <div class="empty-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
@@ -530,34 +325,37 @@
     <button class="btn btn-green" onclick="showStep(1)" style="max-width:320px;margin:0.75rem auto 0;">🌱 เริ่มลงทะเบียน</button>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       STEP 1 — Registration
-  ═══════════════════════════════════════════ -->
+  <!-- STEP 1 -->
   <div class="card" id="step1Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-green">🌱</div>
-      <div>
-        <div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div>
-        <div class="card-sub">ระบุขอบเขตแปลงและประเภทพืช</div>
-      </div>
+      <div><div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div><div class="card-sub">ระบุขอบเขตแปลงและประเภทพืช</div></div>
     </div>
     <div class="card-body">
 
+      <div style="font-size:0.875rem;font-weight:700;color:var(--text-dark);margin-bottom:0.5rem;">🗺️ เลือกวิธีระบุแปลง</div>
+      <div class="mode-grid">
+        <div class="mode-opt active" data-mode="auto" onclick="setMapMode('auto')">
+          <div class="mode-opt-icon">🤖</div>
+          <div class="mode-opt-name">ตรวจจับอัตโนมัติ</div>
+          <div class="mode-opt-desc">คลิกบนแผนที่ — ระบบค้นหาขอบเขตให้</div>
+        </div>
+        <div class="mode-opt" data-mode="draw" onclick="setMapMode('draw')">
+          <div class="mode-opt-icon">✏️</div>
+          <div class="mode-opt-name">วาดเอง</div>
+          <div class="mode-opt-desc">กำหนดขอบเขตแปลงด้วยตนเอง</div>
+        </div>
+      </div>
+
       <div class="map-section">
-        <div style="font-size:0.875rem;font-weight:700;color:var(--text-dark);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem;">
-          📍 ระบุขอบเขตแปลง
-        </div>
         <div class="map-toolbar">
-          <button class="mbtn" id="btnSaved" onclick="setMode('saved')">💾 แปลงของฉัน</button>
-          <button class="mbtn" id="btnAuto"  onclick="setMode('auto')">🛰️ อัตโนมัติ</button>
-          <button class="mbtn" id="btnDraw"  onclick="setMode('draw')">✏️ วาดเอง</button>
-          <button class="mbtn" id="btnMyLoc" onclick="goToMyLocation()">📍 ตำแหน่งฉัน</button>
+          <button class="mbtn" id="btnSaved" onclick="loadSavedPoly()">💾 แปลงของฉัน</button>
+          <button class="mbtn" id="btnMyLoc"  onclick="goToMyLocation()">📍 ตำแหน่งฉัน</button>
+          <button class="mbtn" id="btnDrawTool" onclick="startDraw()" style="display:none;">✏️ เริ่มวาด</button>
         </div>
-        <div class="map-hint" id="mapHint">เลือกวิธีระบุขอบเขตแปลงด้านบน</div>
+        <div class="map-hint" id="mapHint">🤖 คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ — ระบบจะค้นหาขอบเขตอัตโนมัติ</div>
         <div id="mainMap"></div>
-        <div class="area-badge" id="areaBadge">
-          ✅ เลือกแปลงแล้ว — <strong id="areaDisplay">0</strong> ไร่ · คาดว่าได้ ~<strong id="coinsPreview">0</strong> AgriCoins
-        </div>
+        <div class="area-badge" id="areaBadge">✅ เลือกแปลงแล้ว — <strong id="areaDisplay">0</strong> ไร่ · คาดว่าได้ ~<strong id="coinsPreview">0</strong> AgriCoins</div>
         <button class="clear-btn" id="clearBtn" onclick="clearAll()">🗑️ ล้างขอบเขต</button>
       </div>
 
@@ -571,133 +369,81 @@
           <option value="other">🌿 อื่นๆ</option>
         </select>
       </div>
-
       <div class="field">
         <label>📝 ชื่อแปลง (ไม่บังคับ)</label>
         <input type="text" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
       </div>
 
       <div class="alert error" id="step1Err" hidden>
-        <div class="alert-icon">⚠️</div>
-        <div class="alert-content" id="step1ErrText"></div>
+        <div class="alert-icon">⚠️</div><div class="alert-content" id="step1ErrText"></div>
       </div>
-
-      <button class="btn btn-green" id="step1Submit" disabled onclick="submitStep1()">
-        🌱 ลงทะเบียนเริ่มปลูก
-      </button>
+      <button class="btn btn-green" id="step1Submit" disabled onclick="submitStep1()">🌱 ลงทะเบียนเริ่มปลูก</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       STEP 2 — Crop Verification
-  ═══════════════════════════════════════════ -->
+  <!-- STEP 2 -->
   <div class="card" id="step2Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-blue">🌾</div>
-      <div>
-        <div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div>
-        <div class="card-sub">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div>
-      </div>
+      <div><div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div><div class="card-sub">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div></div>
     </div>
     <div class="card-body">
 
-      <!-- Waiting state -->
       <div class="alert info" id="step2Wait">
         <div class="alert-icon">⏳</div>
-        <div class="alert-content">
-          <div class="alert-title">รอการตรวจสอบ</div>
-          ต้องรออีก <strong id="step2Days">-</strong> วัน ก่อนตรวจสอบพืช
-        </div>
+        <div class="alert-content"><div class="alert-title">รอการตรวจสอบ</div>ต้องรออีก <strong id="step2Days">-</strong> วัน ก่อนตรวจสอบพืช</div>
       </div>
-
-      <!-- Ready state -->
       <div class="alert success" id="step2Ready" hidden>
         <div class="alert-icon">✅</div>
-        <div class="alert-content">
-          <div class="alert-title">พร้อมตรวจสอบแล้ว!</div>
-          ระบบจะวิเคราะห์ NDVI, EVI, ESA WorldCover, NDWI จาก Sentinel-2
-        </div>
+        <div class="alert-content"><div class="alert-title">พร้อมตรวจสอบแล้ว!</div>ระบบจะวิเคราะห์ NDVI, EVI, ESA WorldCover, NDWI จาก Sentinel-2</div>
       </div>
 
-      <!-- Satellite evidence (shown after analysis) -->
       <div id="step2Evidence" hidden></div>
 
-      <!-- ✅ CROP VERIFIED SUCCESS — shows after verification passes, user must click to proceed -->
       <div class="verified-banner" id="cropVerifiedBanner" hidden>
         <div class="verified-icon">🌾</div>
         <div class="verified-title">ตรวจพบพืชในแปลงแล้ว!</div>
         <div class="verified-sub">ดาวเทียมยืนยันการเติบโตของพืช — พร้อมดำเนินการต่อ</div>
         <div class="verified-stats">
-          <div class="verified-stat">
-            <div class="verified-stat-val" id="cvNdvi">-</div>
-            <div class="verified-stat-lbl">NDVI Peak</div>
-          </div>
-          <div class="verified-stat">
-            <div class="verified-stat-val" id="cvCrop">-</div>
-            <div class="verified-stat-lbl">พื้นที่เกษตร</div>
-          </div>
-          <div class="verified-stat">
-            <div class="verified-stat-val" id="cvImgs">-</div>
-            <div class="verified-stat-lbl">ภาพดาวเทียม</div>
-          </div>
+          <div class="verified-stat"><div class="verified-stat-val" id="cvNdvi">-</div><div class="verified-stat-lbl">NDVI Peak</div></div>
+          <div class="verified-stat"><div class="verified-stat-val" id="cvCrop">-</div><div class="verified-stat-lbl">พื้นที่เกษตร</div></div>
+          <div class="verified-stat"><div class="verified-stat-val" id="cvImgs">-</div><div class="verified-stat-lbl">ภาพดาวเทียม</div></div>
         </div>
       </div>
 
-      <!-- Proceed to Step 3 button (shown after crop verified) -->
-      <button class="btn btn-green" id="proceedToStep3Btn" hidden onclick="proceedToStep3()">
-        🌾 ดำเนินการต่อ — แจ้งเก็บเกี่ยว →
-      </button>
+      <button class="btn btn-green" id="proceedToStep3Btn" hidden onclick="proceedToStep3()">🌾 ดำเนินการต่อ — แจ้งเก็บเกี่ยว →</button>
 
-      <!-- Demo skip section -->
       <div id="step2SkipSection" hidden>
         <div class="divider-or">Demo Mode</div>
         <button class="btn btn-purple" onclick="doStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบ</button>
       </div>
-
-      <!-- Main verify button (hidden after verified) -->
-      <button class="btn btn-blue" id="step2Submit" disabled onclick="doStep2(false)">
-        🛰️ ตรวจสอบพืชด้วยดาวเทียม
-      </button>
+      <button class="btn btn-blue" id="step2Submit" disabled onclick="doStep2(false)">🛰️ ตรวจสอบพืชด้วยดาวเทียม</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       STEP 3 — Post-harvest Monitoring
-  ═══════════════════════════════════════════ -->
+  <!-- STEP 3 -->
   <div class="card" id="step3Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-amber">🔥</div>
-      <div>
-        <div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div>
-        <div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div>
-      </div>
+      <div><div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div><div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div></div>
     </div>
     <div class="card-body">
 
-      <!-- Pre-harvest declare (hidden until crops verified) -->
+      <div id="harvestWaitSection">
+        <div class="alert info">
+          <div class="alert-icon">⏳</div>
+          <div class="alert-content"><div class="alert-title">รอการยืนยันพืช</div>กลับไปขั้นตอนที่ 2 เพื่อตรวจสอบพืชด้วยดาวเทียมก่อน</div>
+        </div>
+      </div>
+
       <div id="harvestSection" hidden>
         <div class="alert success">
           <div class="alert-icon">🌾</div>
-          <div class="alert-content">
-            <div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>
-            เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่างเพื่อเริ่มการตรวจสอบ 60 วัน
-          </div>
+          <div class="alert-content"><div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่างเพื่อเริ่มการตรวจสอบ 60 วัน</div>
         </div>
         <button class="btn btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
       </div>
 
-      <!-- Waiting for verification -->
-      <div id="harvestWaitSection">
-        <div class="alert info">
-          <div class="alert-icon">⏳</div>
-          <div class="alert-content">
-            <div class="alert-title">รอการยืนยันพืช</div>
-            กลับไปขั้นตอนที่ 2 เพื่อตรวจสอบพืชด้วยดาวเทียมก่อน
-          </div>
-        </div>
-      </div>
-
-      <!-- Monitoring in progress -->
       <div id="monitorSection" hidden>
         <div class="monitor-card">
           <div class="monitor-header">
@@ -755,7 +501,7 @@
     </div>
   </div>
 
-  <!-- ═══ SUCCESS ═══ -->
+  <!-- SUCCESS -->
   <div class="card" id="successCard" hidden>
     <div class="final-card success">
       <div class="final-icon">🎉</div>
@@ -767,12 +513,14 @@
         <div>AgriCoins</div>
       </div>
     </div>
-    <div class="mini-map" id="successMiniMap"></div>
-    <div id="successImpact"></div>
-    <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    <div class="card-body">
+      <div class="mini-map" id="successMiniMap"></div>
+      <div id="successImpact"></div>
+      <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    </div>
   </div>
 
-  <!-- ═══ FAILED ═══ -->
+  <!-- FAILED -->
   <div class="card" id="failedCard" hidden>
     <div class="final-card failed">
       <div class="final-icon">😔</div>
@@ -780,11 +528,13 @@
       <div class="final-sub">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
       <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ PM2.5</div>
     </div>
-    <div class="mini-map burn-border" id="failedMiniMap"></div>
-    <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    <div class="card-body">
+      <div class="mini-map burn-border" id="failedMiniMap"></div>
+      <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    </div>
   </div>
 
-  <!-- ═══ HISTORY ═══ -->
+  <!-- HISTORY -->
   <div class="card" id="historyCard">
     <div class="card-body">
       <div class="history-title">📋 ประวัติการตรวจสอบ</div>
@@ -792,11 +542,8 @@
     </div>
   </div>
 
-</div><!-- /page-content -->
+</div>
 
-
-
-<!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div><div class="spinner"></div><div class="loading-text" id="loadingText">กำลังโหลด...</div></div>
 </div>
@@ -809,694 +556,436 @@
 <script src="utils.js"></script>
 <script src="api.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════
-// GLOBAL STATE
-// ═══════════════════════════════════════════════════════════
 const currentUser = Auth.getCurrentUser();
 if (!currentUser) window.location.href = 'index.html';
 
-const PM25_PER_RAI = 3.88;
-const CO2_PER_RAI  = 898;
-const HA_TO_RAI    = 6.25;
-const BACKEND      = 'https://agricall.onrender.com';
+const PM25_PER_RAI = 3.88, CO2_PER_RAI = 898, HA_TO_RAI = 6.25;
+const BACKEND = 'https://agricall.onrender.com';
 
-let map           = null;
-let drawnItems    = null;
-let drawControl   = null;
-let selectedPoly  = null;
-let activeCycle   = null;
-let demoMode      = false;
-let mapMode       = 'none';
-let savedPoly     = null;
-let burnScarLayer = null;
-let mapInited     = false;
+let map, drawnItems, drawControl, selectedPoly, activeCycle, burnScarLayer;
+let demoMode = false, mapMode = 'auto', savedPoly = null, mapInited = false;
 
-// ═══════════════════════════════════════════════════════════
-// HEADER INIT
-// ═══════════════════════════════════════════════════════════
+// ── Header ────────────────────────────────────────────────
 function initHeader() {
-  const typeLabels = { customer: 'ลูกค้า', farmer: 'เกษตรกร', baler: 'คนอัดฟาง' };
+  const lbl = { customer:'ลูกค้า', farmer:'เกษตรกร', baler:'คนอัดฟาง' };
   document.getElementById('headerUserName').textContent = currentUser.name || '-';
-  document.getElementById('headerUserType').textContent = typeLabels[currentUser.type] || currentUser.type;
+  document.getElementById('headerUserType').textContent = lbl[currentUser.type] || currentUser.type;
 }
 
-// ═══════════════════════════════════════════════════════════
-// MAP
-// ═══════════════════════════════════════════════════════════
+// ── Loading / Toast ───────────────────────────────────────
+function showLoading(t) { document.getElementById('loadingText').textContent = t||'กำลังโหลด...'; document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading()  { document.getElementById('loadingOverlay').classList.remove('show'); }
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast'+(type==='green'?' green':type==='red'?' red':'');
+  t.classList.add('show'); clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Map ───────────────────────────────────────────────────
 function initMap() {
   if (mapInited) { if (map) setTimeout(() => map.invalidateSize(), 100); return; }
   mapInited = true;
   map = L.map('mainMap').setView([18.7883, 98.9853], 13);
-  const gHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
-  const esri    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '© Esri' });
-  const osm     = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OSM' });
-  gHybrid.addTo(map);
-  L.control.layers({ '🛰️ ดาวเทียม (Google)': gHybrid, '🛰️ ดาวเทียม (Esri)': esri, '🗺️ แผนที่ถนน': osm }, null, { position: 'topright', collapsed: true }).addTo(map);
-  L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
-  drawnItems = new L.FeatureGroup();
-  map.addLayer(drawnItems);
-  map.on('click', async (e) => { if (mapMode !== 'auto') return; await autoDetect(e.latlng.lat, e.latlng.lng); });
+  const gH = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {maxZoom:20, attribution:'© Google'});
+  const es  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19, attribution:'© Esri'});
+  const os  = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OSM'});
+  gH.addTo(map);
+  L.control.layers({'🛰️ Google':gH,'🛰️ Esri':es,'🗺️ ถนน':os}, null, {position:'topright', collapsed:true}).addTo(map);
+  L.control.scale({metric:true, imperial:false, position:'bottomleft'}).addTo(map);
+  drawnItems = new L.FeatureGroup(); map.addLayer(drawnItems);
+  map.on('click', async (e) => { if (mapMode === 'auto') await autoDetect(e.latlng.lat, e.latlng.lng); });
+  document.getElementById('mainMap').classList.add('crosshair');
   setTimeout(() => map.invalidateSize(), 150);
 }
 
-function moveMapTo(containerId) {
-  const mapEl = document.getElementById('mainMap');
-  if (!mapEl) return;
-  if (containerId) {
-    const target = document.getElementById(containerId);
-    if (target) { target.innerHTML = ''; target.appendChild(mapEl); }
-  } else {
-    const badge = document.getElementById('areaBadge');
-    if (badge && badge.parentNode) badge.parentNode.insertBefore(mapEl, badge);
-  }
+function moveMapTo(cid) {
+  const el = document.getElementById('mainMap'); if (!el) return;
+  if (cid) { const t = document.getElementById(cid); if (t) { t.innerHTML=''; t.appendChild(el); } }
+  else { const b = document.getElementById('areaBadge'); if (b&&b.parentNode) b.parentNode.insertBefore(el,b); }
   if (map) setTimeout(() => map.invalidateSize(), 80);
 }
 
-function createMiniMap(containerId, polygon, style) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  const mm = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, attributionControl: false }).setView([18.7883, 98.9853], 13);
-  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(mm);
+function createMiniMap(cid, polygon, style) {
+  const c = document.getElementById(cid); if (!c) return; c.innerHTML='';
+  const mm = L.map(c, {zoomControl:false, dragging:false, scrollWheelZoom:false, attributionControl:false}).setView([18.7883,98.9853],13);
+  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:20}).addTo(mm);
   if (polygon) {
-    const ll = polygon.coordinates[0].map(c => [c[1], c[0]]);
-    const s  = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.4 };
-    const layer = L.polygon(ll, s);
-    layer.addTo(mm);
-    mm.fitBounds(layer.getBounds(), { padding: [10, 10] });
+    const ll = polygon.coordinates[0].map(c=>[c[1],c[0]]);
+    const lyr = L.polygon(ll, style||{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.4});
+    lyr.addTo(mm); mm.fitBounds(lyr.getBounds(),{padding:[10,10]});
   }
-  return mm;
 }
 
-// ═══════════════════════════════════════════════════════════
-// DEMO
-// ═══════════════════════════════════════════════════════════
-function toggleDemo() {
-  demoMode = document.getElementById('demoToggle').checked;
-  document.getElementById('demoBadge').style.display = demoMode ? 'inline' : 'none';
-  document.getElementById('demoAlert').hidden = !demoMode;
-  showToast(demoMode ? '🚀 Demo Mode ON' : 'Demo Mode OFF', '');
-  if (activeCycle) renderCycle(activeCycle);
-}
-
-// ═══════════════════════════════════════════════════════════
-// BURN SCAR LAYER
-// ═══════════════════════════════════════════════════════════
-async function loadBurnScar() {
-  try {
-    const res = await fetch('strict_burn_tier1_chiangmai.tif');
-    if (!res.ok) return;
-    const buf = await res.arrayBuffer();
-    const gr  = await parseGeoraster(buf);
-    burnScarLayer = new GeoRasterLayer({
-      georaster: gr, opacity: 0.7, resolution: 256,
-      pixelValuesToColorFn: v => {
-        const x = v[0];
-        if (!x || x === 0 || x === -9999 || isNaN(x)) return null;
-        if (x >= 0.8 || x >= 3) return 'rgba(255,0,0,0.85)';
-        if (x >= 0.5 || x >= 2) return 'rgba(255,140,0,0.75)';
-        if (x >= 0.2 || x >= 1) return 'rgba(255,200,0,0.65)';
-        if (x > 0)               return 'rgba(255,255,100,0.5)';
-        return null;
-      }
-    });
-    burnScarLayer.addTo(map);
-    document.getElementById('burnLayerPanel').hidden = false;
-  } catch (e) { console.log('Burn GeoTIFF N/A:', e.message); }
-}
-function toggleBurnLayer() {
-  if (!burnScarLayer) return;
-  document.getElementById('burnToggle').checked ? burnScarLayer.addTo(map) : map.removeLayer(burnScarLayer);
-}
-function setBurnOpacity(v) {
-  document.getElementById('opacityVal').textContent = v + '%';
-  if (burnScarLayer) burnScarLayer.setOpacity(v / 100);
-}
-function removeBurnScar() {
-  if (burnScarLayer && map.hasLayer(burnScarLayer)) map.removeLayer(burnScarLayer);
-  burnScarLayer = null;
-  document.getElementById('burnLayerPanel').hidden = true;
-}
-
-// ═══════════════════════════════════════════════════════════
-// POLYGON HELPERS
-// ═══════════════════════════════════════════════════════════
-function displayPoly(geojson, style) {
-  drawnItems.clearLayers();
-  const s  = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 };
-  const ll = geojson.coordinates[0].map(c => [c[1], c[0]]);
-  const layer = L.polygon(ll, s);
-  drawnItems.addLayer(layer);
-  map.fitBounds(layer.getBounds(), { padding: [30, 30] });
-  return layer;
-}
-function computeRai(geojson) {
-  try {
-    const ll = geojson.coordinates[0].map(c => L.latLng(c[1], c[0]));
-    return (L.GeometryUtil.geodesicArea(ll) / 10000) * HA_TO_RAI;
-  } catch { return 0; }
-}
-function calcCoins(rai) { return Math.floor(rai * PM25_PER_RAI * 10) + Math.floor(rai * CO2_PER_RAI / 100); }
-function updatePreview(rai) {
-  document.getElementById('areaDisplay').textContent   = rai.toFixed(2);
-  document.getElementById('coinsPreview').textContent  = calcCoins(rai);
-  document.getElementById('areaBadge').classList.add('show');
-  document.getElementById('clearBtn').style.display    = 'block';
-  document.getElementById('step1Submit').disabled      = false;
-}
-
-// ═══════════════════════════════════════════════════════════
-// MAP MODES
-// ═══════════════════════════════════════════════════════════
-function setMode(mode) {
+// ── Map Mode ─────────────────────────────────────────────
+function setMapMode(mode) {
   mapMode = mode;
-  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
+  document.querySelectorAll('.mode-opt').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+  if (drawControl) { map.removeControl(drawControl); drawControl=null; }
   document.getElementById('mainMap').classList.remove('crosshair');
-  if (drawControl) { map.removeControl(drawControl); drawControl = null; }
-
-  if (mode === 'saved') {
-    document.getElementById('btnSaved').classList.add('mg');
-    if (savedPoly) {
-      displayPoly(savedPoly); selectedPoly = savedPoly;
-      updatePreview(computeRai(savedPoly));
-      document.getElementById('mapHint').textContent = '✅ โหลดแปลงที่บันทึกไว้แล้ว';
-      showToast('โหลดแปลงสำเร็จ', 'green');
-    } else {
-      document.getElementById('mapHint').textContent = '⚠️ ยังไม่มีแปลงที่บันทึกไว้';
-      showToast('ยังไม่มีแปลง', 'red');
-    }
-  } else if (mode === 'auto') {
-    document.getElementById('btnAuto').classList.add('ma');
+  if (mode === 'auto') {
+    document.getElementById('btnDrawTool').style.display = 'none';
     document.getElementById('mainMap').classList.add('crosshair');
-    document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ';
-    showToast('คลิกบนแผนที่เพื่อตรวจจับแปลง', '');
-  } else if (mode === 'draw') {
-    document.getElementById('btnDraw').classList.add('md');
-    document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต กด "Finish" เมื่อเสร็จ';
-    drawControl = new L.Control.Draw({
-      draw: {
-        polygon: { allowIntersection: false, showArea: true, shapeOptions: { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 } },
-        polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
-      },
-      edit: { featureGroup: drawnItems, remove: true }
-    });
-    map.addControl(drawControl);
-    map.on(L.Draw.Event.CREATED, (e) => {
-      drawnItems.clearLayers(); drawnItems.addLayer(e.layer);
-      const ll = e.layer.getLatLngs()[0];
-      const coords = ll.map(p => [p.lng, p.lat]); coords.push(coords[0]);
-      selectedPoly = { type: 'Polygon', coordinates: [coords] };
-      updatePreview((L.GeometryUtil.geodesicArea(ll) / 10000) * HA_TO_RAI);
-      document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อย';
-      showToast('✅ วาดขอบเขตสำเร็จ', 'green');
-    });
+    document.getElementById('mapHint').textContent = '🤖 คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ — ระบบจะค้นหาขอบเขตอัตโนมัติ';
+  } else {
+    document.getElementById('btnDrawTool').style.display = '';
+    document.getElementById('mapHint').textContent = '✏️ กด "เริ่มวาด" แล้วคลิกจุดบนแผนที่เพื่อวาดขอบเขต';
   }
+}
+
+function startDraw() {
+  if (drawControl) { map.removeControl(drawControl); drawControl=null; }
+  drawControl = new L.Control.Draw({
+    draw:{ polygon:{allowIntersection:false, showArea:true, shapeOptions:{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.3}}, polyline:false, rectangle:false, circle:false, marker:false, circlemarker:false },
+    edit:{ featureGroup:drawnItems, remove:true }
+  });
+  map.addControl(drawControl);
+  document.getElementById('mapHint').textContent = '✏️ คลิกจุดบนแผนที่เพื่อวาดขอบเขต กด "Finish" เมื่อเสร็จ';
+  map.on(L.Draw.Event.CREATED, (e) => {
+    drawnItems.clearLayers(); drawnItems.addLayer(e.layer);
+    const ll = e.layer.getLatLngs()[0];
+    const coords = ll.map(p=>[p.lng,p.lat]); coords.push(coords[0]);
+    selectedPoly = {type:'Polygon', coordinates:[coords]};
+    updatePreview((L.GeometryUtil.geodesicArea(ll)/10000)*HA_TO_RAI);
+    document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อย';
+    showToast('✅ วาดขอบเขตสำเร็จ','green');
+  });
+  showToast('คลิกบนแผนที่เพื่อเริ่มวาด','');
+}
+
+function loadSavedPoly() {
+  if (savedPoly) {
+    displayPoly(savedPoly); selectedPoly=savedPoly; updatePreview(computeRai(savedPoly));
+    document.getElementById('mapHint').textContent='✅ โหลดแปลงที่บันทึกไว้แล้ว';
+    document.getElementById('btnSaved').classList.add('mg');
+    showToast('โหลดแปลงสำเร็จ','green');
+  } else showToast('ยังไม่มีแปลงที่บันทึกไว้','red');
 }
 
 async function autoDetect(lat, lng) {
   showLoading('กำลังตรวจจับแปลง...');
   try {
-    const r = await API.callBackend('/api/burn-scar/analyze', { mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id });
+    const r = await API.callBackend('/api/burn-scar/analyze',{mode:'auto',lat,lng,radius_m:500,days_back:90,user_id:currentUser.id});
     hideLoading();
     if (r.success && r.polygon) {
-      displayPoly(r.polygon); selectedPoly = r.polygon;
-      updatePreview(r.farm_area_ha * HA_TO_RAI);
-      document.getElementById('mapHint').textContent = '✅ ตรวจจับสำเร็จ';
-      showToast('🛰️ ตรวจจับแปลงสำเร็จ', 'green');
-    } else { showToast('ไม่พบแปลง ลองคลิกตำแหน่งอื่น', 'red'); }
-  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
+      displayPoly(r.polygon); selectedPoly=r.polygon; updatePreview(r.farm_area_ha*HA_TO_RAI);
+      document.getElementById('mapHint').textContent='✅ ตรวจจับสำเร็จ';
+      showToast('🛰️ ตรวจจับแปลงสำเร็จ','green');
+    } else showToast('ไม่พบแปลง ลองคลิกตำแหน่งอื่น','red');
+  } catch(e) { hideLoading(); showToast('เกิดข้อผิดพลาด: '+e.message,'red'); }
 }
 
 async function goToMyLocation() {
   showLoading('กำลังระบุตำแหน่ง...');
   try {
-    const pos = await new Promise((ok, fail) => navigator.geolocation.getCurrentPosition(ok, fail, { enableHighAccuracy: true, timeout: 10000 }));
+    const pos = await new Promise((ok,fail)=>navigator.geolocation.getCurrentPosition(ok,fail,{enableHighAccuracy:true,timeout:10000}));
     hideLoading();
-    const { latitude: lat, longitude: lng } = pos.coords;
-    map.setView([lat, lng], 17);
-    document.getElementById('btnMyLoc').classList.add('ml');
-    L.marker([lat, lng]).addTo(map).bindPopup('📍 ตำแหน่งของคุณ').openPopup();
-    if (mapMode === 'auto') await autoDetect(lat, lng);
-    else showToast('📍 ปรับแผนที่ไปยังตำแหน่งของคุณ', 'green');
-  } catch { hideLoading(); showToast('ไม่สามารถระบุตำแหน่งได้', 'red'); }
+    const {latitude:lat, longitude:lng} = pos.coords;
+    map.setView([lat,lng],17); document.getElementById('btnMyLoc').classList.add('ml');
+    L.marker([lat,lng]).addTo(map).bindPopup('📍 ตำแหน่งของคุณ').openPopup();
+    if (mapMode==='auto') await autoDetect(lat,lng);
+    else showToast('📍 ปรับแผนที่ไปยังตำแหน่งของคุณ','green');
+  } catch { hideLoading(); showToast('ไม่สามารถระบุตำแหน่งได้','red'); }
 }
 
-function clearAll() {
+// ── Polygon helpers ───────────────────────────────────────
+function displayPoly(geo, style) {
   drawnItems.clearLayers();
-  selectedPoly = null; mapMode = 'none'; removeBurnScar();
+  const s = style||{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.3};
+  const ll = geo.coordinates[0].map(c=>[c[1],c[0]]);
+  const lyr = L.polygon(ll,s); drawnItems.addLayer(lyr);
+  map.fitBounds(lyr.getBounds(),{padding:[30,30]}); return lyr;
+}
+function computeRai(geo) {
+  try { return (L.GeometryUtil.geodesicArea(geo.coordinates[0].map(c=>L.latLng(c[1],c[0])))/10000)*HA_TO_RAI; } catch { return 0; }
+}
+function calcCoins(rai) {
+  const pm25=parseFloat(rai)*PM25_PER_RAI, co2=parseFloat(rai)*CO2_PER_RAI;
+  return { pm25Prevented:pm25.toFixed(2), co2Prevented:co2.toFixed(2), pm25Coins:Math.floor(pm25*10), co2Coins:Math.floor(co2/100), totalCoins:Math.floor(pm25*10)+Math.floor(co2/100) };
+}
+function updatePreview(rai) {
+  document.getElementById('areaDisplay').textContent  = rai.toFixed(2);
+  document.getElementById('coinsPreview').textContent = calcCoins(rai).totalCoins;
+  document.getElementById('areaBadge').classList.add('show');
+  document.getElementById('clearBtn').style.display   = 'block';
+  document.getElementById('step1Submit').disabled     = false;
+}
+function clearAll() {
+  drawnItems.clearLayers(); selectedPoly=null; removeBurnScar();
   document.getElementById('areaBadge').classList.remove('show');
-  document.getElementById('clearBtn').style.display    = 'none';
-  document.getElementById('step1Submit').disabled      = true;
-  document.getElementById('mapHint').textContent       = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
-  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
-  document.getElementById('mainMap').classList.remove('crosshair');
+  document.getElementById('clearBtn').style.display='none';
+  document.getElementById('step1Submit').disabled=true;
+  document.getElementById('mapHint').textContent = mapMode==='auto'
+    ? '🤖 คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ — ระบบจะค้นหาขอบเขตอัตโนมัติ'
+    : '✏️ กด "เริ่มวาด" แล้วคลิกจุดบนแผนที่เพื่อวาดขอบเขต';
+  document.querySelectorAll('.mbtn').forEach(b=>b.className='mbtn');
 }
 
-// ═══════════════════════════════════════════════════════════
-// LOADING / TOAST
-// ═══════════════════════════════════════════════════════════
-function showLoading(t) { document.getElementById('loadingText').textContent = t || 'กำลังโหลด...'; document.getElementById('loadingOverlay').classList.add('show'); }
-function hideLoading()  { document.getElementById('loadingOverlay').classList.remove('show'); }
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (type === 'green' ? ' green' : type === 'red' ? ' red' : '');
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+// ── Burn scar layer ───────────────────────────────────────
+async function loadBurnScar() {
+  try {
+    const res=await fetch('strict_burn_tier1_chiangmai.tif'); if(!res.ok)return;
+    const gr=await parseGeoraster(await res.arrayBuffer());
+    burnScarLayer=new GeoRasterLayer({georaster:gr,opacity:0.7,resolution:256,pixelValuesToColorFn:v=>{
+      const x=v[0]; if(!x||x===0||x===-9999||isNaN(x))return null;
+      if(x>=0.8||x>=3)return 'rgba(255,0,0,0.85)';
+      if(x>=0.5||x>=2)return 'rgba(255,140,0,0.75)';
+      if(x>=0.2||x>=1)return 'rgba(255,200,0,0.65)';
+      if(x>0)return 'rgba(255,255,100,0.5)'; return null;
+    }});
+    burnScarLayer.addTo(map); document.getElementById('burnLayerPanel').hidden=false;
+  } catch(e){console.log('Burn GeoTIFF N/A:',e.message);}
 }
+function toggleBurnLayer(){ if(!burnScarLayer)return; document.getElementById('burnToggle').checked?burnScarLayer.addTo(map):map.removeLayer(burnScarLayer); }
+function setBurnOpacity(v){ document.getElementById('opacityVal').textContent=v+'%'; if(burnScarLayer)burnScarLayer.setOpacity(v/100); }
+function removeBurnScar(){ if(burnScarLayer&&map&&map.hasLayer(burnScarLayer))map.removeLayer(burnScarLayer); burnScarLayer=null; document.getElementById('burnLayerPanel').hidden=true; }
 
-// ═══════════════════════════════════════════════════════════
-// SATELLITE EVIDENCE RENDER
-// ═══════════════════════════════════════════════════════════
+// ── Satellite evidence ────────────────────────────────────
 function renderEvidence(v, id) {
-  const el = document.getElementById(id);
-  if (!el || !v) return;
-  const fmt = n  => (n != null ? Number(n).toFixed(3) : 'N/A');
-  const pct = n  => (n != null ? (n * 100).toFixed(0) + '%' : 'N/A');
-  const cls = (val, thr) => (val == null ? 'warn' : val >= thr ? 'pass' : 'fail');
-  const reasons = (v.reasons || []).map(r => `<div class="sat-reason">${r}</div>`).join('');
-  el.innerHTML = `
-    <div class="sat-panel">
-      <div class="sat-panel-title">🛰️ หลักฐานจากดาวเทียม — ${v.crops_detected != null ? (v.crops_detected ? '<span class="sat-val pass">✅ ตรวจพบพืช</span>' : '<span class="sat-val fail">❌ ไม่พบพืช</span>') : ''}</div>
-      <div class="sat-row"><span class="sat-label">NDVI สูงสุด (≥0.35)</span><span class="sat-val ${cls(v.ndvi_peak,0.35)}">${fmt(v.ndvi_peak)}</span></div>
-      <div class="sat-row"><span class="sat-label">NDVI เฉลี่ย</span><span class="sat-val">${fmt(v.ndvi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">EVI มวลชีวภาพ</span><span class="sat-val ${cls(v.evi_score,0)}">${fmt(v.evi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">ESA พื้นที่เกษตร (≥30%)</span><span class="sat-val ${cls(v.cropland_fraction,0.3)}">${pct(v.cropland_fraction)}</span></div>
-      <div class="sat-row"><span class="sat-label">NDWI</span><span class="sat-val">${fmt(v.ndwi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">จำนวนภาพ</span><span class="sat-val ${(v.imagery_count||0)>=2?'pass':'warn'}">${v.imagery_count||0} ภาพ</span></div>
-      ${reasons ? `<div class="sat-reasons">${reasons}</div>` : ''}
-      <div class="sat-source">แหล่งข้อมูล: ${v.source||'N/A'}</div>
-    </div>`;
-  el.hidden = false;
+  const el=document.getElementById(id); if(!el||!v)return;
+  const fmt=n=>n!=null?Number(n).toFixed(3):'N/A';
+  const pct=n=>n!=null?(n*100).toFixed(0)+'%':'N/A';
+  const cls=(val,thr)=>val==null?'warn':val>=thr?'pass':'fail';
+  const reasons=(v.reasons||[]).map(r=>`<div class="sat-reason">${r}</div>`).join('');
+  el.innerHTML=`<div class="sat-panel">
+    <div class="sat-panel-title">🛰️ หลักฐานจากดาวเทียม — ${v.crops_detected!=null?(v.crops_detected?'<span class="sat-val pass">✅ ตรวจพบพืช</span>':'<span class="sat-val fail">❌ ไม่พบพืช</span>'):''}</div>
+    <div class="sat-row"><span class="sat-label">NDVI สูงสุด (≥0.35)</span><span class="sat-val ${cls(v.ndvi_peak,0.35)}">${fmt(v.ndvi_peak)}</span></div>
+    <div class="sat-row"><span class="sat-label">NDVI เฉลี่ย</span><span class="sat-val">${fmt(v.ndvi_score)}</span></div>
+    <div class="sat-row"><span class="sat-label">EVI มวลชีวภาพ</span><span class="sat-val ${cls(v.evi_score,0)}">${fmt(v.evi_score)}</span></div>
+    <div class="sat-row"><span class="sat-label">ESA พื้นที่เกษตร (≥30%)</span><span class="sat-val ${cls(v.cropland_fraction,0.3)}">${pct(v.cropland_fraction)}</span></div>
+    <div class="sat-row"><span class="sat-label">NDWI</span><span class="sat-val">${fmt(v.ndwi_score)}</span></div>
+    <div class="sat-row"><span class="sat-label">จำนวนภาพ</span><span class="sat-val ${(v.imagery_count||0)>=2?'pass':'warn'}">${v.imagery_count||0} ภาพ</span></div>
+    ${reasons?`<div class="sat-reasons">${reasons}</div>`:''}
+    <div class="sat-source">แหล่งข้อมูล: ${v.source||'N/A'}</div>
+  </div>`; el.hidden=false;
 }
 
-// ═══════════════════════════════════════════════════════════
-// SHOW CROP VERIFIED BANNER + PROCEED BUTTON
-// ═══════════════════════════════════════════════════════════
-function showCropVerifiedUI(verification) {
-  // Populate banner stats
-  if (verification) {
-    document.getElementById('cvNdvi').textContent  = verification.ndvi_peak != null ? Number(verification.ndvi_peak).toFixed(3) : '-';
-    document.getElementById('cvCrop').textContent  = verification.cropland_fraction != null ? (verification.cropland_fraction * 100).toFixed(0) + '%' : '-';
-    document.getElementById('cvImgs').textContent  = (verification.imagery_count || 0) + ' ภาพ';
+// ── Crop verified UI ──────────────────────────────────────
+function showCropVerifiedUI(v) {
+  if(v){
+    document.getElementById('cvNdvi').textContent=v.ndvi_peak!=null?Number(v.ndvi_peak).toFixed(3):'-';
+    document.getElementById('cvCrop').textContent=v.cropland_fraction!=null?(v.cropland_fraction*100).toFixed(0)+'%':'-';
+    document.getElementById('cvImgs').textContent=(v.imagery_count||0)+' ภาพ';
   }
-  document.getElementById('cropVerifiedBanner').hidden  = false;
-  document.getElementById('proceedToStep3Btn').hidden   = false;
-  // Hide the verify button to avoid double-clicking
-  document.getElementById('step2Submit').hidden         = true;
-  document.getElementById('step2SkipSection').hidden    = true;
+  document.getElementById('cropVerifiedBanner').hidden=false;
+  document.getElementById('proceedToStep3Btn').hidden=false;
+  document.getElementById('step2Submit').hidden=true;
+  document.getElementById('step2SkipSection').hidden=true;
 }
+async function proceedToStep3(){ showToast('กำลังไปขั้นตอนที่ 3...','green'); await loadStatus(); }
 
-// Called when user explicitly clicks "Proceed to Step 3"
-async function proceedToStep3() {
-  showToast('กำลังไปขั้นตอนที่ 3...', 'green');
-  await loadStatus();
-}
-
-// ═══════════════════════════════════════════════════════════
-// BURN RESULT RENDER
-// ═══════════════════════════════════════════════════════════
+// ── Burn result ───────────────────────────────────────────
 function renderBurn(result) {
-  const ba       = result.burn_analysis || result;
-  const burned   = ba.burn_detected;
-  const rai      = activeCycle ? activeCycle.area_rai : 0;
-  const burnedRai = ((ba.burned_area_ha || 0) * HA_TO_RAI).toFixed(2);
-
-  drawnItems.eachLayer(layer => {
-    if (!layer.setStyle) return;
-    layer.setStyle(burned
-      ? { color: '#c0392b', fillColor: '#e74c3c', fillOpacity: 0.4 }
-      : { color: '#7FAD6B', fillColor: '#a5c995', fillOpacity: 0.35 });
-    layer.bindPopup(burned
-      ? `⚠️ พบการเผา ${ba.burn_percentage||0}%`
-      : `✅ ไม่พบการเผา — แปลงสะอาด`).openPopup();
+  const ba=result.burn_analysis||result, burned=ba.burn_detected;
+  const rai=activeCycle?activeCycle.area_rai:0;
+  const burnedRai=((ba.burned_area_ha||0)*HA_TO_RAI).toFixed(2);
+  drawnItems.eachLayer(lyr=>{
+    if(!lyr.setStyle)return;
+    lyr.setStyle(burned?{color:'#c0392b',fillColor:'#e74c3c',fillOpacity:0.4}:{color:'#7FAD6B',fillColor:'#a5c995',fillOpacity:0.35});
+    lyr.bindPopup(burned?`⚠️ พบการเผา ${ba.burn_percentage||0}%`:'✅ ไม่พบการเผา — แปลงสะอาด').openPopup();
   });
-
-  document.getElementById('mainMap').classList.toggle('burn-border', burned);
-
-  const banner = document.getElementById('burnBanner');
-  banner.innerHTML = `
-    <div class="burn-banner ${burned?'burned':'clean'}">
-      <div class="burn-banner-icon">${burned?'⚠️':'✅'}</div>
-      <div class="burn-banner-title">${burned?'พบการเผา!':'ไม่พบการเผา'}</div>
-      <div class="burn-banner-sub">${burned?`พบ ${ba.burn_percentage||0}% ของพื้นที่`:'แปลงสะอาด ไม่มีร่องรอยการเผา'}</div>
-      <div class="burn-stats">
-        <div class="burn-stat-row"><span>ขนาดพื้นที่:</span><span>${rai.toFixed?rai.toFixed(1):rai} ไร่</span></div>
-        <div class="burn-stat-row"><span>พื้นที่เผา:</span><span>${burnedRai} ไร่</span></div>
-        <div class="burn-stat-row"><span>เปอร์เซ็นต์:</span><span>${ba.burn_percentage||0}%</span></div>
-        <div class="burn-stat-row"><span>วิธีตรวจจับ:</span><span>${ba.method||ba.source||'-'}</span></div>
-      </div>
-    </div>`;
-  banner.hidden = false;
-  loadBurnScar();
+  document.getElementById('mainMap').classList.toggle('burn-border',burned);
+  const banner=document.getElementById('burnBanner');
+  banner.innerHTML=`<div class="burn-banner ${burned?'burned':'clean'}">
+    <div class="burn-banner-icon">${burned?'⚠️':'✅'}</div>
+    <div class="burn-banner-title">${burned?'พบการเผา!':'ไม่พบการเผา'}</div>
+    <div class="burn-banner-sub">${burned?`พบ ${ba.burn_percentage||0}% ของพื้นที่`:'แปลงสะอาด ไม่มีร่องรอยการเผา'}</div>
+    <div class="burn-stats">
+      <div class="burn-stat-row"><span>ขนาดพื้นที่:</span><span>${rai.toFixed?rai.toFixed(1):rai} ไร่</span></div>
+      <div class="burn-stat-row"><span>พื้นที่เผา:</span><span>${burnedRai} ไร่</span></div>
+      <div class="burn-stat-row"><span>เปอร์เซ็นต์:</span><span>${ba.burn_percentage||0}%</span></div>
+      <div class="burn-stat-row"><span>วิธีตรวจจับ:</span><span>${ba.method||ba.source||'-'}</span></div>
+    </div>
+  </div>`; banner.hidden=false; loadBurnScar();
 }
 
-// ═══════════════════════════════════════════════════════════
-// VIEW MANAGEMENT
-// ═══════════════════════════════════════════════════════════
-function hideAll() {
-  ['noCycleCard','step1Card','step2Card','step3Card','successCard','failedCard'].forEach(id => {
-    document.getElementById(id).hidden = true;
-  });
-  moveMapTo(null);
+// ── Stepper / View ────────────────────────────────────────
+function hideAll(){['noCycleCard','step1Card','step2Card','step3Card','successCard','failedCard'].forEach(id=>document.getElementById(id).hidden=true); moveMapTo(null);}
+function updateStepper(cur,status){
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById('sStep'+i), line=document.getElementById('sLine'+(i-1));
+    el.classList.remove('active','done','failed'); if(line)line.classList.remove('done');
+    if(status==='completed'){el.classList.add('done');if(line)line.classList.add('done');}
+    else if(status==='failed'&&i<=cur){el.classList.add(i===cur?'failed':'done');if(line&&i<=cur)line.classList.add('done');}
+    else if(i<cur){el.classList.add('done');if(line)line.classList.add('done');}
+    else if(i===cur){el.classList.add('active');if(line)line.classList.add('done');}
+  }
 }
-
-function updateStepper(cur, status) {
-  for (let i = 1; i <= 3; i++) {
-    const el   = document.getElementById('sStep' + i);
-    const line = document.getElementById('sLine' + (i - 1));
-    el.classList.remove('active','done','failed');
-    if (line) line.classList.remove('done');
-
-    if (status === 'completed') {
-      el.classList.add('done');
-      if (line) line.classList.add('done');
-    } else if (status === 'failed' && i <= cur) {
-      el.classList.add(i === cur ? 'failed' : 'done');
-      if (line && i <= cur) line.classList.add('done');
-    } else if (i < cur) {
-      el.classList.add('done');
-      if (line) line.classList.add('done');
-    } else if (i === cur) {
-      el.classList.add('active');
-      if (line) line.classList.add('done');
-    }
+function showStep(n){
+  hideAll(); updateStepper(n,'in_progress');
+  if(n===1){
+    document.getElementById('step1Card').hidden=false; moveMapTo(null);
+    setTimeout(()=>{if(map)map.invalidateSize();},100);
+    if(savedPoly&&!selectedPoly){setTimeout(()=>{displayPoly(savedPoly);selectedPoly=savedPoly;updatePreview(computeRai(savedPoly));document.getElementById('mapHint').textContent='✅ โหลดแปลงอัตโนมัติ';document.getElementById('btnSaved').classList.add('mg');},150);}
   }
 }
 
-function showStep(n) {
-  hideAll();
-  updateStepper(n, 'in_progress');
-  if (n === 1) {
-    document.getElementById('step1Card').hidden = false;
-    moveMapTo(null);
-    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
-    if (savedPoly && !selectedPoly) {
-      setTimeout(() => {
-        displayPoly(savedPoly); selectedPoly = savedPoly;
-        updatePreview(computeRai(savedPoly));
-        document.getElementById('mapHint').textContent = '✅ โหลดแปลงอัตโนมัติ';
-        document.getElementById('btnSaved').classList.add('mg');
-        mapMode = 'saved';
-      }, 150);
-    }
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// LOAD STATUS
-// ═══════════════════════════════════════════════════════════
-async function loadStatus() {
+// ── Status / Cycle ────────────────────────────────────────
+async function loadStatus(){
   showLoading('กำลังโหลด...');
-  try {
-    const r = await API.callBackend('/api/farming/status', { user_id: currentUser.id });
-    hideLoading();
-    if (r.success) {
-      activeCycle = r.active_cycle;
-      renderHistory(r.history || []);
-      r.has_active_cycle ? renderCycle(activeCycle) : showNoCycle();
-    } else { showNoCycle(); }
-  } catch (e) { hideLoading(); console.error(e); showNoCycle(); }
+  try{
+    const r=await API.callBackend('/api/farming/status',{user_id:currentUser.id}); hideLoading();
+    if(r.success){activeCycle=r.active_cycle;renderHistory(r.history||[]);r.has_active_cycle?renderCycle(activeCycle):showNoCycle();}
+    else showNoCycle();
+  }catch(e){hideLoading();console.error(e);showNoCycle();}
 }
-
-function showNoCycle() {
-  hideAll();
-  updateStepper(0, 'none');
-  document.getElementById('noCycleCard').hidden = false;
-}
-
-function renderCycle(c) {
-  hideAll();
-  updateStepper(c.current_step, c.final_status);
-
-  if (c.final_status === 'completed') {
-    document.getElementById('successCard').hidden = false;
-    document.getElementById('successCoins').textContent = Math.round(c.reward?.agricoin_awarded || 0);
-    setTimeout(() => createMiniMap('successMiniMap', c.polygon, { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.35 }), 200);
-    const rai = c.area_rai || 0;
-    if (rai > 0) {
-      document.getElementById('successImpact').innerHTML = `
-        <div class="reward-strip" style="background:linear-gradient(135deg,var(--primary-green),var(--secondary-green));">
-          <div class="reward-strip-title">🌍 ผลกระทบเชิงบวก</div>
-          <div class="reward-grid">
-            <div class="reward-cell"><div class="reward-val">${(rai*PM25_PER_RAI).toFixed(1)} kg</div><div class="reward-lbl">PM2.5 ลดได้</div></div>
-            <div class="reward-cell"><div class="reward-val">${Math.round(rai*CO2_PER_RAI)} kg</div><div class="reward-lbl">CO₂ ลดได้</div></div>
-            <div class="reward-cell"><div class="reward-val">🪙 ${calcCoins(rai)}</div><div class="reward-lbl">AgriCoins</div></div>
-          </div>
-        </div>`;
-    }
-    return;
-  }
-
-  if (c.final_status === 'failed') {
-    document.getElementById('failedCard').hidden = false;
-    setTimeout(() => createMiniMap('failedMiniMap', c.polygon, { color: '#c0392b', weight: 3, fillColor: '#e74c3c', fillOpacity: 0.4 }), 200);
-    return;
-  }
-
-  if (c.current_step === 1) { showStep(1); return; }
-
-  if (c.current_step === 2) {
-    hideAll();
-    updateStepper(2, 'in_progress');
-    document.getElementById('step2Card').hidden = false;
-
-    // Reset step 2 UI
-    document.getElementById('cropVerifiedBanner').hidden = true;
-    document.getElementById('proceedToStep3Btn').hidden  = true;
-    document.getElementById('step2Submit').hidden        = false;
-    document.getElementById('step2Evidence').hidden      = true;
-
-    const wait = c.days_info?.days_until_crop_check || 0;
-    if (wait > 0) {
-      document.getElementById('step2Wait').hidden   = false;
-      document.getElementById('step2Ready').hidden  = true;
-      document.getElementById('step2Days').textContent = wait;
-      document.getElementById('step2Submit').disabled  = true;
-      document.getElementById('step2SkipSection').hidden = !demoMode;
-    } else {
-      document.getElementById('step2Wait').hidden   = true;
-      document.getElementById('step2Ready').hidden  = false;
-      document.getElementById('step2Submit').disabled  = false;
-      document.getElementById('step2SkipSection').hidden = true;
-    }
-    return;
-  }
-
-  if (c.current_step === 3) {
-    hideAll();
-    updateStepper(3, 'in_progress');
-    document.getElementById('step3Card').hidden = false;
-
-    if (c.steps.step3.status === 'monitoring') {
-      document.getElementById('harvestSection').hidden  = true;
-      document.getElementById('monitorSection').hidden  = false;
-      moveMapTo('monitorMapContainer');
-      document.getElementById('mainMap').style.height = '380px';
-      if (c.polygon) displayPoly(c.polygon);
-
-      const days = c.days_info?.days_remaining_monitoring ?? c.steps.step3.days_remaining ?? 60;
-      const pct  = Math.min(((60 - days) / 60) * 100, 100);
-      document.getElementById('daysLeft').textContent   = days;
-      document.getElementById('progressBar').style.width = pct + '%';
-
-      const rai = c.area_rai;
-      document.getElementById('prevPM25').textContent  = (rai * PM25_PER_RAI).toFixed(1);
-      document.getElementById('prevCO2').textContent   = Math.round(rai * CO2_PER_RAI);
-      document.getElementById('prevCoins').textContent = calcCoins(rai);
-      document.getElementById('step3SkipSection').hidden = !demoMode;
-      document.getElementById('burnBanner').hidden = true;
-    } else {
-      // Only show harvest button if crops have been verified (step2 completed)
-      const cropsVerified = c.steps?.step2?.status === 'completed' || c.steps?.step2?.crops_verified === true;
-      document.getElementById('harvestSection').hidden      = !cropsVerified;
-      document.getElementById('harvestWaitSection').hidden  = cropsVerified;
-      document.getElementById('monitorSection').hidden      = true;
-    }
-    return;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// STEP ACTIONS
-// ═══════════════════════════════════════════════════════════
-async function submitStep1() {
-  document.getElementById('step1Err').hidden = true;
-  if (!selectedPoly) { showErr('กรุณาเลือกแปลงก่อน'); return; }
-  showLoading('กำลังลงทะเบียน...');
-  try {
-    const res = await fetch(BACKEND + '/api/farming/start', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: currentUser.id, polygon: selectedPoly,
-        crop_type: document.getElementById('cropType').value,
-        field_name: document.getElementById('fieldName').value.trim() || 'แปลงเกษตร'
-      })
-    });
-    const r = await res.json();
-    hideLoading();
-    if (r.success) {
-      showToast(r.message || 'ลงทะเบียนสำเร็จ!', 'green');
-      await loadStatus();
-    } else {
-      showErr(r.error || 'เกิดข้อผิดพลาด');
-      if (r.existing_cycle_id) setTimeout(() => loadStatus(), 1500);
-    }
-  } catch (e) { hideLoading(); showErr('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: ' + e.message); }
-}
-
-function showErr(msg) {
-  document.getElementById('step1ErrText').textContent = msg;
-  document.getElementById('step1Err').hidden = false;
-  showToast(msg, 'red');
-}
-
-async function doStep2(skip) {
-  document.getElementById('step2Evidence').hidden      = true;
-  document.getElementById('cropVerifiedBanner').hidden = true;
-  document.getElementById('proceedToStep3Btn').hidden  = true;
-  document.getElementById('step2Submit').hidden        = false;
-
-  showLoading(skip ? 'กำลังตรวจสอบ (ข้ามเวลารอ)...' : 'กำลังวิเคราะห์ Sentinel-2...');
-  try {
-    const res = await fetch(BACKEND + '/api/farming/verify-crops', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skip })
-    });
-    const r = await res.json();
-    hideLoading();
-
-    // Always show satellite evidence so user can read it
-    if (r.verification) renderEvidence(r.verification, 'step2Evidence');
-
-    if (r.success && r.crops_verified) {
-      showToast('✅ ตรวจพบพืช!' + (r.demo_mode ? ' (Demo)' : ''), 'green');
-      // Show success banner + explicit proceed button — do NOT auto-navigate
-      showCropVerifiedUI(r.verification);
-    } else if (!r.success && r.days_remaining) {
-      showToast(`⏳ ต้องรออีก ${r.days_remaining} วัน`, '');
-      document.getElementById('step2Days').textContent = r.days_remaining;
-      if (demoMode) document.getElementById('step2SkipSection').hidden = false;
-    } else {
-      showToast('⚠️ ' + (r.message || r.error || 'ไม่พบพืชในแปลง'), 'red');
-    }
-  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
-}
-
-async function doHarvest() {
-  showLoading('กำลังบันทึก...');
-  try {
-    const r = await API.callBackend('/api/farming/declare-harvest', {
-      user_id: currentUser.id, cycle_id: activeCycle.cycle_id, verify_satellite: true
-    });
-    hideLoading();
-    if (r.success) {
-      if (r.harvest_satellite_check) {
-        const h = r.harvest_satellite_check;
-        showToast(h.harvest_detected
-          ? `🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`
-          : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว', '');
-      }
-      showToast(r.message, 'green');
-      document.getElementById('harvestSection').hidden = true;
-      setTimeout(() => loadStatus(), 2000);
-    } else { showToast(r.error, 'red'); }
-  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
-}
-
-async function doCheckBurn(skip) {
-  showLoading(skip ? 'กำลังข้าม 60 วัน & ตรวจสอบ...' : 'กำลังตรวจสอบการเผาจากดาวเทียม...');
-  try {
-    const r = await API.callBackend('/api/farming/check-burn-status', {
-      user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skip
-    });
-    hideLoading();
-    if (r.burn_analysis) renderBurn(r);
-    if (r.status === 'completed' || r.status === 'failed') {
-      showToast(r.message, r.status === 'completed' ? 'green' : 'red');
-      setTimeout(() => loadStatus(), 3500);
-    } else {
-      showToast(r.message, 'green');
-      if (r.monitoring) {
-        document.getElementById('daysLeft').textContent    = r.monitoring.days_remaining;
-        document.getElementById('progressBar').style.width = Math.min(((60-r.monitoring.days_remaining)/60)*100,100) + '%';
-      }
-    }
-  } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
-}
-
-// ═══════════════════════════════════════════════════════════
-// HISTORY
-// ═══════════════════════════════════════════════════════════
-function renderHistory(list) {
-  const el = document.getElementById('historyList');
-  if (!list.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:1rem;">ยังไม่มีประวัติ</div>'; return; }
-  el.innerHTML = list.map(h => {
-    const icon   = h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳';
-    const reward = h.final_status === 'completed' ? '+' + Math.round(h.agricoin_awarded) + ' 🪙' : '-';
-    return `<div class="history-item">
-      <div class="history-left">
-        <div class="history-dot ${h.final_status}">${icon}</div>
-        <div>
-          <div class="history-name">${h.field_name || 'แปลงเกษตร'}</div>
-          <div class="history-meta">${(h.area_rai||0).toFixed(1)} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
+function showNoCycle(){hideAll();updateStepper(0,'none');document.getElementById('noCycleCard').hidden=false;}
+function renderCycle(c){
+  hideAll(); updateStepper(c.current_step,c.final_status);
+  if(c.final_status==='completed'){
+    document.getElementById('successCard').hidden=false;
+    document.getElementById('successCoins').textContent=Math.round(c.reward?.agricoin_awarded||0);
+    setTimeout(()=>createMiniMap('successMiniMap',c.polygon,{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.35}),200);
+    const rai=c.area_rai||0;
+    if(rai>0){const coins=calcCoins(rai);document.getElementById('successImpact').innerHTML=`
+      <div class="reward-strip" style="background:linear-gradient(135deg,var(--primary-green),var(--secondary-green));margin-top:0.75rem;">
+        <div class="reward-strip-title">🌍 ผลกระทบเชิงบวก</div>
+        <div class="reward-grid">
+          <div class="reward-cell"><div class="reward-val">${coins.pm25Prevented} kg</div><div class="reward-lbl">PM2.5 ลดได้</div></div>
+          <div class="reward-cell"><div class="reward-val">${coins.co2Prevented} kg</div><div class="reward-lbl">CO₂ ลดได้</div></div>
+          <div class="reward-cell"><div class="reward-val">🪙 ${coins.totalCoins}</div><div class="reward-lbl">AgriCoins</div></div>
         </div>
-      </div>
-      <div class="history-reward">${reward}</div>
-    </div>`;
+        <div class="reward-breakdown">
+          <div class="reward-breakdown-title">📋 รายละเอียดการคำนวณ</div>
+          <div class="reward-breakdown-row"><span>🌫️ PM2.5 (${coins.pm25Prevented} kg × 10)</span><span>+${coins.pm25Coins}</span></div>
+          <div class="reward-breakdown-row"><span>🌱 CO₂ (${coins.co2Prevented} kg ÷ 100)</span><span>+${coins.co2Coins}</span></div>
+          <div class="reward-breakdown-row"><span>🏆 รวม</span><span>+${coins.totalCoins} AgriCoins</span></div>
+        </div>
+        <div class="reward-explanation">💡 ทุก 100g PM2.5 ที่ลดได้ = 1 AgriCoin · ทุก 100kg CO₂ ที่ลดได้ = 1 AgriCoin</div>
+      </div>`;}
+    return;
+  }
+  if(c.final_status==='failed'){document.getElementById('failedCard').hidden=false;setTimeout(()=>createMiniMap('failedMiniMap',c.polygon,{color:'#c0392b',weight:3,fillColor:'#e74c3c',fillOpacity:0.4}),200);return;}
+  if(c.current_step===1){showStep(1);return;}
+  if(c.current_step===2){
+    hideAll();updateStepper(2,'in_progress');document.getElementById('step2Card').hidden=false;
+    document.getElementById('cropVerifiedBanner').hidden=true;document.getElementById('proceedToStep3Btn').hidden=true;
+    document.getElementById('step2Submit').hidden=false;document.getElementById('step2Evidence').hidden=true;
+    const wait=c.days_info?.days_until_crop_check||0;
+    if(wait>0){document.getElementById('step2Wait').hidden=false;document.getElementById('step2Ready').hidden=true;document.getElementById('step2Days').textContent=wait;document.getElementById('step2Submit').disabled=true;document.getElementById('step2SkipSection').hidden=!demoMode;}
+    else{document.getElementById('step2Wait').hidden=true;document.getElementById('step2Ready').hidden=false;document.getElementById('step2Submit').disabled=false;document.getElementById('step2SkipSection').hidden=true;}
+    return;
+  }
+  if(c.current_step===3){
+    hideAll();updateStepper(3,'in_progress');document.getElementById('step3Card').hidden=false;
+    if(c.steps.step3.status==='monitoring'){
+      document.getElementById('harvestSection').hidden=true;document.getElementById('harvestWaitSection').hidden=true;document.getElementById('monitorSection').hidden=false;
+      moveMapTo('monitorMapContainer');document.getElementById('mainMap').style.height='380px';
+      if(c.polygon)displayPoly(c.polygon);
+      const days=c.days_info?.days_remaining_monitoring??c.steps.step3.days_remaining??60;
+      document.getElementById('daysLeft').textContent=days;
+      document.getElementById('progressBar').style.width=Math.min(((60-days)/60)*100,100)+'%';
+      const coins=calcCoins(c.area_rai);
+      document.getElementById('prevPM25').textContent=coins.pm25Prevented;
+      document.getElementById('prevCO2').textContent=coins.co2Prevented;
+      document.getElementById('prevCoins').textContent=coins.totalCoins;
+      document.getElementById('step3SkipSection').hidden=!demoMode;
+      document.getElementById('burnBanner').hidden=true;
+    } else {
+      const cv=c.steps?.step2?.status==='completed'||c.steps?.step2?.crops_verified===true;
+      document.getElementById('harvestSection').hidden=!cv;document.getElementById('harvestWaitSection').hidden=cv;document.getElementById('monitorSection').hidden=true;
+    }
+    return;
+  }
+}
+
+// ── Step actions ──────────────────────────────────────────
+async function submitStep1(){
+  document.getElementById('step1Err').hidden=true;
+  if(!selectedPoly){showErr('กรุณาเลือกแปลงก่อน');return;}
+  showLoading('กำลังลงทะเบียน...');
+  try{
+    const res=await fetch(BACKEND+'/api/farming/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:currentUser.id,polygon:selectedPoly,crop_type:document.getElementById('cropType').value,field_name:document.getElementById('fieldName').value.trim()||'แปลงเกษตร'})});
+    const r=await res.json(); hideLoading();
+    if(r.success){showToast(r.message||'ลงทะเบียนสำเร็จ!','green');await loadStatus();}
+    else{showErr(r.error||'เกิดข้อผิดพลาด');if(r.existing_cycle_id)setTimeout(()=>loadStatus(),1500);}
+  }catch(e){hideLoading();showErr('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: '+e.message);}
+}
+function showErr(msg){document.getElementById('step1ErrText').textContent=msg;document.getElementById('step1Err').hidden=false;showToast(msg,'red');}
+
+async function doStep2(skip){
+  document.getElementById('step2Evidence').hidden=true;document.getElementById('cropVerifiedBanner').hidden=true;
+  document.getElementById('proceedToStep3Btn').hidden=true;document.getElementById('step2Submit').hidden=false;
+  showLoading(skip?'กำลังตรวจสอบ (ข้ามเวลารอ)...':'กำลังวิเคราะห์ Sentinel-2...');
+  try{
+    const res=await fetch(BACKEND+'/api/farming/verify-crops',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:currentUser.id,cycle_id:activeCycle.cycle_id,skip_wait:skip})});
+    const r=await res.json(); hideLoading();
+    if(r.verification)renderEvidence(r.verification,'step2Evidence');
+    if(r.success&&r.crops_verified){showToast('✅ ตรวจพบพืช!'+(r.demo_mode?' (Demo)':''),'green');showCropVerifiedUI(r.verification);}
+    else if(!r.success&&r.days_remaining){showToast(`⏳ ต้องรออีก ${r.days_remaining} วัน`,'');document.getElementById('step2Days').textContent=r.days_remaining;if(demoMode)document.getElementById('step2SkipSection').hidden=false;}
+    else showToast('⚠️'+(r.message||r.error||'ไม่พบพืชในแปลง'),'red');
+  }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
+}
+
+async function doHarvest(){
+  showLoading('กำลังบันทึก...');
+  try{
+    const r=await API.callBackend('/api/farming/declare-harvest',{user_id:currentUser.id,cycle_id:activeCycle.cycle_id,verify_satellite:true}); hideLoading();
+    if(r.success){if(r.harvest_satellite_check){const h=r.harvest_satellite_check;showToast(h.harvest_detected?`🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`:'⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว','');}showToast(r.message,'green');document.getElementById('harvestSection').hidden=true;setTimeout(()=>loadStatus(),2000);}
+    else showToast(r.error,'red');
+  }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
+}
+
+async function doCheckBurn(skip){
+  showLoading(skip?'กำลังข้าม 60 วัน & ตรวจสอบ...':'กำลังตรวจสอบการเผาจากดาวเทียม...');
+  try{
+    const r=await API.callBackend('/api/farming/check-burn-status',{user_id:currentUser.id,cycle_id:activeCycle.cycle_id,skip_wait:skip}); hideLoading();
+    if(r.burn_analysis)renderBurn(r);
+    if(r.status==='completed'||r.status==='failed'){showToast(r.message,r.status==='completed'?'green':'red');setTimeout(()=>loadStatus(),3500);}
+    else{showToast(r.message,'green');if(r.monitoring){document.getElementById('daysLeft').textContent=r.monitoring.days_remaining;document.getElementById('progressBar').style.width=Math.min(((60-r.monitoring.days_remaining)/60)*100,100)+'%';}}
+  }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
+}
+
+// ── Demo ──────────────────────────────────────────────────
+function toggleDemo(){
+  demoMode=document.getElementById('demoToggle').checked;
+  document.getElementById('demoBadge').style.display=demoMode?'inline':'none';
+  document.getElementById('demoAlert').hidden=!demoMode;
+  showToast(demoMode?'🚀 Demo Mode ON':'Demo Mode OFF','');
+  if(activeCycle)renderCycle(activeCycle);
+}
+
+// ── History ───────────────────────────────────────────────
+function renderHistory(list){
+  const el=document.getElementById('historyList');
+  if(!list.length){el.innerHTML='<div style="text-align:center;color:var(--text-light);padding:1rem;">ยังไม่มีประวัติ</div>';return;}
+  el.innerHTML=list.map(h=>{
+    const icon=h.final_status==='completed'?'✅':h.final_status==='failed'?'❌':'⏳';
+    const reward=h.final_status==='completed'?'+'+Math.round(h.agricoin_awarded)+' 🪙':'-';
+    return `<div class="history-item"><div class="history-left"><div class="history-dot ${h.final_status}">${icon}</div><div><div class="history-name">${h.field_name||'แปลงเกษตร'}</div><div class="history-meta">${(h.area_rai||0).toFixed(1)} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div></div></div><div class="history-reward">${reward}</div></div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
-// MISC
-// ═══════════════════════════════════════════════════════════
-function startNew() {
-  activeCycle = null; selectedPoly = null;
-  if (drawnItems) drawnItems.clearLayers();
-  mapMode = 'none'; removeBurnScar();
-  document.getElementById('areaBadge').classList.remove('show');
-  document.getElementById('clearBtn').style.display       = 'none';
-  document.getElementById('step1Err').hidden              = true;
-  document.getElementById('step1Submit').disabled         = true;
-  document.getElementById('fieldName').value              = '';
-  document.getElementById('mapHint').textContent          = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
-  document.getElementById('cropVerifiedBanner').hidden    = true;
-  document.getElementById('proceedToStep3Btn').hidden     = true;
-  document.getElementById('step2Submit').hidden           = false;
-  document.getElementById('harvestSection').hidden         = true;
-  document.getElementById('harvestWaitSection').hidden     = false;
-  document.getElementById('step2Evidence').hidden         = true;
-  document.getElementById('burnBanner').hidden            = true;
-  document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
-  document.getElementById('mainMap').classList.remove('crosshair','burn-border');
-  document.getElementById('mainMap').style.height         = '320px';
+// ── Start new / logout ────────────────────────────────────
+function startNew(){
+  activeCycle=null;selectedPoly=null;if(drawnItems)drawnItems.clearLayers();mapMode='auto';removeBurnScar();
+  document.getElementById('areaBadge').classList.remove('show');document.getElementById('clearBtn').style.display='none';
+  document.getElementById('step1Err').hidden=true;document.getElementById('step1Submit').disabled=true;document.getElementById('fieldName').value='';
+  document.getElementById('mapHint').textContent='🤖 คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ — ระบบจะค้นหาขอบเขตอัตโนมัติ';
+  document.getElementById('cropVerifiedBanner').hidden=true;document.getElementById('proceedToStep3Btn').hidden=true;
+  document.getElementById('step2Submit').hidden=false;document.getElementById('harvestSection').hidden=true;
+  document.getElementById('harvestWaitSection').hidden=false;document.getElementById('step2Evidence').hidden=true;
+  document.getElementById('burnBanner').hidden=true;
+  document.querySelectorAll('.mode-opt').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-mode="auto"]').classList.add('active');
+  document.getElementById('mainMap').classList.remove('burn-border');document.getElementById('mainMap').classList.add('crosshair');
+  document.getElementById('mainMap').style.height='320px';
   showStep(1);
 }
+function logout(){if(confirm('ต้องการออกจากระบบ?')){Auth.logout();window.location.href='index.html';}}
 
-function logout() { if (confirm('ต้องการออกจากระบบ?')) { Auth.logout(); window.location.href = 'index.html'; } }
-
-// ═══════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════
-async function init() {
-  initHeader();
-  initMap();
-  try {
-    const res  = await fetch(BACKEND + '/api/user/get-polygon', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: currentUser.id })
-    });
-    const data = await res.json();
-    if (data.success && data.has_polygon) {
-      savedPoly = data.polygon;
-      document.getElementById('btnSaved').textContent     = '💾 แปลงของฉัน ✓';
-      document.getElementById('btnSaved').style.borderColor = '#7FAD6B';
-    }
-  } catch (e) { console.warn('No saved polygon:', e); }
+// ── Init ──────────────────────────────────────────────────
+async function init(){
+  initHeader(); initMap();
+  try{
+    const res=await fetch(BACKEND+'/api/user/get-polygon',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:currentUser.id})});
+    const data=await res.json();
+    if(data.success&&data.has_polygon){savedPoly=data.polygon;document.getElementById('btnSaved').textContent='💾 แปลงของฉัน ✓';document.getElementById('btnSaved').style.borderColor='#7FAD6B';}
+  }catch(e){console.warn('No saved polygon:',e);}
   await loadStatus();
 }
-
 window.addEventListener('load', init);
 </script>
 </body>
