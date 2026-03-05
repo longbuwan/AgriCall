@@ -674,8 +674,8 @@
     </div>
     <div class="card-body">
 
-      <!-- Pre-harvest declare -->
-      <div id="harvestSection">
+      <!-- Pre-harvest declare (hidden until crops verified) -->
+      <div id="harvestSection" hidden>
         <div class="alert success">
           <div class="alert-icon">🌾</div>
           <div class="alert-content">
@@ -684,6 +684,17 @@
           </div>
         </div>
         <button class="btn btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
+      </div>
+
+      <!-- Waiting for verification -->
+      <div id="harvestWaitSection">
+        <div class="alert info">
+          <div class="alert-icon">⏳</div>
+          <div class="alert-content">
+            <div class="alert-title">รอการยืนยันพืช</div>
+            กลับไปขั้นตอนที่ 2 เพื่อตรวจสอบพืชด้วยดาวเทียมก่อน
+          </div>
+        </div>
       </div>
 
       <!-- Monitoring in progress -->
@@ -1297,8 +1308,11 @@ function renderCycle(c) {
       document.getElementById('step3SkipSection').hidden = !demoMode;
       document.getElementById('burnBanner').hidden = true;
     } else {
-      document.getElementById('harvestSection').hidden  = false;
-      document.getElementById('monitorSection').hidden  = true;
+      // Only show harvest button if crops have been verified (step2 completed)
+      const cropsVerified = c.steps?.step2?.status === 'completed' || c.steps?.step2?.crops_verified === true;
+      document.getElementById('harvestSection').hidden      = !cropsVerified;
+      document.getElementById('harvestWaitSection').hidden  = cropsVerified;
+      document.getElementById('monitorSection').hidden      = true;
     }
     return;
   }
@@ -1450,6 +1464,8 @@ function startNew() {
   document.getElementById('cropVerifiedBanner').hidden    = true;
   document.getElementById('proceedToStep3Btn').hidden     = true;
   document.getElementById('step2Submit').hidden           = false;
+  document.getElementById('harvestSection').hidden         = true;
+  document.getElementById('harvestWaitSection').hidden     = false;
   document.getElementById('step2Evidence').hidden         = true;
   document.getElementById('burnBanner').hidden            = true;
   document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
