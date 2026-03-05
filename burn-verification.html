@@ -3,485 +3,494 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ระบบตรวจสอบการเพาะปลูก - AgriCall</title>
+  <title>Burn Verification - AgriCall</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="dashboard.css">
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* ═══ DESIGN TOKENS (matching home page) ═══ */
     :root {
-      --green:       #7FAD6B;
-      --green-dark:  #5a9447;
-      --green-light: #a5c995;
-      --cream:       #F7F5F0;
-      --white:       #FFFFFF;
-      --text-dark:   #1a2e1a;
-      --text-med:    #5a6b5a;
-      --text-light:  #9aaa9a;
-      --border:      #dde8dd;
-      --amber:       #e07b39;
-      --blue:        #5b8ac8;
-      --red:         #c0392b;
-      --red-light:   #e74c3c;
-      --purple:      #8B5CF6;
-      --shadow-sm:   0 2px 8px rgba(60,90,60,0.08);
-      --shadow-md:   0 4px 16px rgba(60,90,60,0.12);
-      --shadow-lg:   0 8px 32px rgba(60,90,60,0.16);
-      --r-sm: 8px;
-      --r-md: 12px;
-      --r-lg: 18px;
-      --r-xl: 24px;
+      --primary-green:   #7FAD6B;
+      --secondary-green: #5a9447;
+      --green-light:     #a5c995;
+      --light-cream:     #F7F5F0;
+      --white:           #FFFFFF;
+      --text-dark:       #1a2e1a;
+      --text-medium:     #5a6b5a;
+      --text-light:      #9aaa9a;
+      --border:          #dde8dd;
+      --accent-gold:     #e07b39;
+      --blue:            #5b8ac8;
+      --red:             #c0392b;
+      --red-light:       #e74c3c;
+      --purple:          #8B5CF6;
+      --shadow-sm:  0 2px 8px rgba(60,90,60,0.08);
+      --shadow-md:  0 4px 16px rgba(60,90,60,0.12);
+      --shadow-lg:  0 8px 32px rgba(60,90,60,0.16);
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  18px;
+      --radius-xl:  24px;
+      --radius-full: 9999px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Prompt', sans-serif;
-      background: var(--cream);
+      background: var(--light-cream);
       min-height: 100vh;
       color: var(--text-dark);
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    body::before {
-      content: '';
-      position: fixed; top: -100px; right: -100px;
-      width: 360px; height: 360px;
-      background: radial-gradient(circle, rgba(127,173,107,0.15) 0%, transparent 65%);
-      pointer-events: none; z-index: 0;
     }
 
-    /* ── Topbar ───────────────────────────────────── */
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
+    /* ── Header (matches home page) ─────────────── */
+    .dashboard-header {
       background: var(--white);
-      box-shadow: 0 1px 8px rgba(60,90,60,0.1);
-      padding: 0 1rem;
+      box-shadow: var(--shadow-sm);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .dashboard-nav {
       display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
+      padding: 0.875rem 1.25rem; max-width: 1200px; margin: 0 auto;
     }
-    .topbar-logo {
-      font-family: 'Itim', cursive;
-      font-size: 1.5rem; color: var(--green);
-      display: flex; align-items: center; gap: .4rem;
+    .dashboard-logo {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Itim', cursive; font-size: 1.5rem;
+      color: var(--primary-green); text-decoration: none;
     }
-    .topbar-logo span { font-size: 1.6rem; }
-    .topbar-right { font-size: .8125rem; color: var(--text-med); }
-    .topbar-right a { color: var(--green); font-weight: 700; text-decoration: none; }
+    .dashboard-logo .logo-icon { font-size: 1.6rem; }
+    .dashboard-user { display: flex; align-items: center; gap: 0.75rem; }
+    .dashboard-user .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+    .dashboard-user .user-type { font-size: 0.75rem; color: var(--text-medium); }
+    .logout-btn {
+      background: rgba(127,173,107,0.1); border: 1.5px solid rgba(127,173,107,0.3);
+      color: var(--primary-green); border-radius: var(--radius-md);
+      padding: 0.45rem 0.875rem; font-family: 'Prompt', sans-serif;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(127,173,107,0.2); }
 
-    /* ── Demo Pill ─────────────────────────────────── */
+    /* ── Demo Pill ─────────────────────────────── */
     .demo-pill-bar {
       background: var(--white); border-bottom: 1px solid var(--border);
-      padding: .5rem 1rem; display: flex; align-items: center; justify-content: center;
+      padding: 0.5rem 1.25rem; display: flex; align-items: center; justify-content: center;
     }
     .demo-pill {
-      display: inline-flex; align-items: center; gap: .4rem;
+      display: inline-flex; align-items: center; gap: 0.4rem;
       background: rgba(139,92,246,0.06); border: 1.5px solid rgba(139,92,246,0.25);
-      padding: .35rem .8rem; border-radius: 99px; cursor: pointer;
-      font-size: .8rem; font-weight: 500; color: var(--purple); transition: all .2s;
+      padding: 0.35rem 0.875rem; border-radius: var(--radius-full); cursor: pointer;
+      font-size: 0.8rem; font-weight: 500; color: var(--purple); transition: all 0.2s;
     }
     .demo-pill:hover { background: rgba(139,92,246,0.12); }
     .demo-pill input { width: 16px; height: 16px; accent-color: var(--purple); cursor: pointer; }
     .demo-badge {
-      background: var(--purple); color: #fff; font-size: .6rem; font-weight: 700;
-      padding: .15rem .5rem; border-radius: 99px; letter-spacing: .05em;
-      animation: pulse-badge 2s ease infinite;
+      background: var(--purple); color: #fff; font-size: 0.6rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: var(--radius-full); letter-spacing: 0.05em;
+      animation: pulseBadge 2s ease infinite;
     }
-    @keyframes pulse-badge {
+    @keyframes pulseBadge {
       0%,100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.5); }
-      50%     { box-shadow: 0 0 0 6px rgba(139,92,246,0); }
+      50%      { box-shadow: 0 0 0 6px rgba(139,92,246,0); }
     }
 
-    /* ── Stepper ───────────────────────────────────── */
+    /* ── Stepper ────────────────────────────────── */
     .stepper-wrap {
       background: var(--white); border-bottom: 1px solid var(--border);
-      padding: .875rem 1rem; position: sticky; top: 56px; z-index: 99;
+      padding: 0.875rem 1.25rem; position: sticky; top: 56px; z-index: 99;
     }
-    .stepper { display: flex; align-items: center; justify-content: center; gap: 0; max-width: 480px; margin: 0 auto; }
-    .st { display: flex; flex-direction: column; align-items: center; gap: .25rem; position: relative; z-index: 1; }
+    .stepper {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; max-width: 480px; margin: 0 auto;
+    }
+    .st { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; position: relative; z-index: 1; }
     .st-circle {
-      width: 38px; height: 38px; border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 50%;
       border: 2.5px solid var(--border); background: var(--white);
       display: flex; align-items: center; justify-content: center;
-      font-size: .9rem; font-weight: 700; color: var(--text-light); transition: all .3s;
+      font-size: 0.9rem; font-weight: 700; color: var(--text-light); transition: all 0.3s;
     }
-    .st-label { font-size: .65rem; color: var(--text-light); white-space: nowrap; transition: color .3s; font-weight: 500; }
-    .st-line { flex: 1; height: 2.5px; background: var(--border); margin-bottom: 18px; min-width: 28px; max-width: 60px; transition: background .3s; }
-    .st.active .st-circle { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 0 4px rgba(127,173,107,.2); transform: scale(1.08); }
-    .st.active .st-label { color: var(--green); font-weight: 700; }
-    .st.done .st-circle { background: var(--green-light); border-color: var(--green-light); color: var(--green-dark); }
-    .st.done .st-label { color: var(--green-dark); }
+    .st-label { font-size: 0.65rem; color: var(--text-light); white-space: nowrap; font-weight: 500; transition: color 0.3s; }
+    .st-line { flex: 1; height: 2.5px; background: var(--border); margin-bottom: 18px; min-width: 28px; max-width: 60px; transition: background 0.3s; }
+    .st.active .st-circle { background: var(--primary-green); border-color: var(--primary-green); color: #fff; box-shadow: 0 0 0 4px rgba(127,173,107,0.2); transform: scale(1.08); }
+    .st.active .st-label  { color: var(--primary-green); font-weight: 700; }
+    .st.done .st-circle   { background: var(--green-light); border-color: var(--green-light); color: var(--secondary-green); }
+    .st.done .st-label    { color: var(--secondary-green); }
     .st.failed .st-circle { background: var(--red); border-color: var(--red); color: #fff; }
-    .st.failed .st-label { color: var(--red); }
-    .st-line.done { background: var(--green-light); }
+    .st.failed .st-label  { color: var(--red); }
+    .st-line.done         { background: var(--green-light); }
 
-    /* ── Content ───────────────────────────────────── */
-    .content { max-width: 520px; margin: 0 auto; padding: 1.25rem 1rem 5.5rem; position: relative; z-index: 1; }
+    /* ── Page Content ────────────────────────────── */
+    .page-content {
+      max-width: 600px; margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
 
-    /* ── Card ──────────────────────────────────────── */
+    /* ── Section Title (matches home page) ──────── */
+    .section-title {
+      font-size: 1.125rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.75rem; padding: 0 0.25rem;
+    }
+
+    /* ── Card (matches home page) ────────────────── */
     .card {
-      background: var(--white); border-radius: var(--r-xl);
+      background: var(--white); border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 1rem;
     }
     .card[hidden] { display: none; }
+
+    /* Card Header with gradient icon (matches home nav-card.primary style) */
     .card-header {
-      display: flex; align-items: center; gap: .875rem;
+      display: flex; align-items: center; gap: 0.875rem;
       padding: 1.25rem 1.25rem 1rem; border-bottom: 1.5px solid var(--border);
     }
     .card-icon {
-      width: 48px; height: 48px; border-radius: var(--r-lg);
+      width: 52px; height: 52px; border-radius: var(--radius-lg);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; flex-shrink: 0; color: #fff;
     }
-    .ci-green  { background: linear-gradient(135deg, #10B981, #059669); }
+    .ci-green  { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); }
     .ci-blue   { background: linear-gradient(135deg, #3B82F6, #2563EB); }
     .ci-amber  { background: linear-gradient(135deg, #F59E0B, #D97706); }
     .ci-red    { background: linear-gradient(135deg, #EF4444, #DC2626); }
     .ci-purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
-    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
-    .card-sub { font-size: .8rem; color: var(--text-med); margin-top: .15rem; }
-    .card-body { padding: 1.25rem; }
 
-    /* ── Alert ─────────────────────────────────────── */
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
+    .card-sub   { font-size: 0.8rem; color: var(--text-medium); margin-top: 0.15rem; }
+    .card-body  { padding: 1.25rem; }
+
+    /* ── Alert Boxes ─────────────────────────────── */
     .alert {
-      border-radius: var(--r-md); padding: .875rem 1rem;
-      margin-bottom: .75rem; font-size: .85rem; line-height: 1.5;
-      display: flex; gap: .6rem; align-items: flex-start;
+      border-radius: var(--radius-md); padding: 0.875rem 1rem;
+      margin-bottom: 0.75rem; font-size: 0.85rem; line-height: 1.5;
+      display: flex; gap: 0.6rem; align-items: flex-start;
     }
-    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+    .alert-icon    { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
     .alert-content { flex: 1; }
-    .alert-title { font-weight: 600; margin-bottom: .2rem; }
-    .alert.info    { background: rgba(91,138,200,.08); color: #1E40AF; border-left: 3px solid var(--blue); }
-    .alert.success { background: rgba(127,173,107,.08); color: #065F46; border-left: 3px solid var(--green); }
-    .alert.warning { background: rgba(224,123,57,.08); color: #92400E; border-left: 3px solid var(--amber); }
-    .alert.error   { background: rgba(192,57,43,.08); color: #991B1B; border-left: 3px solid var(--red); }
-    .alert.purple  { background: rgba(139,92,246,.06); color: #5B21B6; border-left: 3px solid var(--purple); }
+    .alert-title   { font-weight: 600; margin-bottom: 0.2rem; }
+    .alert.info    { background: rgba(91,138,200,0.08); color: #1E40AF; border-left: 3px solid var(--blue); }
+    .alert.success { background: rgba(127,173,107,0.1);  color: #065F46; border-left: 3px solid var(--primary-green); }
+    .alert.warning { background: rgba(224,123,57,0.08);  color: #92400E; border-left: 3px solid var(--accent-gold); }
+    .alert.error   { background: rgba(192,57,43,0.08);   color: #991B1B; border-left: 3px solid var(--red); }
+    .alert.purple  { background: rgba(139,92,246,0.06);  color: #5B21B6; border-left: 3px solid var(--purple); }
 
-    /* ── Map ───────────────────────────────────────── */
-    .map-section { margin-top: .75rem; }
-    .map-toolbar { display: flex; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
+    /* ── Map Tools ───────────────────────────────── */
+    .map-section { margin-top: 0.75rem; }
+    .map-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
     .mbtn {
-      flex: 1; min-width: 70px; padding: .55rem .5rem;
-      border: 2px solid var(--border); border-radius: var(--r-md);
+      flex: 1; min-width: 70px; padding: 0.55rem 0.5rem;
+      border: 2px solid var(--border); border-radius: var(--radius-md);
       background: var(--white); font-family: 'Prompt', sans-serif;
-      font-size: .78rem; font-weight: 500; color: var(--text-dark);
-      cursor: pointer; text-align: center; transition: all .2s;
+      font-size: 0.78rem; font-weight: 500; color: var(--text-dark);
+      cursor: pointer; text-align: center; transition: all 0.2s;
     }
-    .mbtn:hover { border-color: var(--green); background: #f0fdf4; }
+    .mbtn:hover { border-color: var(--primary-green); background: #f0fdf4; }
     .mbtn.ma { background: #3B82F6; border-color: #3B82F6; color: #fff; }
-    .mbtn.mg { background: var(--green); border-color: var(--green); color: #fff; }
+    .mbtn.mg { background: var(--primary-green); border-color: var(--primary-green); color: #fff; }
     .mbtn.md { background: #F59E0B; border-color: #F59E0B; color: #fff; }
     .mbtn.ml { background: var(--purple); border-color: var(--purple); color: #fff; }
 
     .map-hint {
-      font-size: .8rem; color: var(--text-med); background: rgba(91,138,200,.06);
-      border-radius: var(--r-sm); padding: .45rem .7rem; margin-bottom: .5rem;
+      font-size: 0.8rem; color: var(--text-medium);
+      background: rgba(91,138,200,0.06); border-radius: var(--radius-sm);
+      padding: 0.45rem 0.7rem; margin-bottom: 0.5rem;
       border-left: 3px solid var(--blue); min-height: 2rem;
     }
-
     #mainMap {
-      height: 320px; border-radius: var(--r-lg);
+      height: 320px; border-radius: var(--radius-lg);
       border: 2px solid var(--border); overflow: hidden;
     }
     #mainMap.crosshair { cursor: crosshair !important; }
     #mainMap.burn-border { border-color: var(--red); }
 
     .area-badge {
-      display: none; margin-top: .625rem;
-      background: rgba(16,185,129,.1); border: 1.5px solid rgba(16,185,129,.3);
-      border-radius: var(--r-md); padding: .75rem 1rem; font-size: .8125rem; color: var(--text-dark);
+      display: none; margin-top: 0.625rem;
+      background: rgba(16,185,129,0.1); border: 1.5px solid rgba(16,185,129,0.3);
+      border-radius: var(--radius-md); padding: 0.75rem 1rem;
+      font-size: 0.8125rem; color: var(--text-dark);
     }
     .area-badge.show { display: block; }
     .area-badge strong { color: #059669; }
-
     .clear-btn {
-      width: 100%; margin-top: .5rem; padding: .6rem;
-      border: 2px solid var(--border); border-radius: var(--r-md);
+      width: 100%; margin-top: 0.5rem; padding: 0.6rem;
+      border: 2px solid var(--border); border-radius: var(--radius-md);
       background: var(--white); font-family: 'Prompt', sans-serif;
-      font-size: .8rem; color: var(--text-med); cursor: pointer; display: none;
+      font-size: 0.8rem; color: var(--text-medium); cursor: pointer; display: none;
     }
     .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
-    /* ── Burn Layer Panel ──────────────────────────── */
-    .burn-layer-panel {
-      background: rgba(192,57,43,.06); border: 1.5px solid rgba(192,57,43,.2);
-      border-radius: var(--r-md); padding: .875rem; margin-top: .75rem;
-    }
-    .burn-layer-panel[hidden] { display: none; }
-    .burn-layer-row { display: flex; align-items: center; justify-content: space-between; }
-    .burn-layer-title { font-weight: 600; font-size: .85rem; color: var(--red); display: flex; align-items: center; gap: .4rem; }
-    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute; cursor: pointer; inset: 0;
-      background: #CBD5E1; border-radius: 24px; transition: .25s;
-    }
-    .toggle-slider::before {
-      content: ''; position: absolute; width: 18px; height: 18px;
-      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .25s;
-    }
-    .toggle-switch input:checked + .toggle-slider { background: var(--red); }
-    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
-    .opacity-row { margin-top: .5rem; display: flex; align-items: center; gap: .5rem; font-size: .8rem; color: var(--text-med); }
-    .opacity-row input[type=range] {
-      flex: 1; height: 4px; -webkit-appearance: none; border-radius: 2px;
-      background: linear-gradient(to right, rgba(192,57,43,.2), rgba(192,57,43,1));
-    }
-    .opacity-row input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-      background: var(--red); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,.2); cursor: pointer;
-    }
-    .burn-legend { display: flex; gap: .75rem; margin-top: .5rem; font-size: .75rem; color: var(--text-med); flex-wrap: wrap; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: .2rem; }
-
-    /* ── Forms ─────────────────────────────────────── */
+    /* ── Form Fields ─────────────────────────────── */
     .field { margin-bottom: 1rem; }
-    .field label {
-      display: block; font-size: .8125rem; font-weight: 600;
-      color: var(--text-dark); margin-bottom: .4rem;
-    }
+    .field label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.4rem; }
     .field select, .field input {
-      width: 100%; padding: .8rem 1rem;
-      border: 2px solid var(--border); border-radius: var(--r-md);
-      font-family: 'Prompt', sans-serif; font-size: .9375rem;
+      width: 100%; padding: 0.8rem 1rem;
+      border: 2px solid var(--border); border-radius: var(--radius-md);
+      font-family: 'Prompt', sans-serif; font-size: 0.9375rem;
       color: var(--text-dark); background: var(--white);
-      transition: border-color .2s, box-shadow .2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .field select:focus, .field input:focus {
-      outline: none; border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(127,173,107,.12);
+      outline: none; border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(127,173,107,0.12);
     }
 
-    /* ── Buttons ───────────────────────────────────── */
-    .btn-p {
-      width: 100%; padding: .95rem; border: none; border-radius: var(--r-md);
+    /* ── Buttons (matching home page nav-card style) ─ */
+    .btn {
+      width: 100%; padding: 0.95rem; border: none; border-radius: var(--radius-lg);
       font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: transform .15s, box-shadow .15s; margin-top: .75rem;
-      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 0.75rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
-    .btn-p:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-p:active:not(:disabled) { transform: scale(.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
 
     .btn-green {
-      background: linear-gradient(135deg, var(--green), var(--green-dark));
-      color: #fff; box-shadow: 0 4px 14px rgba(127,173,107,.35);
+      background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+      color: #fff; box-shadow: 0 4px 14px rgba(127,173,107,0.35);
     }
-    .btn-green:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(127,173,107,.42); transform: translateY(-1px); }
+    .btn-green:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(127,173,107,0.42); transform: translateY(-1px); }
 
     .btn-blue {
       background: linear-gradient(135deg, #3B82F6, #2563EB);
-      color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,.3);
+      color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,0.3);
     }
-    .btn-blue:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(59,130,246,.4); transform: translateY(-1px); }
+    .btn-blue:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(59,130,246,0.4); transform: translateY(-1px); }
 
     .btn-amber {
       background: linear-gradient(135deg, #F59E0B, #D97706);
-      color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,.3);
+      color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,0.3);
     }
-    .btn-amber:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(245,158,11,.4); transform: translateY(-1px); }
+    .btn-amber:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(245,158,11,0.4); transform: translateY(-1px); }
 
     .btn-purple {
       background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-      color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,.3);
-      animation: pulse-badge 2s infinite;
+      color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.3);
+      animation: pulseBadge 2s infinite;
     }
 
-    .btn-o {
-      width: 100%; padding: .875rem; background: var(--white);
-      color: var(--green); border: 2px solid var(--green);
-      border-radius: var(--r-md); font-family: 'Prompt', sans-serif;
-      font-size: .9375rem; font-weight: 600; cursor: pointer;
-      transition: background .2s; margin-top: .625rem;
+    .btn-outline {
+      background: var(--white); color: var(--primary-green);
+      border: 2px solid var(--primary-green); border-radius: var(--radius-lg);
+      font-family: 'Prompt', sans-serif; font-size: 0.9375rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s; margin-top: 0.625rem;
+      width: 100%; padding: 0.875rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
-    .btn-o:hover { background: rgba(127,173,107,.05); }
+    .btn-outline:hover { background: rgba(127,173,107,0.05); }
 
     .divider-or {
-      display: flex; align-items: center; gap: .75rem; margin: .75rem 0;
-      color: var(--text-light); font-size: .8rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.75rem; margin: 0.75rem 0;
+      color: var(--text-light); font-size: 0.8rem; font-weight: 500;
     }
     .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    /* ── Satellite Evidence Panel ──────────────────── */
+    /* ── Satellite Evidence Panel ───────────────── */
     .sat-panel {
-      background: #1a2e1a; color: #dde8dd; border-radius: var(--r-md);
-      padding: 1rem; margin-top: .75rem; font-size: .8rem;
-      font-family: 'JetBrains Mono', monospace, 'Prompt';
+      background: #1a2e1a; color: #dde8dd; border-radius: var(--radius-md);
+      padding: 1rem; margin-top: 0.75rem; font-size: 0.8rem;
     }
     .sat-panel[hidden] { display: none; }
-    .sat-panel-title { color: var(--green-light); font-weight: 700; margin-bottom: .6rem; font-family: 'Prompt'; font-size: .85rem; }
-    .sat-row { display: flex; justify-content: space-between; padding: .3rem 0; border-bottom: 1px solid rgba(127,173,107,.15); }
+    .sat-panel-title { color: var(--green-light); font-weight: 700; margin-bottom: 0.6rem; font-size: 0.85rem; }
+    .sat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid rgba(127,173,107,0.15); }
     .sat-row:last-child { border-bottom: none; }
     .sat-label { color: var(--text-light); }
-    .sat-val { font-weight: 600; }
+    .sat-val   { font-weight: 600; }
     .sat-val.pass { color: var(--green-light); }
     .sat-val.fail { color: #e74c3c; }
     .sat-val.warn { color: #F59E0B; }
-    .sat-reasons { margin-top: .6rem; font-size: .75rem; }
-    .sat-reason { padding: .2rem 0; color: #CBD5E1; line-height: 1.4; }
-    .sat-source { margin-top: .5rem; color: var(--text-light); font-size: .7rem; border-top: 1px solid rgba(127,173,107,.15); padding-top: .4rem; }
+    .sat-reasons  { margin-top: 0.6rem; font-size: 0.75rem; }
+    .sat-reason   { padding: 0.2rem 0; color: #CBD5E1; line-height: 1.4; }
+    .sat-source   { margin-top: 0.5rem; color: var(--text-light); font-size: 0.7rem; border-top: 1px solid rgba(127,173,107,0.15); padding-top: 0.4rem; }
 
-    /* ── Monitor Card ─────────────────────────────── */
+    /* ── Crop Verified Success Banner ───────────── */
+    .verified-banner {
+      background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+      border-radius: var(--radius-xl); padding: 1.5rem; color: #fff;
+      text-align: center; margin-bottom: 0.75rem;
+    }
+    .verified-banner[hidden] { display: none; }
+    .verified-icon  { font-size: 3rem; margin-bottom: 0.5rem; animation: popIn 0.55s cubic-bezier(0.175,0.885,0.32,1.275); }
+    .verified-title { font-size: 1.3rem; font-weight: 700; }
+    .verified-sub   { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
+    .verified-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; margin-top: 1rem;
+    }
+    .verified-stat {
+      background: rgba(255,255,255,0.2); border-radius: var(--radius-md); padding: 0.6rem;
+      text-align: center;
+    }
+    .verified-stat-val { font-size: 1.05rem; font-weight: 700; }
+    .verified-stat-lbl { font-size: 0.65rem; opacity: 0.9; }
+
+    /* ── Monitor Card ────────────────────────────── */
     .monitor-card {
       background: linear-gradient(135deg, #1a2e1a, #2a4a2a);
-      color: #fff; border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1rem;
+      color: #fff; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem;
     }
     .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .monitor-title { font-size: 1rem; font-weight: 600; }
-    .monitor-badge { padding: .25rem .6rem; border-radius: 99px; font-size: .7rem; font-weight: 600; background: var(--green); }
-    .days-hero { text-align: center; margin-bottom: 1.25rem; }
-    .days-num {
+    .monitor-title  { font-size: 1rem; font-weight: 600; }
+    .monitor-badge  { padding: 0.25rem 0.625rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; background: var(--primary-green); }
+    .days-hero  { text-align: center; margin-bottom: 1.25rem; }
+    .days-num   {
       font-size: 3.5rem; font-weight: 800; line-height: 1;
-      background: linear-gradient(135deg, var(--green), var(--green-light));
+      background: linear-gradient(135deg, var(--primary-green), var(--green-light));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .days-lbl { font-size: .9rem; opacity: .7; margin-top: .2rem; }
-    .progress-track { background: rgba(255,255,255,.15); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: .5rem; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--green-light)); border-radius: 99px; transition: width .6s ease; }
-    .progress-labels { display: flex; justify-content: space-between; font-size: .7rem; opacity: .6; }
+    .days-lbl { font-size: 0.9rem; opacity: 0.7; margin-top: 0.2rem; }
+    .progress-track { background: rgba(255,255,255,0.15); border-radius: var(--radius-full); height: 10px; overflow: hidden; margin-bottom: 0.5rem; }
+    .progress-fill  { height: 100%; background: linear-gradient(90deg, var(--primary-green), var(--green-light)); border-radius: var(--radius-full); transition: width 0.6s ease; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.6; }
 
-    /* ── Burn Banner ───────────────────────────────── */
-    .burn-banner {
-      border-radius: var(--r-lg); padding: 1.5rem; text-align: center;
-      margin-top: .75rem; color: #fff;
+    /* ── Burn Layer Panel ────────────────────────── */
+    .burn-layer-panel {
+      background: rgba(192,57,43,0.06); border: 1.5px solid rgba(192,57,43,0.2);
+      border-radius: var(--radius-md); padding: 0.875rem; margin-top: 0.75rem;
     }
+    .burn-layer-panel[hidden] { display: none; }
+    .burn-layer-row  { display: flex; align-items: center; justify-content: space-between; }
+    .burn-layer-title { font-weight: 600; font-size: 0.85rem; color: var(--red); display: flex; align-items: center; gap: 0.4rem; }
+    .toggle-switch   { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #CBD5E1; border-radius: 24px; transition: 0.25s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px;
+      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.25s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--red); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+    .opacity-row { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-medium); }
+    .opacity-row input[type=range] { flex: 1; height: 4px; -webkit-appearance: none; border-radius: 2px; background: linear-gradient(to right, rgba(192,57,43,0.2), rgba(192,57,43,1)); }
+    .opacity-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--red); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
+    }
+    .burn-legend { display: flex; gap: 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-medium); flex-wrap: wrap; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 0.2rem; }
+
+    /* ── Burn Result Banner ──────────────────────── */
+    .burn-banner { border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-top: 0.75rem; color: #fff; }
     .burn-banner[hidden] { display: none; }
-    .burn-banner.clean  { background: linear-gradient(135deg, var(--green-dark), var(--green)); }
+    .burn-banner.clean  { background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); }
     .burn-banner.burned { background: linear-gradient(135deg, #991B1B, var(--red)); }
-    .burn-banner-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+    .burn-banner-icon  { font-size: 2.5rem; margin-bottom: 0.5rem; }
     .burn-banner-title { font-size: 1.25rem; font-weight: 700; }
-    .burn-banner-sub { font-size: .9rem; opacity: .9; margin-top: .25rem; }
-    .burn-stats { background: rgba(255,255,255,.15); border-radius: var(--r-md); padding: .875rem; margin-top: 1rem; text-align: left; }
-    .burn-stat-row { display: flex; justify-content: space-between; padding: .3rem 0; font-size: .85rem; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .burn-banner-sub   { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
+    .burn-stats { background: rgba(255,255,255,0.15); border-radius: var(--radius-md); padding: 0.875rem; margin-top: 1rem; text-align: left; }
+    .burn-stat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .burn-stat-row:last-child { border-bottom: none; }
 
-    /* ── Reward Strip ──────────────────────────────── */
+    /* ── Reward / Impact Strips ─────────────────── */
     .reward-strip {
-      background: linear-gradient(135deg, var(--amber), #D97706);
-      color: #fff; border-radius: var(--r-md); padding: 1rem; margin-top: .75rem;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #fff; border-radius: var(--radius-md); padding: 1rem; margin-top: 0.75rem;
     }
-    .reward-strip-title { font-weight: 600; margin-bottom: .5rem; font-size: .9rem; }
-    .reward-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; }
-    .reward-cell { background: rgba(255,255,255,.2); border-radius: var(--r-sm); padding: .6rem; text-align: center; }
-    .reward-val { font-size: 1.05rem; font-weight: 700; }
-    .reward-lbl { font-size: .65rem; opacity: .9; }
+    .reward-strip-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .reward-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    .reward-cell { background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); padding: 0.6rem; text-align: center; }
+    .reward-val  { font-size: 1.05rem; font-weight: 700; }
+    .reward-lbl  { font-size: 0.65rem; opacity: 0.9; }
 
-    /* ── Impact Strip ─────────────────────────────── */
-    .impact-strip {
-      background: linear-gradient(135deg, var(--green-dark), var(--green));
-      color: #fff; border-radius: var(--r-md); padding: 1rem; margin-top: .75rem;
-    }
-    .impact-title { font-weight: 600; margin-bottom: .5rem; font-size: .9rem; }
-    .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-    .impact-cell { background: rgba(255,255,255,.2); border-radius: var(--r-sm); padding: .6rem; text-align: center; }
-    .impact-val { font-size: 1.15rem; font-weight: 700; }
-    .impact-lbl { font-size: .7rem; opacity: .9; }
-
-    /* ── Final Cards ──────────────────────────────── */
-    .final-card { border-radius: var(--r-xl); padding: 2rem; text-align: center; color: #fff; }
-    .final-card.success { background: linear-gradient(135deg, var(--green-dark), var(--green)); }
+    /* ── Final Cards ─────────────────────────────── */
+    .final-card { border-radius: var(--radius-xl); padding: 2rem; text-align: center; color: #fff; }
+    .final-card.success { background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); }
     .final-card.failed  { background: linear-gradient(135deg, #991B1B, var(--red)); }
-    .final-icon { font-size: 3.5rem; margin-bottom: .75rem; animation: popIn .55s cubic-bezier(.175,.885,.32,1.275); }
-    @keyframes popIn { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+    .final-icon  { font-size: 3.5rem; margin-bottom: 0.75rem; animation: popIn 0.55s cubic-bezier(0.175,0.885,0.32,1.275); }
+    @keyframes popIn { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .final-title { font-size: 1.5rem; font-weight: 700; }
-    .final-sub { font-size: .9rem; opacity: .9; margin-top: .25rem; margin-bottom: 1.25rem; }
-    .final-coins { background: rgba(255,255,255,.2); border-radius: var(--r-md); padding: 1.25rem; }
+    .final-sub   { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; margin-bottom: 1.25rem; }
+    .final-coins { background: rgba(255,255,255,0.2); border-radius: var(--radius-md); padding: 1.25rem; }
     .final-coins-num { font-size: 2.5rem; font-weight: 800; }
-    .final-tip { background: rgba(255,255,255,.15); border-radius: var(--r-md); padding: .875rem; font-size: .85rem; margin-top: 1rem; }
+    .final-tip { background: rgba(255,255,255,0.15); border-radius: var(--radius-md); padding: 0.875rem; font-size: 0.85rem; margin-top: 1rem; }
 
-    /* ── Mini Map (for results) ────────────────────── */
-    .mini-map {
-      height: 180px; border-radius: var(--r-md);
-      border: 2px solid var(--border); overflow: hidden; margin-top: .75rem;
-    }
+    /* ── Mini Map ────────────────────────────────── */
+    .mini-map { height: 180px; border-radius: var(--radius-md); border: 2px solid var(--border); overflow: hidden; margin-top: 0.75rem; }
     .mini-map.burn-border { border-color: var(--red); }
 
-    /* ── Empty State ──────────────────────────────── */
+    /* ── Empty State ─────────────────────────────── */
     .empty-state {
-      background: var(--white); border-radius: var(--r-xl);
+      background: var(--white); border-radius: var(--radius-xl);
       padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-md);
     }
     .empty-state[hidden] { display: none; }
-    .empty-icon { font-size: 3.5rem; margin-bottom: .75rem; }
+    .empty-icon  { font-size: 3.5rem; margin-bottom: 0.75rem; }
     .empty-title { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); }
-    .empty-text { color: var(--text-med); margin: .5rem 0 1.25rem; line-height: 1.5; font-size: .9rem; }
+    .empty-text  { color: var(--text-medium); margin: 0.5rem 0 1.25rem; line-height: 1.5; font-size: 0.9rem; }
 
-    /* ── History ──────────────────────────────────── */
-    .history-title { font-weight: 600; font-size: .9rem; color: var(--text-dark); margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+    /* ── History ─────────────────────────────────── */
+    .history-title { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
     .history-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: .75rem; background: var(--cream); border-radius: var(--r-md);
-      margin-bottom: .4rem; border: 1.5px solid var(--border);
+      padding: 0.75rem; background: var(--light-cream); border-radius: var(--radius-md);
+      margin-bottom: 0.4rem; border: 1.5px solid var(--border);
     }
-    .history-left { display: flex; align-items: center; gap: .6rem; }
-    .history-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
-    .history-dot.completed { background: rgba(127,173,107,.15); }
-    .history-dot.failed    { background: rgba(192,57,43,.1); }
-    .history-dot.in_progress { background: rgba(91,138,200,.1); }
-    .history-name { font-weight: 600; font-size: .875rem; }
-    .history-meta { font-size: .7rem; color: var(--text-light); }
-    .history-reward { font-weight: 600; color: var(--green-dark); font-size: .9rem; }
+    .history-left   { display: flex; align-items: center; gap: 0.6rem; }
+    .history-dot    { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .history-dot.completed   { background: rgba(127,173,107,0.15); }
+    .history-dot.failed      { background: rgba(192,57,43,0.1); }
+    .history-dot.in_progress { background: rgba(91,138,200,0.1); }
+    .history-name   { font-weight: 600; font-size: 0.875rem; }
+    .history-meta   { font-size: 0.7rem; color: var(--text-light); }
+    .history-reward { font-weight: 600; color: var(--secondary-green); font-size: 0.9rem; }
 
-    /* ── Loading ──────────────────────────────────── */
+
+
+    /* ── Loading Overlay ─────────────────────────── */
     .loading-overlay {
-      position: fixed; inset: 0; background: rgba(247,245,240,.92); backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center; z-index: 3000;
+      position: fixed; inset: 0; background: rgba(247,245,240,0.92);
+      backdrop-filter: blur(4px); display: none;
+      align-items: center; justify-content: center; z-index: 3000;
     }
     .loading-overlay.show { display: flex; }
     .spinner {
       width: 48px; height: 48px; border: 4px solid var(--border);
-      border-top-color: var(--green); border-radius: 50%;
-      animation: spin .8s linear infinite; margin: 0 auto .75rem;
+      border-top-color: var(--primary-green); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: .9rem; color: var(--text-med); text-align: center; }
+    .loading-text { font-size: 0.9rem; color: var(--text-medium); text-align: center; }
 
-    /* ── Toast ────────────────────────────────────── */
+    /* ── Toast ───────────────────────────────────── */
     .toast {
       position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: var(--text-dark); color: #fff; padding: .7rem 1.25rem; border-radius: var(--r-md);
-      font-size: .875rem; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 9999;
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1); max-width: 90vw;
+      background: var(--text-dark); color: #fff; padding: 0.7rem 1.25rem;
+      border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500;
+      box-shadow: var(--shadow-lg); z-index: 9999;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); max-width: 90vw;
     }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.green { background: var(--green); }
-    .toast.red { background: var(--red); }
-
-    /* ── Mobile Nav ────────────────────────────────── */
-    .mobile-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--white); border-top: 1.5px solid var(--border);
-      display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom, 0);
-      box-shadow: 0 -2px 10px rgba(60,90,60,.06);
-    }
-    .mobile-nav a {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      padding: .6rem 0; text-decoration: none; color: var(--text-light);
-      font-size: .65rem; font-weight: 500; transition: color .15s;
-    }
-    .mobile-nav a.active { color: var(--green); }
-    .mobile-nav a .nav-icon { font-size: 1.2rem; margin-bottom: .15rem; }
+    .toast.show  { transform: translateX(-50%) translateY(0); }
+    .toast.green { background: var(--primary-green); }
+    .toast.red   { background: var(--red); }
 
     @media (max-width: 400px) {
-      .st-circle { width: 34px; height: 34px; font-size: .8rem; }
-      .st-label { font-size: .6rem; }
-      #mainMap { height: 270px; }
-      .reward-grid { grid-template-columns: 1fr; }
-      .impact-grid { grid-template-columns: 1fr; }
-      .days-num { font-size: 2.8rem; }
-      .mbtn { font-size: .72rem; padding: .45rem; }
+      .verified-stats { grid-template-columns: 1fr 1fr; }
+      .reward-grid    { grid-template-columns: 1fr; }
+      #mainMap        { height: 260px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════════ TOPBAR ═══════════ -->
-<div class="topbar">
-  <div class="topbar-logo"><span>🌾</span> AgriCall</div>
-  <div class="topbar-right"><a href="#" onclick="logout()">ออกจากระบบ</a></div>
-</div>
+<!-- ═══ HEADER (matches home.html) ═══ -->
+<header class="dashboard-header">
+  <nav class="dashboard-nav">
+    <a href="home.html" class="dashboard-logo">
+      <span class="logo-icon">🌾</span>
+      <span>AgriCall</span>
+    </a>
+    <div class="dashboard-user">
+      <div>
+        <div class="user-name" id="headerUserName">Loading...</div>
+        <div class="user-type" id="headerUserType">Loading...</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
+    </div>
+  </nav>
+</header>
 
-<!-- ═══════════ DEMO TOGGLE ═══════════ -->
+<!-- ═══ DEMO TOGGLE ═══ -->
 <div class="demo-pill-bar">
   <label class="demo-pill">
     <input type="checkbox" id="demoToggle" onchange="toggleDemo()">
@@ -490,7 +499,7 @@
   </label>
 </div>
 
-<!-- ═══════════ STEPPER ═══════════ -->
+<!-- ═══ STEPPER ═══ -->
 <div class="stepper-wrap">
   <div class="stepper">
     <div class="st" id="sStep1"><div class="st-circle">🌱</div><div class="st-label">เริ่มปลูก</div></div>
@@ -501,9 +510,10 @@
   </div>
 </div>
 
-<div class="content">
+<!-- ═══ PAGE CONTENT ═══ -->
+<div class="page-content">
 
-  <!-- Demo info -->
+  <!-- Demo alert -->
   <div class="alert purple" id="demoAlert" hidden>
     <div class="alert-icon">🚀</div>
     <div class="alert-content">
@@ -512,30 +522,34 @@
     </div>
   </div>
 
-  <!-- ═══════════ NO CYCLE ═══════════ -->
+  <!-- ═══ NO CYCLE ═══ -->
   <div class="empty-state" id="noCycleCard" hidden>
     <div class="empty-icon">🌱</div>
     <div class="empty-title">เริ่มต้นรอบการเพาะปลูกใหม่</div>
     <div class="empty-text">ลงทะเบียนแปลงเกษตรและเริ่มรอบตรวจสอบ<br>เพื่อรับ AgriCoins เมื่อไม่มีการเผา</div>
-    <button class="btn-p btn-green" onclick="showStep(1)" style="max-width:320px;margin:.75rem auto 0;">🌱 เริ่มลงทะเบียน</button>
+    <button class="btn btn-green" onclick="showStep(1)" style="max-width:320px;margin:0.75rem auto 0;">🌱 เริ่มลงทะเบียน</button>
   </div>
 
-  <!-- ═══════════ STEP 1: Registration ═══════════ -->
+  <!-- ═══════════════════════════════════════════
+       STEP 1 — Registration
+  ═══════════════════════════════════════════ -->
   <div class="card" id="step1Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-green">🌱</div>
-      <div><div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div><div class="card-sub">ระบุแปลงและประเภทพืช</div></div>
+      <div>
+        <div class="card-title">ขั้นตอนที่ 1: ลงทะเบียนเริ่มปลูก</div>
+        <div class="card-sub">ระบุขอบเขตแปลงและประเภทพืช</div>
+      </div>
     </div>
     <div class="card-body">
 
-      <!-- Map Section (same style as signup) -->
       <div class="map-section">
-        <div style="font-size:.875rem;font-weight:700;color:var(--text-dark);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+        <div style="font-size:0.875rem;font-weight:700;color:var(--text-dark);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem;">
           📍 ระบุขอบเขตแปลง
         </div>
         <div class="map-toolbar">
           <button class="mbtn" id="btnSaved" onclick="setMode('saved')">💾 แปลงของฉัน</button>
-          <button class="mbtn" id="btnAuto"  onclick="setMode('auto')">🛰️ ตรวจจับอัตโนมัติ</button>
+          <button class="mbtn" id="btnAuto"  onclick="setMode('auto')">🛰️ อัตโนมัติ</button>
           <button class="mbtn" id="btnDraw"  onclick="setMode('draw')">✏️ วาดเอง</button>
           <button class="mbtn" id="btnMyLoc" onclick="goToMyLocation()">📍 ตำแหน่งฉัน</button>
         </div>
@@ -568,17 +582,26 @@
         <div class="alert-content" id="step1ErrText"></div>
       </div>
 
-      <button class="btn-p btn-green" id="step1Submit" disabled onclick="submitStep1()">🌱 ลงทะเบียนเริ่มปลูก</button>
+      <button class="btn btn-green" id="step1Submit" disabled onclick="submitStep1()">
+        🌱 ลงทะเบียนเริ่มปลูก
+      </button>
     </div>
   </div>
 
-  <!-- ═══════════ STEP 2: Crop Verification ═══════════ -->
+  <!-- ═══════════════════════════════════════════
+       STEP 2 — Crop Verification
+  ═══════════════════════════════════════════ -->
   <div class="card" id="step2Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-blue">🌾</div>
-      <div><div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div><div class="card-sub">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div></div>
+      <div>
+        <div class="card-title">ขั้นตอนที่ 2: ตรวจสอบพืช</div>
+        <div class="card-sub">ยืนยันพืชเติบโตด้วยดาวเทียม Sentinel-2</div>
+      </div>
     </div>
     <div class="card-body">
+
+      <!-- Waiting state -->
       <div class="alert info" id="step2Wait">
         <div class="alert-icon">⏳</div>
         <div class="alert-content">
@@ -586,6 +609,8 @@
           ต้องรออีก <strong id="step2Days">-</strong> วัน ก่อนตรวจสอบพืช
         </div>
       </div>
+
+      <!-- Ready state -->
       <div class="alert success" id="step2Ready" hidden>
         <div class="alert-icon">✅</div>
         <div class="alert-content">
@@ -594,42 +619,78 @@
         </div>
       </div>
 
+      <!-- Satellite evidence (shown after analysis) -->
       <div id="step2Evidence" hidden></div>
 
-      <div id="step2SkipSection" hidden>
-        <div class="divider-or">Demo Mode</div>
-        <button class="btn-p btn-purple" onclick="doStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบ</button>
+      <!-- ✅ CROP VERIFIED SUCCESS — shows after verification passes, user must click to proceed -->
+      <div class="verified-banner" id="cropVerifiedBanner" hidden>
+        <div class="verified-icon">🌾</div>
+        <div class="verified-title">ตรวจพบพืชในแปลงแล้ว!</div>
+        <div class="verified-sub">ดาวเทียมยืนยันการเติบโตของพืช — พร้อมดำเนินการต่อ</div>
+        <div class="verified-stats">
+          <div class="verified-stat">
+            <div class="verified-stat-val" id="cvNdvi">-</div>
+            <div class="verified-stat-lbl">NDVI Peak</div>
+          </div>
+          <div class="verified-stat">
+            <div class="verified-stat-val" id="cvCrop">-</div>
+            <div class="verified-stat-lbl">พื้นที่เกษตร</div>
+          </div>
+          <div class="verified-stat">
+            <div class="verified-stat-val" id="cvImgs">-</div>
+            <div class="verified-stat-lbl">ภาพดาวเทียม</div>
+          </div>
+        </div>
       </div>
 
-      <button class="btn-p btn-blue" id="step2Submit" disabled onclick="doStep2(false)">🛰️ ตรวจสอบพืชด้วยดาวเทียม</button>
+      <!-- Proceed to Step 3 button (shown after crop verified) -->
+      <button class="btn btn-green" id="proceedToStep3Btn" hidden onclick="proceedToStep3()">
+        🌾 ดำเนินการต่อ — แจ้งเก็บเกี่ยว →
+      </button>
+
+      <!-- Demo skip section -->
+      <div id="step2SkipSection" hidden>
+        <div class="divider-or">Demo Mode</div>
+        <button class="btn btn-purple" onclick="doStep2(true)">🚀 ข้าม 30 วัน & ตรวจสอบ</button>
+      </div>
+
+      <!-- Main verify button (hidden after verified) -->
+      <button class="btn btn-blue" id="step2Submit" disabled onclick="doStep2(false)">
+        🛰️ ตรวจสอบพืชด้วยดาวเทียม
+      </button>
     </div>
   </div>
 
-  <!-- ═══════════ STEP 3: Post-harvest Monitoring ═══════════ -->
+  <!-- ═══════════════════════════════════════════
+       STEP 3 — Post-harvest Monitoring
+  ═══════════════════════════════════════════ -->
   <div class="card" id="step3Card" hidden>
     <div class="card-header">
       <div class="card-icon ci-amber">🔥</div>
-      <div><div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div><div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div></div>
+      <div>
+        <div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div>
+        <div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div>
+      </div>
     </div>
     <div class="card-body">
 
-      <!-- Pre-harvest -->
+      <!-- Pre-harvest declare -->
       <div id="harvestSection">
         <div class="alert success">
           <div class="alert-icon">🌾</div>
           <div class="alert-content">
             <div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>
-            เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่าง
+            เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่างเพื่อเริ่มการตรวจสอบ 60 วัน
           </div>
         </div>
-        <button class="btn-p btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
+        <button class="btn btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
       </div>
 
-      <!-- Monitoring -->
+      <!-- Monitoring in progress -->
       <div id="monitorSection" hidden>
         <div class="monitor-card">
           <div class="monitor-header">
-            <div class="monitor-title">🛰️ กำลังตรวจสอบ</div>
+            <div class="monitor-title">🛰️ กำลังตรวจสอบ 60 วัน</div>
             <div class="monitor-badge">กำลังดำเนินการ</div>
           </div>
           <div class="days-hero">
@@ -640,10 +701,8 @@
           <div class="progress-labels"><span>เริ่มต้น</span><span>60 วัน</span></div>
         </div>
 
-        <!-- Map for monitoring — uses main map -->
         <div id="monitorMapContainer"></div>
 
-        <!-- Burn scar layer controls -->
         <div class="burn-layer-panel" id="burnLayerPanel" hidden>
           <div class="burn-layer-row">
             <div class="burn-layer-title">🔥 ข้อมูลการเผาจากดาวเทียม</div>
@@ -664,14 +723,13 @@
           </div>
         </div>
 
-        <!-- Burn result banner -->
         <div id="burnBanner" hidden></div>
 
-        <button class="btn-p btn-blue" onclick="doCheckBurn(false)">🔍 ตรวจสอบสถานะการเผา</button>
+        <button class="btn btn-blue" onclick="doCheckBurn(false)">🔍 ตรวจสอบสถานะการเผา</button>
 
         <div id="step3SkipSection" hidden>
           <div class="divider-or">Demo Mode</div>
-          <button class="btn-p btn-purple" onclick="doCheckBurn(true)">🚀 ข้าม 60 วัน & รับ AgriCoins</button>
+          <button class="btn btn-purple" onclick="doCheckBurn(true)">🚀 ข้าม 60 วัน & รับ AgriCoins</button>
         </div>
 
         <div class="reward-strip">
@@ -686,7 +744,7 @@
     </div>
   </div>
 
-  <!-- ═══════════ SUCCESS ═══════════ -->
+  <!-- ═══ SUCCESS ═══ -->
   <div class="card" id="successCard" hidden>
     <div class="final-card success">
       <div class="final-icon">🎉</div>
@@ -700,22 +758,22 @@
     </div>
     <div class="mini-map" id="successMiniMap"></div>
     <div id="successImpact"></div>
-    <button class="btn-p btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
   </div>
 
-  <!-- ═══════════ FAILED ═══════════ -->
+  <!-- ═══ FAILED ═══ -->
   <div class="card" id="failedCard" hidden>
     <div class="final-card failed">
       <div class="final-icon">😔</div>
       <div class="final-title">พบการเผา</div>
       <div class="final-sub">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
-      <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ</div>
+      <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ PM2.5</div>
     </div>
     <div class="mini-map burn-border" id="failedMiniMap"></div>
-    <button class="btn-p btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
+    <button class="btn btn-green" onclick="startNew()">🌱 เริ่มรอบใหม่</button>
   </div>
 
-  <!-- ═══════════ HISTORY ═══════════ -->
+  <!-- ═══ HISTORY ═══ -->
   <div class="card" id="historyCard">
     <div class="card-body">
       <div class="history-title">📋 ประวัติการตรวจสอบ</div>
@@ -723,15 +781,9 @@
     </div>
   </div>
 
-</div><!-- /content -->
+</div><!-- /page-content -->
 
-<!-- Nav -->
-<nav class="mobile-nav">
-  <a href="home.html"><div class="nav-icon">🏠</div>หน้าหลัก</a>
-  <a href="burn-verification-v2.html" class="active"><div class="nav-icon">🌾</div>ตรวจสอบ</a>
-  <a href="Stat.html"><div class="nav-icon">📊</div>สถิติ</a>
-  <a href="#" onclick="logout()"><div class="nav-icon">🚪</div>ออก</a>
-</nav>
+
 
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
@@ -746,9 +798,9 @@
 <script src="utils.js"></script>
 <script src="api.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // GLOBAL STATE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 const currentUser = Auth.getCurrentUser();
 if (!currentUser) window.location.href = 'index.html';
 
@@ -757,91 +809,77 @@ const CO2_PER_RAI  = 898;
 const HA_TO_RAI    = 6.25;
 const BACKEND      = 'https://agricall.onrender.com';
 
-let map            = null;
-let drawnItems     = null;
-let drawControl    = null;
-let selectedPoly   = null;
-let activeCycle    = null;
-let demoMode       = false;
-let mapMode        = 'none';
-let savedPoly      = null;
-let burnScarLayer  = null;
-let mapInited      = false;
+let map           = null;
+let drawnItems    = null;
+let drawControl   = null;
+let selectedPoly  = null;
+let activeCycle   = null;
+let demoMode      = false;
+let mapMode       = 'none';
+let savedPoly     = null;
+let burnScarLayer = null;
+let mapInited     = false;
 
-// ═══════════════════════════════════════════════════════════════
-// MAP — single map, stays in #mainMap (like signup page)
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// HEADER INIT
+// ═══════════════════════════════════════════════════════════
+function initHeader() {
+  const typeLabels = { customer: 'ลูกค้า', farmer: 'เกษตรกร', baler: 'คนอัดฟาง' };
+  document.getElementById('headerUserName').textContent = currentUser.name || '-';
+  document.getElementById('headerUserType').textContent = typeLabels[currentUser.type] || currentUser.type;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════════
 function initMap() {
   if (mapInited) { if (map) setTimeout(() => map.invalidateSize(), 100); return; }
   mapInited = true;
-
   map = L.map('mainMap').setView([18.7883, 98.9853], 13);
-
   const gHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
-  const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '© Esri' });
-  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OSM' });
-
+  const esri    = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '© Esri' });
+  const osm     = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OSM' });
   gHybrid.addTo(map);
   L.control.layers({ '🛰️ ดาวเทียม (Google)': gHybrid, '🛰️ ดาวเทียม (Esri)': esri, '🗺️ แผนที่ถนน': osm }, null, { position: 'topright', collapsed: true }).addTo(map);
   L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
-
   drawnItems = new L.FeatureGroup();
   map.addLayer(drawnItems);
-
-  map.on('click', async (e) => {
-    if (mapMode !== 'auto') return;
-    await autoDetect(e.latlng.lat, e.latlng.lng);
-  });
-
+  map.on('click', async (e) => { if (mapMode !== 'auto') return; await autoDetect(e.latlng.lat, e.latlng.lng); });
   setTimeout(() => map.invalidateSize(), 150);
 }
 
-/**
- * Move the main map element into a different container (for monitoring view).
- * If containerId is null, move it back to the step1 location.
- */
 function moveMapTo(containerId) {
   const mapEl = document.getElementById('mainMap');
   if (!mapEl) return;
-  const target = containerId ? document.getElementById(containerId) : null;
-
-  if (target) {
-    target.innerHTML = '';
-    target.appendChild(mapEl);
+  if (containerId) {
+    const target = document.getElementById(containerId);
+    if (target) { target.innerHTML = ''; target.appendChild(mapEl); }
   } else {
-    // Move back to step 1 (before the area badge)
     const badge = document.getElementById('areaBadge');
-    if (badge && badge.parentNode) {
-      badge.parentNode.insertBefore(mapEl, badge);
-    }
+    if (badge && badge.parentNode) badge.parentNode.insertBefore(mapEl, badge);
   }
   if (map) setTimeout(() => map.invalidateSize(), 80);
 }
 
-/**
- * Create a mini Leaflet map for result views (like signup review map)
- */
 function createMiniMap(containerId, polygon, style) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
-
   const mm = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, attributionControl: false }).setView([18.7883, 98.9853], 13);
   L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(mm);
-
   if (polygon) {
-    const latlngs = polygon.coordinates[0].map(c => [c[1], c[0]]);
-    const s = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.4 };
-    const layer = L.polygon(latlngs, s);
+    const ll = polygon.coordinates[0].map(c => [c[1], c[0]]);
+    const s  = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.4 };
+    const layer = L.polygon(ll, s);
     layer.addTo(mm);
     mm.fitBounds(layer.getBounds(), { padding: [10, 10] });
   }
   return mm;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // DEMO
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function toggleDemo() {
   demoMode = document.getElementById('demoToggle').checked;
   document.getElementById('demoBadge').style.display = demoMode ? 'inline' : 'none';
@@ -850,15 +888,15 @@ function toggleDemo() {
   if (activeCycle) renderCycle(activeCycle);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BURN SCAR GEOTIFF LAYER
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// BURN SCAR LAYER
+// ═══════════════════════════════════════════════════════════
 async function loadBurnScar() {
   try {
     const res = await fetch('strict_burn_tier1_chiangmai.tif');
     if (!res.ok) return;
     const buf = await res.arrayBuffer();
-    const gr = await parseGeoraster(buf);
+    const gr  = await parseGeoraster(buf);
     burnScarLayer = new GeoRasterLayer({
       georaster: gr, opacity: 0.7, resolution: 256,
       pixelValuesToColorFn: v => {
@@ -867,7 +905,7 @@ async function loadBurnScar() {
         if (x >= 0.8 || x >= 3) return 'rgba(255,0,0,0.85)';
         if (x >= 0.5 || x >= 2) return 'rgba(255,140,0,0.75)';
         if (x >= 0.2 || x >= 1) return 'rgba(255,200,0,0.65)';
-        if (x > 0) return 'rgba(255,255,100,0.5)';
+        if (x > 0)               return 'rgba(255,255,100,0.5)';
         return null;
       }
     });
@@ -875,7 +913,6 @@ async function loadBurnScar() {
     document.getElementById('burnLayerPanel').hidden = false;
   } catch (e) { console.log('Burn GeoTIFF N/A:', e.message); }
 }
-
 function toggleBurnLayer() {
   if (!burnScarLayer) return;
   document.getElementById('burnToggle').checked ? burnScarLayer.addTo(map) : map.removeLayer(burnScarLayer);
@@ -890,53 +927,46 @@ function removeBurnScar() {
   document.getElementById('burnLayerPanel').hidden = true;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // POLYGON HELPERS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function displayPoly(geojson, style) {
   drawnItems.clearLayers();
-  const s = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 };
-  const latlngs = geojson.coordinates[0].map(c => [c[1], c[0]]);
-  const layer = L.polygon(latlngs, s);
+  const s  = style || { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.3 };
+  const ll = geojson.coordinates[0].map(c => [c[1], c[0]]);
+  const layer = L.polygon(ll, s);
   drawnItems.addLayer(layer);
   map.fitBounds(layer.getBounds(), { padding: [30, 30] });
   return layer;
 }
-
 function computeRai(geojson) {
   try {
     const ll = geojson.coordinates[0].map(c => L.latLng(c[1], c[0]));
     return (L.GeometryUtil.geodesicArea(ll) / 10000) * HA_TO_RAI;
   } catch { return 0; }
 }
-
-function calcCoins(rai) {
-  return Math.floor(rai * PM25_PER_RAI * 10) + Math.floor(rai * CO2_PER_RAI / 100);
-}
-
+function calcCoins(rai) { return Math.floor(rai * PM25_PER_RAI * 10) + Math.floor(rai * CO2_PER_RAI / 100); }
 function updatePreview(rai) {
-  document.getElementById('areaDisplay').textContent = rai.toFixed(2);
-  document.getElementById('coinsPreview').textContent = calcCoins(rai);
+  document.getElementById('areaDisplay').textContent   = rai.toFixed(2);
+  document.getElementById('coinsPreview').textContent  = calcCoins(rai);
   document.getElementById('areaBadge').classList.add('show');
-  document.getElementById('clearBtn').style.display = 'block';
-  document.getElementById('step1Submit').disabled = false;
+  document.getElementById('clearBtn').style.display    = 'block';
+  document.getElementById('step1Submit').disabled      = false;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MAP MODES (same approach as signup page)
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// MAP MODES
+// ═══════════════════════════════════════════════════════════
 function setMode(mode) {
   mapMode = mode;
   document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
-  const mapEl = document.getElementById('mainMap');
-  mapEl.classList.remove('crosshair');
+  document.getElementById('mainMap').classList.remove('crosshair');
   if (drawControl) { map.removeControl(drawControl); drawControl = null; }
 
   if (mode === 'saved') {
     document.getElementById('btnSaved').classList.add('mg');
     if (savedPoly) {
-      displayPoly(savedPoly);
-      selectedPoly = savedPoly;
+      displayPoly(savedPoly); selectedPoly = savedPoly;
       updatePreview(computeRai(savedPoly));
       document.getElementById('mapHint').textContent = '✅ โหลดแปลงที่บันทึกไว้แล้ว';
       showToast('โหลดแปลงสำเร็จ', 'green');
@@ -946,7 +976,7 @@ function setMode(mode) {
     }
   } else if (mode === 'auto') {
     document.getElementById('btnAuto').classList.add('ma');
-    mapEl.classList.add('crosshair');
+    document.getElementById('mainMap').classList.add('crosshair');
     document.getElementById('mapHint').textContent = '🛰️ คลิกบนแผนที่ตรงตำแหน่งแปลงของคุณ';
     showToast('คลิกบนแผนที่เพื่อตรวจจับแปลง', '');
   } else if (mode === 'draw') {
@@ -961,11 +991,9 @@ function setMode(mode) {
     });
     map.addControl(drawControl);
     map.on(L.Draw.Event.CREATED, (e) => {
-      drawnItems.clearLayers();
-      drawnItems.addLayer(e.layer);
+      drawnItems.clearLayers(); drawnItems.addLayer(e.layer);
       const ll = e.layer.getLatLngs()[0];
-      const coords = ll.map(p => [p.lng, p.lat]);
-      coords.push(coords[0]);
+      const coords = ll.map(p => [p.lng, p.lat]); coords.push(coords[0]);
       selectedPoly = { type: 'Polygon', coordinates: [coords] };
       updatePreview((L.GeometryUtil.geodesicArea(ll) / 10000) * HA_TO_RAI);
       document.getElementById('mapHint').textContent = '✅ วาดขอบเขตเรียบร้อย';
@@ -980,8 +1008,7 @@ async function autoDetect(lat, lng) {
     const r = await API.callBackend('/api/burn-scar/analyze', { mode: 'auto', lat, lng, radius_m: 500, days_back: 90, user_id: currentUser.id });
     hideLoading();
     if (r.success && r.polygon) {
-      displayPoly(r.polygon);
-      selectedPoly = r.polygon;
+      displayPoly(r.polygon); selectedPoly = r.polygon;
       updatePreview(r.farm_area_ha * HA_TO_RAI);
       document.getElementById('mapHint').textContent = '✅ ตรวจจับสำเร็จ';
       showToast('🛰️ ตรวจจับแปลงสำเร็จ', 'green');
@@ -1005,23 +1032,20 @@ async function goToMyLocation() {
 
 function clearAll() {
   drawnItems.clearLayers();
-  selectedPoly = null;
-  mapMode = 'none';
-  removeBurnScar();
+  selectedPoly = null; mapMode = 'none'; removeBurnScar();
   document.getElementById('areaBadge').classList.remove('show');
-  document.getElementById('clearBtn').style.display = 'none';
-  document.getElementById('step1Submit').disabled = true;
-  document.getElementById('mapHint').textContent = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
+  document.getElementById('clearBtn').style.display    = 'none';
+  document.getElementById('step1Submit').disabled      = true;
+  document.getElementById('mapHint').textContent       = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
   document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
   document.getElementById('mainMap').classList.remove('crosshair');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // LOADING / TOAST
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function showLoading(t) { document.getElementById('loadingText').textContent = t || 'กำลังโหลด...'; document.getElementById('loadingOverlay').classList.add('show'); }
-function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
-
+function hideLoading()  { document.getElementById('loadingOverlay').classList.remove('show'); }
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1031,96 +1055,122 @@ function showToast(msg, type) {
   t._t = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER SATELLITE EVIDENCE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// SATELLITE EVIDENCE RENDER
+// ═══════════════════════════════════════════════════════════
 function renderEvidence(v, id) {
   const el = document.getElementById(id);
   if (!el || !v) return;
-  const fmt = n => (n != null ? Number(n).toFixed(3) : 'N/A');
-  const pct = n => (n != null ? (n * 100).toFixed(0) + '%' : 'N/A');
+  const fmt = n  => (n != null ? Number(n).toFixed(3) : 'N/A');
+  const pct = n  => (n != null ? (n * 100).toFixed(0) + '%' : 'N/A');
   const cls = (val, thr) => (val == null ? 'warn' : val >= thr ? 'pass' : 'fail');
   const reasons = (v.reasons || []).map(r => `<div class="sat-reason">${r}</div>`).join('');
   el.innerHTML = `
     <div class="sat-panel">
       <div class="sat-panel-title">🛰️ หลักฐานจากดาวเทียม — ${v.crops_detected != null ? (v.crops_detected ? '<span class="sat-val pass">✅ ตรวจพบพืช</span>' : '<span class="sat-val fail">❌ ไม่พบพืช</span>') : ''}</div>
-      <div class="sat-row"><span class="sat-label">NDVI สูงสุด (≥0.35)</span><span class="sat-val ${cls(v.ndvi_peak, 0.35)}">${fmt(v.ndvi_peak)}</span></div>
+      <div class="sat-row"><span class="sat-label">NDVI สูงสุด (≥0.35)</span><span class="sat-val ${cls(v.ndvi_peak,0.35)}">${fmt(v.ndvi_peak)}</span></div>
       <div class="sat-row"><span class="sat-label">NDVI เฉลี่ย</span><span class="sat-val">${fmt(v.ndvi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">EVI มวลชีวภาพ</span><span class="sat-val ${cls(v.evi_score, 0)}">${fmt(v.evi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">ESA พื้นที่เกษตร (≥30%)</span><span class="sat-val ${cls(v.cropland_fraction, 0.3)}">${pct(v.cropland_fraction)}</span></div>
+      <div class="sat-row"><span class="sat-label">EVI มวลชีวภาพ</span><span class="sat-val ${cls(v.evi_score,0)}">${fmt(v.evi_score)}</span></div>
+      <div class="sat-row"><span class="sat-label">ESA พื้นที่เกษตร (≥30%)</span><span class="sat-val ${cls(v.cropland_fraction,0.3)}">${pct(v.cropland_fraction)}</span></div>
       <div class="sat-row"><span class="sat-label">NDWI</span><span class="sat-val">${fmt(v.ndwi_score)}</span></div>
-      <div class="sat-row"><span class="sat-label">จำนวนภาพ</span><span class="sat-val ${(v.imagery_count || 0) >= 2 ? 'pass' : 'warn'}">${v.imagery_count || 0} ภาพ</span></div>
+      <div class="sat-row"><span class="sat-label">จำนวนภาพ</span><span class="sat-val ${(v.imagery_count||0)>=2?'pass':'warn'}">${v.imagery_count||0} ภาพ</span></div>
       ${reasons ? `<div class="sat-reasons">${reasons}</div>` : ''}
-      <div class="sat-source">แหล่งข้อมูล: ${v.source || 'N/A'}</div>
+      <div class="sat-source">แหล่งข้อมูล: ${v.source||'N/A'}</div>
     </div>`;
   el.hidden = false;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER BURN RESULT
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// SHOW CROP VERIFIED BANNER + PROCEED BUTTON
+// ═══════════════════════════════════════════════════════════
+function showCropVerifiedUI(verification) {
+  // Populate banner stats
+  if (verification) {
+    document.getElementById('cvNdvi').textContent  = verification.ndvi_peak != null ? Number(verification.ndvi_peak).toFixed(3) : '-';
+    document.getElementById('cvCrop').textContent  = verification.cropland_fraction != null ? (verification.cropland_fraction * 100).toFixed(0) + '%' : '-';
+    document.getElementById('cvImgs').textContent  = (verification.imagery_count || 0) + ' ภาพ';
+  }
+  document.getElementById('cropVerifiedBanner').hidden  = false;
+  document.getElementById('proceedToStep3Btn').hidden   = false;
+  // Hide the verify button to avoid double-clicking
+  document.getElementById('step2Submit').hidden         = true;
+  document.getElementById('step2SkipSection').hidden    = true;
+}
+
+// Called when user explicitly clicks "Proceed to Step 3"
+async function proceedToStep3() {
+  showToast('กำลังไปขั้นตอนที่ 3...', 'green');
+  await loadStatus();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BURN RESULT RENDER
+// ═══════════════════════════════════════════════════════════
 function renderBurn(result) {
-  const ba = result.burn_analysis || result;
-  const burned = ba.burn_detected;
-  const rai = activeCycle ? activeCycle.area_rai : 0;
+  const ba       = result.burn_analysis || result;
+  const burned   = ba.burn_detected;
+  const rai      = activeCycle ? activeCycle.area_rai : 0;
   const burnedRai = ((ba.burned_area_ha || 0) * HA_TO_RAI).toFixed(2);
 
-  // Color the polygon
   drawnItems.eachLayer(layer => {
     if (!layer.setStyle) return;
     layer.setStyle(burned
       ? { color: '#c0392b', fillColor: '#e74c3c', fillOpacity: 0.4 }
       : { color: '#7FAD6B', fillColor: '#a5c995', fillOpacity: 0.35 });
     layer.bindPopup(burned
-      ? `⚠️ พบการเผา ${ba.burn_percentage || 0}%`
+      ? `⚠️ พบการเผา ${ba.burn_percentage||0}%`
       : `✅ ไม่พบการเผา — แปลงสะอาด`).openPopup();
   });
 
-  // Update map border
-  const mapEl = document.getElementById('mainMap');
-  mapEl.classList.toggle('burn-border', burned);
+  document.getElementById('mainMap').classList.toggle('burn-border', burned);
 
-  // Banner
   const banner = document.getElementById('burnBanner');
   banner.innerHTML = `
-    <div class="burn-banner ${burned ? 'burned' : 'clean'}">
-      <div class="burn-banner-icon">${burned ? '⚠️' : '✅'}</div>
-      <div class="burn-banner-title">${burned ? 'พบการเผา!' : 'ไม่พบการเผา'}</div>
-      <div class="burn-banner-sub">${burned ? `พบ ${ba.burn_percentage || 0}% ของพื้นที่` : 'แปลงสะอาด ไม่มีร่องรอยการเผา'}</div>
+    <div class="burn-banner ${burned?'burned':'clean'}">
+      <div class="burn-banner-icon">${burned?'⚠️':'✅'}</div>
+      <div class="burn-banner-title">${burned?'พบการเผา!':'ไม่พบการเผา'}</div>
+      <div class="burn-banner-sub">${burned?`พบ ${ba.burn_percentage||0}% ของพื้นที่`:'แปลงสะอาด ไม่มีร่องรอยการเผา'}</div>
       <div class="burn-stats">
-        <div class="burn-stat-row"><span>ขนาดพื้นที่:</span><span>${rai.toFixed ? rai.toFixed(1) : rai} ไร่</span></div>
+        <div class="burn-stat-row"><span>ขนาดพื้นที่:</span><span>${rai.toFixed?rai.toFixed(1):rai} ไร่</span></div>
         <div class="burn-stat-row"><span>พื้นที่เผา:</span><span>${burnedRai} ไร่</span></div>
-        <div class="burn-stat-row"><span>เปอร์เซ็นต์:</span><span>${ba.burn_percentage || 0}%</span></div>
-        <div class="burn-stat-row"><span>วิธีตรวจจับ:</span><span>${ba.method || ba.source || '-'}</span></div>
+        <div class="burn-stat-row"><span>เปอร์เซ็นต์:</span><span>${ba.burn_percentage||0}%</span></div>
+        <div class="burn-stat-row"><span>วิธีตรวจจับ:</span><span>${ba.method||ba.source||'-'}</span></div>
       </div>
     </div>`;
   banner.hidden = false;
-
   loadBurnScar();
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // VIEW MANAGEMENT
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function hideAll() {
-  ['noCycleCard', 'step1Card', 'step2Card', 'step3Card', 'successCard', 'failedCard'].forEach(id => {
+  ['noCycleCard','step1Card','step2Card','step3Card','successCard','failedCard'].forEach(id => {
     document.getElementById(id).hidden = true;
   });
-  // Always move map back to step1 container when switching views
   moveMapTo(null);
 }
 
 function updateStepper(cur, status) {
   for (let i = 1; i <= 3; i++) {
-    const el = document.getElementById('sStep' + i);
+    const el   = document.getElementById('sStep' + i);
     const line = document.getElementById('sLine' + (i - 1));
-    el.classList.remove('active', 'done', 'failed');
+    el.classList.remove('active','done','failed');
     if (line) line.classList.remove('done');
 
-    if (status === 'completed') { el.classList.add('done'); if (line) line.classList.add('done'); }
-    else if (status === 'failed' && i <= cur) { el.classList.add(i === cur ? 'failed' : 'done'); if (line && i <= cur) line.classList.add('done'); }
-    else if (i < cur) { el.classList.add('done'); if (line) line.classList.add('done'); }
-    else if (i === cur) { el.classList.add('active'); if (line) line.classList.add('done'); }
+    if (status === 'completed') {
+      el.classList.add('done');
+      if (line) line.classList.add('done');
+    } else if (status === 'failed' && i <= cur) {
+      el.classList.add(i === cur ? 'failed' : 'done');
+      if (line && i <= cur) line.classList.add('done');
+    } else if (i < cur) {
+      el.classList.add('done');
+      if (line) line.classList.add('done');
+    } else if (i === cur) {
+      el.classList.add('active');
+      if (line) line.classList.add('done');
+    }
   }
 }
 
@@ -1129,12 +1179,11 @@ function showStep(n) {
   updateStepper(n, 'in_progress');
   if (n === 1) {
     document.getElementById('step1Card').hidden = false;
-    moveMapTo(null); // ensure map is in step1
+    moveMapTo(null);
     setTimeout(() => { if (map) map.invalidateSize(); }, 100);
     if (savedPoly && !selectedPoly) {
       setTimeout(() => {
-        displayPoly(savedPoly);
-        selectedPoly = savedPoly;
+        displayPoly(savedPoly); selectedPoly = savedPoly;
         updatePreview(computeRai(savedPoly));
         document.getElementById('mapHint').textContent = '✅ โหลดแปลงอัตโนมัติ';
         document.getElementById('btnSaved').classList.add('mg');
@@ -1144,9 +1193,9 @@ function showStep(n) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // LOAD STATUS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function loadStatus() {
   showLoading('กำลังโหลด...');
   try {
@@ -1173,18 +1222,16 @@ function renderCycle(c) {
   if (c.final_status === 'completed') {
     document.getElementById('successCard').hidden = false;
     document.getElementById('successCoins').textContent = Math.round(c.reward?.agricoin_awarded || 0);
-    // Create mini map for success
-    setTimeout(() => {
-      createMiniMap('successMiniMap', c.polygon, { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.35 });
-    }, 200);
+    setTimeout(() => createMiniMap('successMiniMap', c.polygon, { color: '#7FAD6B', weight: 3, fillColor: '#a5c995', fillOpacity: 0.35 }), 200);
     const rai = c.area_rai || 0;
     if (rai > 0) {
       document.getElementById('successImpact').innerHTML = `
-        <div class="impact-strip">
-          <div class="impact-title">🌍 ผลกระทบเชิงบวก</div>
-          <div class="impact-grid">
-            <div class="impact-cell"><div class="impact-val">${(rai * PM25_PER_RAI).toFixed(1)} kg</div><div class="impact-lbl">PM2.5 ลดได้</div></div>
-            <div class="impact-cell"><div class="impact-val">${Math.round(rai * CO2_PER_RAI)} kg</div><div class="impact-lbl">CO₂ ลดได้</div></div>
+        <div class="reward-strip" style="background:linear-gradient(135deg,var(--primary-green),var(--secondary-green));">
+          <div class="reward-strip-title">🌍 ผลกระทบเชิงบวก</div>
+          <div class="reward-grid">
+            <div class="reward-cell"><div class="reward-val">${(rai*PM25_PER_RAI).toFixed(1)} kg</div><div class="reward-lbl">PM2.5 ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val">${Math.round(rai*CO2_PER_RAI)} kg</div><div class="reward-lbl">CO₂ ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val">🪙 ${calcCoins(rai)}</div><div class="reward-lbl">AgriCoins</div></div>
           </div>
         </div>`;
     }
@@ -1193,9 +1240,7 @@ function renderCycle(c) {
 
   if (c.final_status === 'failed') {
     document.getElementById('failedCard').hidden = false;
-    setTimeout(() => {
-      createMiniMap('failedMiniMap', c.polygon, { color: '#c0392b', weight: 3, fillColor: '#e74c3c', fillOpacity: 0.4 });
-    }, 200);
+    setTimeout(() => createMiniMap('failedMiniMap', c.polygon, { color: '#c0392b', weight: 3, fillColor: '#e74c3c', fillOpacity: 0.4 }), 200);
     return;
   }
 
@@ -1205,20 +1250,26 @@ function renderCycle(c) {
     hideAll();
     updateStepper(2, 'in_progress');
     document.getElementById('step2Card').hidden = false;
+
+    // Reset step 2 UI
+    document.getElementById('cropVerifiedBanner').hidden = true;
+    document.getElementById('proceedToStep3Btn').hidden  = true;
+    document.getElementById('step2Submit').hidden        = false;
+    document.getElementById('step2Evidence').hidden      = true;
+
     const wait = c.days_info?.days_until_crop_check || 0;
     if (wait > 0) {
-      document.getElementById('step2Wait').hidden = false;
-      document.getElementById('step2Ready').hidden = true;
+      document.getElementById('step2Wait').hidden   = false;
+      document.getElementById('step2Ready').hidden  = true;
       document.getElementById('step2Days').textContent = wait;
-      document.getElementById('step2Submit').disabled = true;
+      document.getElementById('step2Submit').disabled  = true;
       document.getElementById('step2SkipSection').hidden = !demoMode;
     } else {
-      document.getElementById('step2Wait').hidden = true;
-      document.getElementById('step2Ready').hidden = false;
-      document.getElementById('step2Submit').disabled = false;
+      document.getElementById('step2Wait').hidden   = true;
+      document.getElementById('step2Ready').hidden  = false;
+      document.getElementById('step2Submit').disabled  = false;
       document.getElementById('step2SkipSection').hidden = true;
     }
-    document.getElementById('step2Evidence').hidden = true;
     return;
   }
 
@@ -1228,37 +1279,34 @@ function renderCycle(c) {
     document.getElementById('step3Card').hidden = false;
 
     if (c.steps.step3.status === 'monitoring') {
-      document.getElementById('harvestSection').hidden = true;
-      document.getElementById('monitorSection').hidden = false;
-
-      // Move map into the monitor container
+      document.getElementById('harvestSection').hidden  = true;
+      document.getElementById('monitorSection').hidden  = false;
       moveMapTo('monitorMapContainer');
       document.getElementById('mainMap').style.height = '380px';
       if (c.polygon) displayPoly(c.polygon);
 
       const days = c.days_info?.days_remaining_monitoring ?? c.steps.step3.days_remaining ?? 60;
-      const pct = Math.min(((60 - days) / 60) * 100, 100);
-      document.getElementById('daysLeft').textContent = days;
+      const pct  = Math.min(((60 - days) / 60) * 100, 100);
+      document.getElementById('daysLeft').textContent   = days;
       document.getElementById('progressBar').style.width = pct + '%';
 
       const rai = c.area_rai;
-      document.getElementById('prevPM25').textContent = (rai * PM25_PER_RAI).toFixed(1);
-      document.getElementById('prevCO2').textContent = Math.round(rai * CO2_PER_RAI);
+      document.getElementById('prevPM25').textContent  = (rai * PM25_PER_RAI).toFixed(1);
+      document.getElementById('prevCO2').textContent   = Math.round(rai * CO2_PER_RAI);
       document.getElementById('prevCoins').textContent = calcCoins(rai);
       document.getElementById('step3SkipSection').hidden = !demoMode;
-
       document.getElementById('burnBanner').hidden = true;
     } else {
-      document.getElementById('harvestSection').hidden = false;
-      document.getElementById('monitorSection').hidden = true;
+      document.getElementById('harvestSection').hidden  = false;
+      document.getElementById('monitorSection').hidden  = true;
     }
     return;
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // STEP ACTIONS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function submitStep1() {
   document.getElementById('step1Err').hidden = true;
   if (!selectedPoly) { showErr('กรุณาเลือกแปลงก่อน'); return; }
@@ -1291,7 +1339,11 @@ function showErr(msg) {
 }
 
 async function doStep2(skip) {
-  document.getElementById('step2Evidence').hidden = true;
+  document.getElementById('step2Evidence').hidden      = true;
+  document.getElementById('cropVerifiedBanner').hidden = true;
+  document.getElementById('proceedToStep3Btn').hidden  = true;
+  document.getElementById('step2Submit').hidden        = false;
+
   showLoading(skip ? 'กำลังตรวจสอบ (ข้ามเวลารอ)...' : 'กำลังวิเคราะห์ Sentinel-2...');
   try {
     const res = await fetch(BACKEND + '/api/farming/verify-crops', {
@@ -1301,13 +1353,13 @@ async function doStep2(skip) {
     const r = await res.json();
     hideLoading();
 
+    // Always show satellite evidence so user can read it
     if (r.verification) renderEvidence(r.verification, 'step2Evidence');
 
     if (r.success && r.crops_verified) {
       showToast('✅ ตรวจพบพืช!' + (r.demo_mode ? ' (Demo)' : ''), 'green');
-      document.getElementById('step2Submit').disabled = true;
-      document.getElementById('step2Submit').textContent = '✅ ผ่าน — กำลังไปขั้นตอนถัดไป...';
-      setTimeout(() => loadStatus(), 3000);
+      // Show success banner + explicit proceed button — do NOT auto-navigate
+      showCropVerifiedUI(r.verification);
     } else if (!r.success && r.days_remaining) {
       showToast(`⏳ ต้องรออีก ${r.days_remaining} วัน`, '');
       document.getElementById('step2Days').textContent = r.days_remaining;
@@ -1329,7 +1381,7 @@ async function doHarvest() {
       if (r.harvest_satellite_check) {
         const h = r.harvest_satellite_check;
         showToast(h.harvest_detected
-          ? `🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop || 0).toFixed(2)})`
+          ? `🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`
           : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว', '');
       }
       showToast(r.message, 'green');
@@ -1346,40 +1398,35 @@ async function doCheckBurn(skip) {
       user_id: currentUser.id, cycle_id: activeCycle.cycle_id, skip_wait: skip
     });
     hideLoading();
-
     if (r.burn_analysis) renderBurn(r);
-
-    if (r.status === 'completed') {
-      showToast(r.message, 'green');
-      setTimeout(() => loadStatus(), 3500);
-    } else if (r.status === 'failed') {
-      showToast(r.message, 'red');
+    if (r.status === 'completed' || r.status === 'failed') {
+      showToast(r.message, r.status === 'completed' ? 'green' : 'red');
       setTimeout(() => loadStatus(), 3500);
     } else {
       showToast(r.message, 'green');
       if (r.monitoring) {
-        document.getElementById('daysLeft').textContent = r.monitoring.days_remaining;
-        document.getElementById('progressBar').style.width = Math.min(((60 - r.monitoring.days_remaining) / 60) * 100, 100) + '%';
+        document.getElementById('daysLeft').textContent    = r.monitoring.days_remaining;
+        document.getElementById('progressBar').style.width = Math.min(((60-r.monitoring.days_remaining)/60)*100,100) + '%';
       }
     }
   } catch (e) { hideLoading(); showToast('เกิดข้อผิดพลาด: ' + e.message, 'red'); }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // HISTORY
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function renderHistory(list) {
   const el = document.getElementById('historyList');
   if (!list.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:1rem;">ยังไม่มีประวัติ</div>'; return; }
   el.innerHTML = list.map(h => {
-    const icon = h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳';
-    const reward = h.final_status === 'completed' ? '+' + Math.round(h.agricoin_awarded) : '-';
+    const icon   = h.final_status === 'completed' ? '✅' : h.final_status === 'failed' ? '❌' : '⏳';
+    const reward = h.final_status === 'completed' ? '+' + Math.round(h.agricoin_awarded) + ' 🪙' : '-';
     return `<div class="history-item">
       <div class="history-left">
         <div class="history-dot ${h.final_status}">${icon}</div>
         <div>
           <div class="history-name">${h.field_name || 'แปลงเกษตร'}</div>
-          <div class="history-meta">${(h.area_rai || 0).toFixed(1)} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
+          <div class="history-meta">${(h.area_rai||0).toFixed(1)} ไร่ • ${new Date(h.created_at).toLocaleDateString('th-TH')}</div>
         </div>
       </div>
       <div class="history-reward">${reward}</div>
@@ -1387,50 +1434,50 @@ function renderHistory(list) {
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // MISC
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function startNew() {
   activeCycle = null; selectedPoly = null;
   if (drawnItems) drawnItems.clearLayers();
-  mapMode = 'none';
-  removeBurnScar();
+  mapMode = 'none'; removeBurnScar();
   document.getElementById('areaBadge').classList.remove('show');
-  document.getElementById('clearBtn').style.display = 'none';
-  document.getElementById('step1Err').hidden = true;
-  document.getElementById('step1Submit').disabled = true;
-  document.getElementById('fieldName').value = '';
-  document.getElementById('mapHint').textContent = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
+  document.getElementById('clearBtn').style.display       = 'none';
+  document.getElementById('step1Err').hidden              = true;
+  document.getElementById('step1Submit').disabled         = true;
+  document.getElementById('fieldName').value              = '';
+  document.getElementById('mapHint').textContent          = 'เลือกวิธีระบุขอบเขตแปลงด้านบน';
+  document.getElementById('cropVerifiedBanner').hidden    = true;
+  document.getElementById('proceedToStep3Btn').hidden     = true;
+  document.getElementById('step2Submit').hidden           = false;
+  document.getElementById('step2Evidence').hidden         = true;
+  document.getElementById('burnBanner').hidden            = true;
   document.querySelectorAll('.map-toolbar .mbtn').forEach(b => b.className = 'mbtn');
-  document.getElementById('mainMap').classList.remove('crosshair', 'burn-border');
-  document.getElementById('mainMap').style.height = '320px';
-  document.getElementById('step2Evidence').hidden = true;
-  document.getElementById('burnBanner').hidden = true;
+  document.getElementById('mainMap').classList.remove('crosshair','burn-border');
+  document.getElementById('mainMap').style.height         = '320px';
   showStep(1);
 }
 
 function logout() { if (confirm('ต้องการออกจากระบบ?')) { Auth.logout(); window.location.href = 'index.html'; } }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function init() {
+  initHeader();
   initMap();
-  // Load saved polygon
   try {
-    const res = await fetch(BACKEND + '/api/user/get-polygon', {
+    const res  = await fetch(BACKEND + '/api/user/get-polygon', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: currentUser.id })
     });
     const data = await res.json();
     if (data.success && data.has_polygon) {
       savedPoly = data.polygon;
-      const btn = document.getElementById('btnSaved');
-      btn.textContent = '💾 แปลงของฉัน ✓';
-      btn.style.borderColor = '#7FAD6B';
+      document.getElementById('btnSaved').textContent     = '💾 แปลงของฉัน ✓';
+      document.getElementById('btnSaved').style.borderColor = '#7FAD6B';
     }
   } catch (e) { console.warn('No saved polygon:', e); }
-
   await loadStatus();
 }
 
