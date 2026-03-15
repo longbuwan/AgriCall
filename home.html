@@ -7,707 +7,450 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
   <style>
-    /* ═══════════════════════════════════════
-       HOME PAGE — ELEVATED DESIGN
-       ═══════════════════════════════════════ */
     .home-container {
       min-height: 100vh;
       background: var(--light-cream);
       display: flex;
       flex-direction: column;
     }
-    
     .home-content {
       flex: 1;
       max-width: 720px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 1.1rem;
       width: 100%;
     }
-    
-    /* ═══════════════════════════════════════
-       USER INFO CARD — Glass morphism
-       ═══════════════════════════════════════ */
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Section label (small caps) ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 0.6rem;
+      padding: 0 0.1rem;
+    }
+
+    /* ── User Info Card ── */
     .user-info-card {
       background: var(--white);
       border-radius: var(--radius-xl);
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
+      padding: 1.35rem;
+      margin-bottom: 1.1rem;
       box-shadow: var(--shadow-lg);
       border: 1px solid rgba(229,235,226,0.5);
       position: relative;
       overflow: hidden;
-      animation: cardFadeIn 0.5s var(--ease-out) both;
+      animation: cardFadeIn 0.45s var(--ease-out) both;
     }
-    
     .user-info-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      right: 0;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(127,173,107,0.06) 0%, transparent 70%);
+      top: 0; right: 0;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(127,173,107,0.05) 0%, transparent 70%);
       pointer-events: none;
     }
-    
-    @keyframes cardFadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
     .user-profile {
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.35rem;
       position: relative;
       z-index: 1;
     }
-    
     .user-avatar {
-      width: 68px;
-      height: 68px;
+      width: 64px; height: 64px;
       border-radius: 50%;
       background: linear-gradient(145deg, var(--primary-green) 0%, var(--secondary-green) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem; color: var(--white);
       flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(107,155,90,0.3);
+      box-shadow: 0 4px 14px rgba(107,155,90,0.28);
       position: relative;
     }
-    
     .user-avatar::after {
       content: '';
-      position: absolute;
-      inset: -3px;
+      position: absolute; inset: -3px;
       border-radius: 50%;
-      border: 2px solid rgba(127,173,107,0.2);
+      border: 2px solid rgba(127,173,107,0.18);
     }
-    
     .user-details { flex: 1; min-width: 0; }
-    
     .user-details .user-name {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.35rem;
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 0.3rem;
       letter-spacing: -0.01em;
     }
-    
     .user-type-badge {
       display: inline-block;
-      padding: 0.2rem 0.7rem;
+      padding: 0.18rem 0.65rem;
       background: linear-gradient(135deg, rgba(127,173,107,0.1), rgba(165,201,149,0.15));
       color: var(--secondary-green);
       border-radius: var(--radius-full);
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 0.35rem;
+      font-size: 0.78rem; font-weight: 600;
+      margin-bottom: 0.3rem;
       border: 1px solid rgba(127,173,107,0.15);
     }
-    
     .user-contact {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--text-medium);
-      font-size: 0.82rem;
-      margin-top: 0.35rem;
+      display: flex; align-items: center; gap: 0.35rem;
+      color: var(--text-medium); font-size: 0.8rem; margin-top: 0.3rem;
     }
-    
     .user-rating {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      color: var(--accent-gold);
-      font-weight: 600;
-      margin-top: 0.3rem;
-      font-size: 0.88rem;
+      display: flex; align-items: center; gap: 0.3rem;
+      color: var(--accent-gold); font-weight: 600;
+      margin-top: 0.3rem; font-size: 0.85rem;
     }
-    
-    /* ═══════════════════════════════════════
-       AGRICOIN WALLET — PREMIUM SPLIT UI
-       ═══════════════════════════════════════ */
+
+    /* ── Wallet ── */
     .wallet-section {
       border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 2px 12px rgba(217,119,6,0.12);
+      box-shadow: 0 2px 10px rgba(217,119,6,0.1);
     }
-    
     .wallet-available {
       background: linear-gradient(145deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
-      padding: 1.35rem 1.25rem;
+      padding: 1.25rem;
       color: var(--white);
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .wallet-available::before {
       content: '🌾';
-      position: absolute;
-      font-size: 7rem;
-      opacity: 0.08;
-      right: -0.5rem;
-      top: -1.5rem;
-      pointer-events: none;
-      transform: rotate(-12deg);
+      position: absolute; font-size: 6.5rem; opacity: 0.07;
+      right: -0.5rem; top: -1.5rem;
+      pointer-events: none; transform: rotate(-12deg);
     }
     .wallet-available::after {
       content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: rgba(255,255,255,0.1);
     }
     .wallet-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.6rem;
-      position: relative;
-      z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.55rem; position: relative; z-index: 1;
     }
     .wallet-title {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      opacity: 0.95;
-      letter-spacing: 0.01em;
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.82rem; font-weight: 600; opacity: 0.95;
     }
-    .wallet-title-icon { font-size: 1.3rem; }
+    .wallet-title-icon { font-size: 1.2rem; }
     .wallet-balance-row {
-      display: flex;
-      align-items: baseline;
-      gap: 0.4rem;
-      position: relative;
-      z-index: 1;
+      display: flex; align-items: baseline; gap: 0.4rem;
+      position: relative; z-index: 1;
     }
     .wallet-amount {
-      font-size: 2.5rem;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 2.35rem; font-weight: 700;
+      line-height: 1; letter-spacing: -0.02em;
     }
-    .wallet-unit {
-      font-size: 0.85rem;
-      opacity: 0.85;
-      font-weight: 500;
-    }
+    .wallet-unit { font-size: 0.82rem; opacity: 0.85; font-weight: 500; }
     .wallet-sub {
-      font-size: 0.76rem;
-      opacity: 0.8;
-      margin-top: 0.45rem;
-      position: relative;
-      z-index: 1;
-      line-height: 1.4;
+      font-size: 0.74rem; opacity: 0.78;
+      margin-top: 0.4rem; position: relative; z-index: 1; line-height: 1.4;
     }
-    
     .wallet-pending {
       background: linear-gradient(160deg, #78350F 0%, #5c2a0a 100%);
-      padding: 1.1rem 1.25rem;
-      color: #fde68a;
+      padding: 1rem 1.25rem; color: #fde68a;
     }
     .pending-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 0.45rem;
     }
     .pending-title {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.82rem;
-      font-weight: 600;
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem; font-weight: 600;
     }
-    .pending-amount {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-    .pending-info {
-      font-size: 0.72rem;
-      opacity: 0.75;
-      line-height: 1.5;
-    }
-    
-    .pending-list { margin-top: 0.75rem; }
+    .pending-amount { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .pending-info { font-size: 0.71rem; opacity: 0.75; line-height: 1.5; }
+    .pending-list { margin-top: 0.7rem; }
     .pending-item {
       background: rgba(255,255,255,0.06);
       border-radius: var(--radius-md);
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
+      padding: 0.7rem; margin-bottom: 0.45rem;
       border-left: 3px solid #fbbf24;
-      transition: background 0.2s ease;
     }
-    .pending-item:hover { background: rgba(255,255,255,0.1); }
     .pending-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.35rem;
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 0.3rem;
     }
-    .pending-item-name { font-size: 0.82rem; font-weight: 600; color: #fff; }
-    .pending-item-amount { font-size: 0.95rem; font-weight: 700; color: #fbbf24; }
+    .pending-item-name { font-size: 0.8rem; font-weight: 600; color: #fff; }
+    .pending-item-amount { font-size: 0.9rem; font-weight: 700; color: #fbbf24; }
     .pending-item-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.72rem;
-      opacity: 0.8;
+      display: flex; justify-content: space-between;
+      align-items: center; font-size: 0.71rem; opacity: 0.8;
     }
     .pending-countdown {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
+      display: inline-flex; align-items: center; gap: 0.2rem;
       background: rgba(251,191,36,0.15);
-      padding: 0.18rem 0.55rem;
+      padding: 0.15rem 0.5rem;
       border-radius: var(--radius-full);
-      font-weight: 600;
-      color: #fbbf24;
-      font-size: 0.68rem;
-      letter-spacing: 0.01em;
+      font-weight: 600; color: #fbbf24; font-size: 0.67rem;
     }
     .pending-progress {
-      height: 3px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-      margin-top: 0.5rem;
-      overflow: hidden;
+      height: 3px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; margin-top: 0.45rem; overflow: hidden;
     }
     .pending-progress-fill {
       height: 100%;
       background: linear-gradient(90deg, #fbbf24, #f59e0b);
-      border-radius: 2px;
-      transition: width 0.6s var(--ease-out);
+      border-radius: 2px; transition: width 0.6s var(--ease-out);
     }
-    
     .released-banner {
       background: linear-gradient(135deg, rgba(127,173,107,0.06), rgba(165,201,149,0.1));
       border: 1.5px solid rgba(127,173,107,0.25);
       border-radius: var(--radius-md);
-      padding: 0.75rem 1rem;
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.82rem;
-      color: var(--secondary-green);
-      font-weight: 500;
-      animation: bannerSlide 0.5s var(--ease-out);
+      padding: 0.7rem 1rem; margin-top: 1rem;
+      display: flex; align-items: center; gap: 0.55rem;
+      font-size: 0.8rem; color: var(--secondary-green); font-weight: 500;
     }
     .released-banner[hidden] { display: none; }
-    @keyframes bannerSlide {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .released-icon { font-size: 1.25rem; }
-    
-    .pending-empty { text-align: center; padding: 0.6rem; font-size: 0.78rem; opacity: 0.65; }
-    
+    .pending-empty { text-align: center; padding: 0.5rem; font-size: 0.76rem; opacity: 0.6; }
     .wallet-total {
       background: linear-gradient(135deg, #451a03, #3b0f00);
-      padding: 0.65rem 1.25rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.85);
+      padding: 0.6rem 1.25rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.78rem; color: rgba(255,255,255,0.8);
     }
-    .wallet-total-val { font-weight: 700; font-size: 0.92rem; color: #fff; }
-    
-    /* ═══════════════════════════════════════
-       BURN VERIFICATION — HERO CARD (URGENT)
-       ═══════════════════════════════════════ */
+    .wallet-total-val { font-weight: 700; font-size: 0.9rem; color: #fff; }
+
+    /* ── Burn Verification Card — POSITIVE / GREEN ── */
     .burn-section {
-      margin-bottom: 1.5rem;
-      animation: cardFadeIn 0.5s var(--ease-out) 0.06s both;
+      margin-bottom: 1.1rem;
+      animation: cardFadeIn 0.45s var(--ease-out) 0.06s both;
     }
 
-    .burn-section .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.75rem;
-      padding: 0 0.125rem;
-    }
-
-    /* The big hero card for Burn Verification */
-    .burn-hero-card {
-      background: linear-gradient(145deg, #7f1d1d 0%, #991b1b 35%, #b45309 100%);
+    .burn-card {
+      background: linear-gradient(150deg, #14532d 0%, #166534 45%, #15803d 100%);
       border-radius: var(--radius-xl);
-      padding: 0;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(153,27,27,0.35), 0 2px 8px rgba(0,0,0,0.12);
-      cursor: pointer;
+      box-shadow: 0 6px 22px rgba(21,128,61,0.25), 0 2px 6px rgba(0,0,0,0.07);
       text-decoration: none;
       color: inherit;
       display: block;
       position: relative;
-      border: 1px solid rgba(239,68,68,0.2);
+      border: 1px solid rgba(134,239,172,0.1);
       transition: all 0.3s var(--ease-out);
     }
+    .burn-card:active { transform: scale(0.985); }
 
-    .burn-hero-card:active {
-      transform: scale(0.985);
-    }
-
-    /* Animated ember/glow background */
-    .burn-hero-card::before {
+    .burn-card::before {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse at 20% 50%, rgba(251,191,36,0.18) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.2) 0%, transparent 45%),
-        radial-gradient(ellipse at 60% 80%, rgba(180,83,9,0.25) 0%, transparent 40%);
+        radial-gradient(ellipse at 15% 40%, rgba(187,247,208,0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 70%, rgba(134,239,172,0.06) 0%, transparent 45%);
       pointer-events: none;
-      animation: emberPulse 3s ease-in-out infinite alternate;
     }
 
-    @keyframes emberPulse {
-      from { opacity: 0.6; }
-      to { opacity: 1; }
-    }
-
-    /* Large decorative fire emoji */
-    .burn-hero-card::after {
-      content: '🔥';
+    /* faint decorative satellite */
+    .burn-card::after {
+      content: '🛰️';
       position: absolute;
-      font-size: 9rem;
-      opacity: 0.08;
-      right: -0.75rem;
-      bottom: -1.5rem;
+      font-size: 7.5rem; opacity: 0.06;
+      right: -0.5rem; top: -1rem;
       pointer-events: none;
-      transform: rotate(10deg);
-      filter: blur(2px);
+      transform: rotate(15deg);
+      filter: blur(1px);
     }
 
-    .burn-hero-inner {
-      padding: 1.5rem 1.5rem 1.25rem;
-      position: relative;
-      z-index: 1;
+    .burn-card-inner {
+      padding: 1.35rem 1.4rem 1.15rem;
+      position: relative; z-index: 1;
     }
 
-    /* Urgent badge pill at top */
-    .burn-urgent-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      background: rgba(239,68,68,0.25);
-      border: 1px solid rgba(239,68,68,0.4);
-      color: #fca5a5;
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-full);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+    .burn-top-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
       margin-bottom: 1rem;
-      animation: urgentBlink 2.5s ease-in-out infinite;
     }
 
-    @keyframes urgentBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.75; }
+    .burn-reward-pill {
+      display: inline-flex; align-items: center; gap: 0.38rem;
+      background: rgba(187,247,208,0.13);
+      border: 1px solid rgba(134,239,172,0.22);
+      color: #86efac;
+      padding: 0.28rem 0.8rem;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .burn-reward-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4ade80;
     }
 
-    .burn-urgent-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #f87171;
-      animation: dotPulse 1.5s ease-in-out infinite;
+    .burn-card-arrow {
+      color: rgba(255,255,255,0.38);
+      font-size: 1.1rem;
+      transition: transform 0.2s var(--ease-out);
+    }
+    .burn-card:active .burn-card-arrow { transform: translateX(4px); }
+
+    .burn-main-row {
+      display: flex; align-items: flex-start; gap: 1rem;
     }
 
-    @keyframes dotPulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.7; }
-    }
-
-    .burn-hero-body {
-      display: flex;
-      align-items: flex-start;
-      gap: 1.1rem;
-    }
-
-    .burn-hero-icon {
-      width: 64px;
-      height: 64px;
-      background: rgba(255,255,255,0.1);
+    .burn-icon-wrap {
+      width: 60px; height: 60px; flex-shrink: 0;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
     }
 
-    .burn-hero-text { flex: 1; min-width: 0; }
-
-    .burn-hero-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 0.4rem;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
+    .burn-text { flex: 1; min-width: 0; }
+    .burn-title {
+      font-size: 1.28rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.35rem;
+      letter-spacing: -0.02em; line-height: 1.15;
+    }
+    .burn-desc {
+      font-size: 0.83rem;
+      color: rgba(255,255,255,0.68);
+      line-height: 1.55;
     }
 
-    .burn-hero-desc {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.75);
-      line-height: 1.5;
-      margin-bottom: 0.6rem;
+    /* Steps strip */
+    .burn-steps-strip {
+      background: rgba(0,0,0,0.18);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 0.85rem 1.4rem;
+      display: flex; gap: 0;
+      position: relative; z-index: 1;
     }
-
-    .burn-hero-arrow {
-      font-size: 1.1rem;
-      color: rgba(255,255,255,0.5);
-      flex-shrink: 0;
-      align-self: center;
-      transition: transform 0.25s var(--ease-out);
+    .burn-step {
+      flex: 1; text-align: center; position: relative;
     }
-
-    .burn-hero-card:active .burn-hero-arrow {
-      transform: translateX(4px);
-    }
-
-    /* Stats strip at bottom */
-    .burn-stats-strip {
-      background: rgba(0,0,0,0.25);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      gap: 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .burn-stat {
-      flex: 1;
-      text-align: center;
-      position: relative;
-    }
-
-    .burn-stat + .burn-stat::before {
+    .burn-step + .burn-step::before {
       content: '';
-      position: absolute;
-      left: 0;
-      top: 10%;
-      height: 80%;
-      width: 1px;
-      background: rgba(255,255,255,0.1);
+      position: absolute; left: 0; top: 12%;
+      height: 76%; width: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+    .burn-step-icon { font-size: 1.05rem; margin-bottom: 0.22rem; display: block; }
+    .burn-step-label {
+      font-size: 0.67rem;
+      color: rgba(255,255,255,0.48);
+      font-weight: 500; line-height: 1.35;
+    }
+    .burn-step-label strong {
+      display: block;
+      color: #86efac;
+      font-weight: 700; font-size: 0.69rem;
     }
 
-    .burn-stat-val {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fbbf24;
-      line-height: 1.2;
-    }
-
-    .burn-stat-label {
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.55);
-      margin-top: 0.15rem;
-      font-weight: 500;
-    }
-
-    /* ═══════════════════════════════════════
-       NAVIGATION CARDS — Refined
-       ═══════════════════════════════════════ */
+    /* ── Nav Cards ── */
     .nav-section {
-      margin-bottom: 1.5rem;
-      animation: cardFadeIn 0.5s var(--ease-out) both;
+      margin-bottom: 1.1rem;
+      animation: cardFadeIn 0.45s var(--ease-out) both;
     }
-    
     .nav-section:nth-child(3) { animation-delay: 0.12s; }
-    .nav-section:nth-child(4) { animation-delay: 0.2s; }
-    
-    .nav-section .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 0.75rem;
-      padding: 0 0.125rem;
-    }
-    
-    .nav-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-    
+    .nav-section:nth-child(4) { animation-delay: 0.18s; }
+
+    .nav-grid { display: grid; grid-template-columns: 1fr; gap: 0.65rem; }
+
     .nav-card {
       background: var(--white);
       border-radius: var(--radius-lg);
-      padding: 1.15rem 1.25rem;
+      padding: 1.05rem 1.15rem;
       box-shadow: var(--shadow-sm);
       cursor: pointer;
       transition: all 0.3s var(--ease-out);
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      border: 1px solid rgba(229,235,226,0.5);
-      position: relative;
-      overflow: hidden;
+      text-decoration: none; color: inherit;
+      display: flex; align-items: center; gap: 0.9rem;
+      border: 1px solid rgba(229,235,226,0.55);
+      position: relative; overflow: hidden;
     }
-    
-    .nav-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent 50%, rgba(127,173,107,0.02) 100%);
-      pointer-events: none;
-    }
-    
-    .nav-card:active {
-      transform: scale(0.985);
-      box-shadow: var(--shadow-sm);
-    }
-    
+    .nav-card:active { transform: scale(0.985); }
+
     .nav-card.primary {
       background: linear-gradient(145deg, var(--primary-green) 0%, var(--secondary-green) 60%, #5a8f4a 100%);
-      color: var(--white);
-      border: none;
-      box-shadow: 0 4px 16px rgba(107,155,90,0.3);
+      color: var(--white); border: none;
+      box-shadow: 0 4px 14px rgba(107,155,90,0.28);
     }
-    
     .nav-card.primary::before {
       content: '';
-      position: absolute;
-      top: -30%;
-      right: -15%;
-      width: 140px;
-      height: 140px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 50%;
-      pointer-events: none;
+      position: absolute; top: -30%; right: -15%;
+      width: 130px; height: 130px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%; pointer-events: none;
     }
-    
-    .nav-card.primary::after { background: none; }
-    
+
     .nav-card-icon {
-      width: 56px;
-      height: 56px;
-      background: rgba(255, 255, 255, 0.2);
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,0.18);
       border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; flex-shrink: 0;
       transition: transform 0.3s var(--ease-spring);
     }
-    
     .nav-card:active .nav-card-icon { transform: scale(0.92); }
-    
     .nav-card:not(.primary) .nav-card-icon {
       background: linear-gradient(135deg, rgba(127,173,107,0.08), rgba(165,201,149,0.12));
     }
-    
+
     .nav-card-content { flex: 1; min-width: 0; }
-    
-    .nav-card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 0.2rem;
-      letter-spacing: -0.005em;
-    }
-    
-    .nav-card-description {
-      font-size: 0.82rem;
-      opacity: 0.75;
-      line-height: 1.45;
-    }
-    
+    .nav-card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .nav-card-description { font-size: 0.8rem; opacity: 0.72; line-height: 1.4; }
+
     .nav-card-arrow {
-      font-size: 1.25rem;
-      opacity: 0.4;
-      transition: all 0.25s var(--ease-out);
-      flex-shrink: 0;
+      font-size: 1.15rem; opacity: 0.35; flex-shrink: 0;
+      transition: all 0.2s var(--ease-out);
     }
-    
-    .nav-card:active .nav-card-arrow { transform: translateX(3px); opacity: 0.6; }
-    .nav-card.primary .nav-card-arrow { opacity: 0.7; }
-    
-    /* ═══════════════════════════════════════
-       QUICK STATS — Clean grid
-       ═══════════════════════════════════════ */
+    .nav-card:active .nav-card-arrow { transform: translateX(3px); opacity: 0.55; }
+    .nav-card.primary .nav-card-arrow { opacity: 0.65; }
+
+    /* ── Quick Stats ── */
     .quick-stats {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-top: 0.75rem;
-      animation: cardFadeIn 0.5s var(--ease-out) 0.28s both;
+      gap: 0.65rem;
+      margin-top: 0.65rem;
+      animation: cardFadeIn 0.45s var(--ease-out) 0.24s both;
     }
-    
     .stat-card {
       background: var(--white);
       border-radius: var(--radius-lg);
-      padding: 1rem;
+      padding: 0.9rem;
       box-shadow: var(--shadow-sm);
       text-align: center;
       border: 1px solid rgba(229,235,226,0.5);
-      transition: all 0.25s var(--ease-out);
     }
-    
     .stat-card:active { transform: scale(0.97); }
-    .stat-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
-    
+    .stat-icon { font-size: 1.5rem; margin-bottom: 0.35rem; }
     .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.4rem; font-weight: 700;
       color: var(--primary-green);
-      line-height: 1;
-      margin-bottom: 0.25rem;
+      line-height: 1; margin-bottom: 0.2rem;
       letter-spacing: -0.02em;
     }
-    
-    .stat-label { font-size: 0.78rem; color: var(--text-medium); font-weight: 500; }
-    
-    /* ═══════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════ */
+    .stat-label { font-size: 0.76rem; color: var(--text-medium); font-weight: 500; }
+
+    /* ── Responsive ── */
     @media (min-width: 768px) {
       .nav-grid { grid-template-columns: repeat(2, 1fr); }
       .quick-stats { grid-template-columns: repeat(4, 1fr); }
       .home-content { padding: 1.5rem; }
     }
-    
     @media (max-width: 480px) {
       .home-content { padding: 0.75rem; }
-      .user-avatar { width: 58px; height: 58px; font-size: 1.65rem; }
-      .user-details .user-name { font-size: 1.1rem; }
+      .user-avatar { width: 56px; height: 56px; font-size: 1.6rem; }
       .wallet-amount { font-size: 2rem; }
-      .nav-card { padding: 1rem; }
-      .nav-card-icon { width: 48px; height: 48px; font-size: 1.5rem; }
-      .nav-card-title { font-size: 0.95rem; }
-      .nav-card-description { font-size: 0.78rem; }
-      .user-info-card { padding: 1.25rem; }
-      .burn-hero-title { font-size: 1.15rem; }
-      .burn-hero-icon { width: 54px; height: 54px; font-size: 1.9rem; }
-      .burn-hero-inner { padding: 1.15rem 1.15rem 1rem; }
+      .nav-card { padding: 0.9rem 1rem; }
+      .nav-card-icon { width: 46px; height: 46px; font-size: 1.45rem; }
+      .burn-title { font-size: 1.12rem; }
+      .burn-icon-wrap { width: 52px; height: 52px; font-size: 1.75rem; }
+      .burn-card-inner { padding: 1.1rem 1.15rem 1rem; }
     }
   </style>
 </head>
 <body>
   <div class="home-container">
-    <!-- Header -->
+
     <header class="dashboard-header">
       <nav class="dashboard-nav">
         <a href="#" class="dashboard-logo">
@@ -723,11 +466,10 @@
         </div>
       </nav>
     </header>
-    
-    <!-- Main Content -->
+
     <div class="home-content">
 
-      <!-- User Info Card -->
+      <!-- User Info + Wallet -->
       <div class="user-info-card">
         <div class="user-profile">
           <div class="user-avatar" id="userAvatar">👤</div>
@@ -738,15 +480,14 @@
               <span>📱</span>
               <span id="userPhone">-</span>
             </div>
-            <div class="user-rating" id="userRating" style="display: none;">
+            <div class="user-rating" id="userRating" style="display:none;">
               <span>⭐</span>
               <span id="ratingValue">0.0</span>
-              <span style="font-size: 0.72rem; opacity: 0.6; font-weight: 400;">(<span id="ratingCount">0</span> รีวิว)</span>
+              <span style="font-size:0.7rem;opacity:0.55;font-weight:400;">(<span id="ratingCount">0</span> รีวิว)</span>
             </div>
           </div>
         </div>
-        
-        <!-- AGRICOIN WALLET -->
+
         <div class="wallet-section">
           <div class="wallet-available">
             <div class="wallet-header">
@@ -761,7 +502,7 @@
             </div>
             <div class="wallet-sub">💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม</div>
           </div>
-          
+
           <div class="wallet-pending">
             <div class="pending-header">
               <div class="pending-title">
@@ -771,88 +512,82 @@
               <div class="pending-amount" id="pendingTotal">0</div>
             </div>
             <div class="pending-info">
-              AgriCoins จากการตรวจสอบไม่เผาจะถูกล็อกไว้ 14 วัน
-              เพื่อป้องกันการทุจริต — หลัง 14 วันจะโอนเข้ายอดใช้ได้ทันทีอัตโนมัติ
+              AgriCoins จากการตรวจสอบไม่เผาจะถูกล็อกไว้ 14 วัน — หลัง 14 วันจะโอนเข้ายอดอัตโนมัติ
             </div>
-            
             <div class="pending-list" id="pendingList">
               <div class="pending-empty">ไม่มี AgriCoins ที่รอปลดล็อก</div>
             </div>
-            
-            <div id="forceReleaseSection" hidden style="margin-top:0.75rem;">
+            <div id="forceReleaseSection" hidden style="margin-top:0.7rem;">
               <button id="forceReleaseBtn" onclick="forceReleasePending()"
-                style="width:100%;padding:0.7rem;border:1.5px dashed #fbbf24;border-radius:var(--radius-md);
+                style="width:100%;padding:0.65rem;border:1.5px dashed #fbbf24;border-radius:var(--radius-md);
                        background:rgba(251,191,36,0.1);color:#fbbf24;font-family:'Prompt',sans-serif;
-                       font-size: 0.8rem;font-weight:600;cursor:pointer;display:flex;
-                       align-items:center;justify-content:center;gap:0.4rem;
-                       transition:all 0.25s var(--ease-out);">
+                       font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;
+                       align-items:center;justify-content:center;gap:0.4rem;">
                 🚀 Demo: ข้าม 14 วัน — ปลดล็อกทั้งหมดทันที
               </button>
             </div>
           </div>
-          
+
           <div class="wallet-total">
             <span>รวมทั้งหมด (ใช้ได้ + รอปลดล็อก)</span>
             <span class="wallet-total-val" id="totalBalance">0 🪙</span>
           </div>
         </div>
-        
+
         <div class="released-banner" id="releasedBanner" hidden>
-          <span class="released-icon">🎉</span>
+          <span>🎉</span>
           <span id="releasedText">AgriCoins ปลดล็อกแล้ว!</span>
         </div>
       </div>
 
-      <!-- ════════════════════════════════════
-           BURN VERIFICATION — PRIORITY SECTION
-           ════════════════════════════════════ -->
+      <!-- Burn Verification -->
       <div class="burn-section">
-        <h2 class="section-title">🔥 การตรวจสอบการเผา / Burn Verification</h2>
+        <div class="section-label">🛰️ ตรวจสอบแปลง / Field Verification</div>
 
-        <a href="burn-verification.html" class="burn-hero-card">
-          <div class="burn-hero-inner">
-            <!-- Urgent badge -->
-            <div class="burn-urgent-badge">
-              <div class="burn-urgent-dot"></div>
-              ต้องดำเนินการ · Required Action
-            </div>
-
-            <div class="burn-hero-body">
-              <div class="burn-hero-icon">🔥</div>
-              <div class="burn-hero-text">
-                <div class="burn-hero-title">Burn Verification</div>
-                <div class="burn-hero-desc">
-                  ตรวจสอบร่องรอยการเผาในแปลงเกษตร<br>
-                  รับ AgriCoins เมื่อผ่านการตรวจสอบ
-                </div>
+        <a href="burn-verification.html" class="burn-card">
+          <div class="burn-card-inner">
+            <div class="burn-top-row">
+              <div class="burn-reward-pill">
+                <div class="burn-reward-dot"></div>
+                รับ AgriCoins เมื่อผ่านการตรวจสอบ
               </div>
-              <div class="burn-hero-arrow">→</div>
+              <div class="burn-card-arrow">→</div>
+            </div>
+            <div class="burn-main-row">
+              <div class="burn-icon-wrap">🌿</div>
+              <div class="burn-text">
+                <div class="burn-title">Burn Verification</div>
+      
+              </div>
             </div>
           </div>
 
-          <!-- Stats strip -->
-          <div class="burn-stats-strip">
-            <div class="burn-stat">
-              <div class="burn-stat-val">🌾</div>
-              <div class="burn-stat-label">ป้องกันฝุ่นควัน</div>
+          <div class="burn-steps-strip">
+            <div class="burn-step">
+              <span class="burn-step-icon">📸</span>
+              <div class="burn-step-label">
+                <strong>ถ่ายรูป</strong>แปลงของคุณ
+              </div>
             </div>
-            <div class="burn-stat">
-              <div class="burn-stat-val">🪙</div>
-              <div class="burn-stat-label">รับ AgriCoins</div>
+            <div class="burn-step">
+              <span class="burn-step-icon">🛰️</span>
+              <div class="burn-step-label">
+                <strong>ดาวเทียม</strong>ตรวจสอบ
+              </div>
             </div>
-            <div class="burn-stat">
-              <div class="burn-stat-val">🛰️</div>
-              <div class="burn-stat-label">ตรวจด้วย ดาวเทียม</div>
+            <div class="burn-step">
+              <span class="burn-step-icon">🪙</span>
+              <div class="burn-step-label">
+                <strong>รับ AgriCoins</strong>ทันที
+              </div>
             </div>
           </div>
         </a>
       </div>
 
-      <!-- ════════════════════════════════════
-           BALING SYSTEM — SECONDARY SECTION
-           ════════════════════════════════════ -->
+      <!-- Baling System -->
       <div class="nav-section">
-        <h2 class="section-title">🚜 ระบบการอัดฟาง / Baling System</h2>
+        <div class="section-label">🚜 ระบบอัดฟาง / Baling System</div>
         <div class="nav-grid">
           <a href="dashboard.html" class="nav-card primary" id="dashboardLink">
             <div class="nav-card-icon" id="dashboardIcon">📊</div>
@@ -864,16 +599,16 @@
           </a>
         </div>
       </div>
-      
-      <!-- Navigation — Additional Features -->
+
+      <!-- Additional Features -->
       <div class="nav-section">
-        <h2 class="section-title">🌟 ฟีเจอร์เพิ่มเติม / Additional Features</h2>
+        <div class="section-label">🌟 ฟีเจอร์เพิ่มเติม / Additional Features</div>
         <div class="nav-grid">
           <a href="market.html" class="nav-card">
             <div class="nav-card-icon">🛒</div>
             <div class="nav-card-content">
               <div class="nav-card-title">Marketplace</div>
-              <div class="nav-card-description">ตลาดซื้อขายสินค้าทางการเกษตร — Eco Marketplace</div>
+              <div class="nav-card-description">ตลาดซื้อขายสินค้าเกษตร — Eco Marketplace</div>
             </div>
             <div class="nav-card-arrow">→</div>
           </a>
@@ -887,9 +622,9 @@
           </a>
         </div>
       </div>
-      
+
       <!-- Quick Stats -->
-      <div class="quick-stats" id="quickStats" style="display: none;">
+      <div class="quick-stats" id="quickStats" style="display:none;">
         <div class="stat-card">
           <div class="stat-icon">📦</div>
           <div class="stat-value" id="totalOrders">0</div>
@@ -911,22 +646,23 @@
           <div class="stat-label">Avg Rating</div>
         </div>
       </div>
+
     </div>
   </div>
-  
-  <div id="toast" class="toast" style="display: none;"></div>
-  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+
+  <div id="toast" class="toast" style="display:none;"></div>
+  <div id="loadingOverlay" class="loading-overlay" style="display:none;">
     <div class="spinner"></div>
   </div>
-  
+
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
     const currentUser = Auth.getCurrentUser();
     if (!currentUser) window.location.href = 'index.html';
-    
+
     const BACKEND = 'https://agricall.onrender.com';
-    
+
     const userTypeConfig = {
       customer: {
         icon: '👨‍💼', label: 'ลูกค้า / Customer', labelShort: 'ลูกค้า',
@@ -944,7 +680,7 @@
         dashboardIcon: '🚜', dashboardUrl: 'baler-dashboard.html'
       }
     };
-    
+
     async function loadWallet() {
       try {
         const res = await fetch(BACKEND + '/agricoin/wallet', {
@@ -953,36 +689,21 @@
           body: JSON.stringify({ user_id: currentUser.id })
         });
         const data = await res.json();
-        
-        if (!data.success) {
-          console.error('Wallet error:', data.error);
-          await loadLegacyBalance();
-          return;
-        }
-        
+        if (!data.success) { await loadLegacyBalance(); return; }
         document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);
-        
-        const pendingTotal = data.pending_total || 0;
-        document.getElementById('pendingTotal').textContent = Math.floor(pendingTotal) + ' 🪙';
+        document.getElementById('pendingTotal').textContent = Math.floor(data.pending_total || 0) + ' 🪙';
         document.getElementById('pendingDays').textContent = data.pending_days || 14;
         document.getElementById('totalBalance').textContent = Math.floor(data.total_balance) + ' 🪙';
-        
         renderPendingItems(data.pending_items || []);
-        
         if (data.coins_released_now > 0) {
-          const banner = document.getElementById('releasedBanner');
           document.getElementById('releasedText').textContent =
-            `🎉 ${Math.floor(data.coins_released_now)} AgriCoins ปลดล็อกแล้ว! โอนเข้ายอดใช้ได้ทันทีเรียบร้อย`;
-          banner.hidden = false;
-          setTimeout(() => { banner.hidden = true; }, 10000);
+            `🎉 ${Math.floor(data.coins_released_now)} AgriCoins ปลดล็อกแล้ว!`;
+          document.getElementById('releasedBanner').hidden = false;
+          setTimeout(() => { document.getElementById('releasedBanner').hidden = true; }, 10000);
         }
-        
-      } catch (e) {
-        console.error('Wallet fetch error:', e);
-        await loadLegacyBalance();
-      }
+      } catch (e) { await loadLegacyBalance(); }
     }
-    
+
     async function loadLegacyBalance() {
       try {
         const result = await API.callBackend('/agricoin/balance', { user_id: currentUser.id });
@@ -990,55 +711,43 @@
           document.getElementById('availableBalance').textContent = Math.floor(result.balance);
           document.getElementById('totalBalance').textContent = Math.floor(result.balance) + ' 🪙';
         }
-      } catch (e) { console.error('Legacy balance error:', e); }
+      } catch (e) {}
     }
-    
+
     function renderPendingItems(items) {
       const el = document.getElementById('pendingList');
       const forceSection = document.getElementById('forceReleaseSection');
-      
       if (!items.length) {
         el.innerHTML = '<div class="pending-empty">✅ ไม่มี AgriCoins ที่รอปลดล็อก</div>';
-        forceSection.hidden = true;
-        return;
+        forceSection.hidden = true; return;
       }
-      
       forceSection.hidden = false;
       const PENDING_DAYS = 14;
-      
       el.innerHTML = items.map(item => {
         const daysLeft = item.days_remaining;
-        const daysDone = PENDING_DAYS - daysLeft;
-        const pct = Math.min((daysDone / PENDING_DAYS) * 100, 100);
+        const pct = Math.min(((PENDING_DAYS - daysLeft) / PENDING_DAYS) * 100, 100);
         const relDate = item.release_date_short || item.release_date?.substring(0, 10) || '-';
-        
-        return `
-          <div class="pending-item">
-            <div class="pending-item-header">
-              <div class="pending-item-name">🌾 ${item.field_name || 'แปลงเกษตร'}</div>
-              <div class="pending-item-amount">+${Math.floor(item.amount)} 🪙</div>
-            </div>
-            <div class="pending-item-meta">
-              <span>${item.area_rai ? item.area_rai.toFixed(1) + ' ไร่' : ''}</span>
-              <span class="pending-countdown">
-                ${daysLeft > 0
-                  ? `⏳ อีก ${daysLeft} วัน (${relDate})`
-                  : '✅ พร้อมปลดล็อก!'}
-              </span>
-            </div>
-            <div class="pending-progress">
-              <div class="pending-progress-fill" style="width:${pct}%"></div>
-            </div>
+        return `<div class="pending-item">
+          <div class="pending-item-header">
+            <div class="pending-item-name">🌾 ${item.field_name || 'แปลงเกษตร'}</div>
+            <div class="pending-item-amount">+${Math.floor(item.amount)} 🪙</div>
           </div>
-        `;
+          <div class="pending-item-meta">
+            <span>${item.area_rai ? item.area_rai.toFixed(1) + ' ไร่' : ''}</span>
+            <span class="pending-countdown">
+              ${daysLeft > 0 ? `⏳ อีก ${daysLeft} วัน (${relDate})` : '✅ พร้อมปลดล็อก!'}
+            </span>
+          </div>
+          <div class="pending-progress">
+            <div class="pending-progress-fill" style="width:${pct}%"></div>
+          </div>
+        </div>`;
       }).join('');
     }
-    
+
     async function forceReleasePending() {
       const btn = document.getElementById('forceReleaseBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ กำลังปลดล็อก...';
-      
+      btn.disabled = true; btn.textContent = '⏳ กำลังปลดล็อก...';
       try {
         const res = await fetch(BACKEND + '/agricoin/force-release', {
           method: 'POST',
@@ -1046,12 +755,10 @@
           body: JSON.stringify({ user_id: currentUser.id })
         });
         const data = await res.json();
-        
         if (data.success && data.released_total > 0) {
-          const banner = document.getElementById('releasedBanner');
-          document.getElementById('releasedText').textContent = data.message || 
+          document.getElementById('releasedText').textContent = data.message ||
             `🚀 ปลดล็อก ${data.released_count} รายการ รวม ${Math.floor(data.released_total)} AgriCoins!`;
-          banner.hidden = false;
+          document.getElementById('releasedBanner').hidden = false;
           Toast.success(data.message || 'ปลดล็อกสำเร็จ!');
           await loadWallet();
         } else if (data.success) {
@@ -1059,42 +766,33 @@
         } else {
           Toast.error(data.error || 'เกิดข้อผิดพลาด');
         }
-      } catch (e) {
-        console.error('Force release error:', e);
-        Toast.error('เกิดข้อผิดพลาด: ' + e.message);
-      }
-      
+      } catch (e) { Toast.error('เกิดข้อผิดพลาด: ' + e.message); }
       btn.disabled = false;
       btn.textContent = '🚀 Demo: ข้าม 14 วัน — ปลดล็อกทั้งหมดทันที';
     }
-    
+
     async function initializePage() {
       const config = userTypeConfig[currentUser.type];
-      
       document.getElementById('headerUserName').textContent = currentUser.name;
       document.getElementById('headerUserType').textContent = config.labelShort;
-      
       document.getElementById('userAvatar').textContent = config.icon;
       document.getElementById('userName').textContent = currentUser.name;
       document.getElementById('userTypeBadge').textContent = config.label;
       document.getElementById('userPhone').textContent = currentUser.phone;
-      
       if (currentUser.type === 'farmer' || currentUser.type === 'baler') {
         document.getElementById('userRating').style.display = 'flex';
         document.getElementById('ratingValue').textContent = currentUser.avg_rating?.toFixed(1) || '0.0';
         document.getElementById('ratingCount').textContent = currentUser.total_ratings || '0';
       }
-      
-      const dashboardLink = document.getElementById('dashboardLink');
-      dashboardLink.href = config.dashboardUrl;
+      const dl = document.getElementById('dashboardLink');
+      dl.href = config.dashboardUrl;
       document.getElementById('dashboardIcon').textContent = config.dashboardIcon;
       document.getElementById('dashboardTitle').textContent = config.dashboardTitle;
       document.getElementById('dashboardDescription').textContent = config.dashboardDescription;
-      
       await loadWallet();
       await loadQuickStats();
     }
-    
+
     async function loadQuickStats() {
       try {
         Loading.show();
@@ -1102,7 +800,6 @@
         if (currentUser.type === 'customer') filter.customer_id = currentUser.id;
         else if (currentUser.type === 'farmer') filter.farmer_id = currentUser.id;
         else if (currentUser.type === 'baler') filter.baler_id = currentUser.id;
-        
         const result = await API.getOrders(filter);
         if (result.success) {
           const orders = result.orders;
@@ -1113,12 +810,9 @@
           document.getElementById('quickStats').style.display = 'grid';
         }
         Loading.hide();
-      } catch (e) {
-        Loading.hide();
-        console.error('Stats error:', e);
-      }
+      } catch (e) { Loading.hide(); }
     }
-    
+
     function logout() {
       if (confirm('คุณต้องการออกจากระบบหรือไม่?\nAre you sure you want to logout?')) {
         Auth.logout();
@@ -1126,7 +820,7 @@
         setTimeout(() => { window.location.href = 'index.html'; }, 1000);
       }
     }
-    
+
     initializePage();
   </script>
 </body>
