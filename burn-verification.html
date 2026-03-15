@@ -51,16 +51,19 @@
     }
 
     /* ═══════════════════════════════════════
-       HEADER — Glassmorphic white
+       HEADER — Green gradient (matches home page)
        ═══════════════════════════════════════ */
     .dashboard-header {
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      box-shadow: 0 1px 0 var(--border), var(--shadow-sm);
+      background: linear-gradient(160deg, #7FAD6B 0%, #5a9447 60%, #4a8540 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 20px rgba(74,124,89,0.25);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-radius: 0 0 24px 24px;
+    }
+    .dashboard-header *:not(input) {
+      color: #ffffff !important;
     }
     .dashboard-nav {
       display: flex;
@@ -76,28 +79,29 @@
       gap: 0.5rem;
       font-family: 'Itim', cursive;
       font-size: 1.45rem;
-      color: var(--primary-green);
       text-decoration: none;
       transition: opacity 0.2s;
     }
     .dashboard-logo:active { opacity: 0.7; }
-    .dashboard-logo .logo-icon { font-size: 1.5rem; }
+    .dashboard-logo .logo-icon { font-size: 1.5rem; display: flex; align-items: center; }
+    .dashboard-logo .logo-icon .emoji { width: 1.6em; height: 1.6em; vertical-align: middle; }
     .dashboard-user { display: flex; align-items: center; gap: 0.75rem; }
-    .dashboard-user .user-name { font-weight: 600; font-size: 0.88rem; color: var(--text-dark); }
-    .dashboard-user .user-type { font-size: 0.72rem; color: var(--text-medium); }
+    .dashboard-user .user-name { font-weight: 600; font-size: 0.88rem; }
+    .dashboard-user .user-type { font-size: 0.72rem; opacity: 0.85; }
+    .dashboard-user .user-info { text-align: right; }
     .logout-btn {
-      background: rgba(127,173,107,0.08);
-      border: 1.5px solid rgba(127,173,107,0.25);
-      color: var(--primary-green);
-      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.15) !important;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2) !important;
+      border-radius: 14px;
       padding: 0.45rem 0.85rem;
       font-family: 'Prompt', sans-serif;
       font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s var(--ease-out);
+      transition: all 0.2s ease;
     }
-    .logout-btn:hover { background: rgba(127,173,107,0.16); }
+    .logout-btn:hover { background: rgba(255,255,255,0.28) !important; }
     .logout-btn:active { transform: scale(0.96); }
 
     /* ═══════════════════════════════════════
@@ -152,7 +156,7 @@
       border-bottom: 1px solid var(--border);
       padding: 1rem 1.25rem;
       position: sticky;
-      top: 52px;
+      top: 56px;
       z-index: 99;
     }
     .stepper {
@@ -1097,9 +1101,12 @@
 
 <header class="dashboard-header">
   <nav class="dashboard-nav">
-    <a href="home.html" class="dashboard-logo"><span class="logo-icon">🌾</span><span>AgriCall</span></a>
+    <a href="home.html" class="dashboard-logo">
+      <span class="logo-icon"><img src="Adobe Express - file.png" class="emoji" alt="AgriCall"></span>
+      <span>AgriCall</span>
+    </a>
     <div class="dashboard-user">
-      <div>
+      <div class="user-info">
         <div class="user-name" id="headerUserName">Loading...</div>
         <div class="user-type" id="headerUserType">Loading...</div>
       </div>
