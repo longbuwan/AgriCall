@@ -168,17 +168,16 @@
     .verified-stat-val { font-size: 1.05rem; font-weight: 700; }
     .verified-stat-lbl { font-size: 0.65rem; opacity: 0.9; }
 
-    /* Monitor card */
-    .monitor-card { background: linear-gradient(135deg, #1a2e1a, #2a4a2a); color: #fff; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
-    .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .monitor-title { font-size: 1rem; font-weight: 600; }
-    .monitor-badge { padding: 0.25rem 0.625rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; background: var(--primary-green); }
-    .days-hero { text-align: center; margin-bottom: 1.25rem; }
-    .days-num { font-size: 3.5rem; font-weight: 800; line-height: 1; background: linear-gradient(135deg, var(--primary-green), var(--green-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .days-lbl { font-size: 0.9rem; opacity: 0.7; margin-top: 0.2rem; }
-    .progress-track { background: rgba(255,255,255,0.15); border-radius: var(--radius-full); height: 10px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-green), var(--green-light)); border-radius: var(--radius-full); transition: width 0.6s ease; }
-    .progress-labels { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.6; }
+    /* Harvest summary card */
+    .harvest-summary { background: linear-gradient(135deg, #1a2e1a, #2a4a2a); color: #fff; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
+    .harvest-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .harvest-summary-title { font-size: 1rem; font-weight: 600; }
+    .harvest-summary-badge { padding: 0.25rem 0.625rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600; background: var(--primary-green); }
+    .harvest-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+    .harvest-info-item { background: rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 0.75rem; text-align: center; }
+    .harvest-info-val { font-size: 1.3rem; font-weight: 700; color: var(--green-light); }
+    .harvest-info-lbl { font-size: 0.7rem; opacity: 0.7; margin-top: 0.15rem; }
+    .harvest-explain { font-size: 0.8rem; opacity: 0.85; line-height: 1.5; background: rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 0.75rem; text-align: center; }
 
     /* Burn layer panel */
     .burn-layer-panel { background: rgba(192,57,43,0.06); border: 1.5px solid rgba(192,57,43,0.2); border-radius: var(--radius-md); padding: 0.875rem; margin-top: 0.75rem; }
@@ -306,7 +305,7 @@
     <div class="st-line" id="sLine1"></div>
     <div class="st" id="sStep2"><div class="st-circle">🌾</div><div class="st-label">ตรวจพืช</div></div>
     <div class="st-line" id="sLine2"></div>
-    <div class="st" id="sStep3"><div class="st-circle">🔥</div><div class="st-label">ตรวจ 60 วัน</div></div>
+    <div class="st" id="sStep3"><div class="st-circle">🔥</div><div class="st-label">เก็บเกี่ยว</div></div>
   </div>
 </div>
 
@@ -314,7 +313,7 @@
 
   <div class="alert purple" id="demoAlert" hidden>
     <div class="alert-icon">🚀</div>
-    <div class="alert-content"><div class="alert-title">Demo Mode เปิดใช้งาน</div>ข้ามเวลารอ 30/60 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง</div>
+    <div class="alert-content"><div class="alert-title">Demo Mode เปิดใช้งาน</div>ข้ามเวลารอ 30 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง</div>
   </div>
 
   <!-- NO CYCLE -->
@@ -421,14 +420,15 @@
     </div>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- STEP 3: HARVEST + BURN CHECK -->
   <div class="card" id="step3Card" hidden>
     <div class="card-header">
-      <div class="card-icon ci-amber">🔥</div>
-      <div><div class="card-title">ขั้นตอนที่ 3: ตรวจสอบหลังเก็บเกี่ยว</div><div class="card-sub">แจ้งเก็บเกี่ยวและรอตรวจสอบ 60 วัน</div></div>
+      <div class="card-icon ci-amber">🌾</div>
+      <div><div class="card-title">ขั้นตอนที่ 3: แจ้งเก็บเกี่ยว & ตรวจสอบการเผา</div><div class="card-sub">ระบบตรวจสอบว่าไม่มีการเผาตั้งแต่เริ่มปลูกจนถึงวันนี้</div></div>
     </div>
     <div class="card-body">
 
+      <!-- Waiting for crop verification -->
       <div id="harvestWaitSection">
         <div class="alert info">
           <div class="alert-icon">⏳</div>
@@ -436,29 +436,44 @@
         </div>
       </div>
 
+      <!-- Ready to declare harvest -->
       <div id="harvestSection" hidden>
-        <div class="alert success">
-          <div class="alert-icon">🌾</div>
-          <div class="alert-content"><div class="alert-title">พืชผ่านการตรวจสอบแล้ว!</div>เมื่อเก็บเกี่ยวเสร็จ กดปุ่มด้านล่างเพื่อเริ่มการตรวจสอบ 60 วัน</div>
-        </div>
-        <button class="btn btn-amber" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยวเสร็จแล้ว</button>
-      </div>
 
-      <div id="monitorSection" hidden>
-        <div class="monitor-card">
-          <div class="monitor-header">
-            <div class="monitor-title">🛰️ กำลังตรวจสอบ 60 วัน</div>
-            <div class="monitor-badge">กำลังดำเนินการ</div>
+        <div class="harvest-summary" id="harvestSummary">
+          <div class="harvest-summary-header">
+            <div class="harvest-summary-title">📋 สรุปรอบการเพาะปลูก</div>
+            <div class="harvest-summary-badge">พร้อมเก็บเกี่ยว</div>
           </div>
-          <div class="days-hero">
-            <div class="days-num" id="daysLeft">60</div>
-            <div class="days-lbl">วันที่เหลือ</div>
+          <div class="harvest-info">
+            <div class="harvest-info-item">
+              <div class="harvest-info-val" id="harvestAreaRai">-</div>
+              <div class="harvest-info-lbl">พื้นที่ (ไร่)</div>
+            </div>
+            <div class="harvest-info-item">
+              <div class="harvest-info-val" id="harvestDaysSincePlanting">-</div>
+              <div class="harvest-info-lbl">วันตั้งแต่เริ่มปลูก</div>
+            </div>
           </div>
-          <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
-          <div class="progress-labels"><span>เริ่มต้น</span><span>60 วัน</span></div>
+          <div class="harvest-explain">
+            🛰️ เมื่อกด "แจ้งเก็บเกี่ยว" ระบบจะตรวจสอบภาพถ่ายดาวเทียม<br>
+            <strong>ตั้งแต่วันที่เริ่มปลูกจนถึงวันนี้</strong> ว่าไม่มีการเผาในแปลง<br>
+            หากไม่พบการเผา — ได้รับ AgriCoins ทันที!
+          </div>
         </div>
 
-        <div id="monitorMapContainer"></div>
+        <div class="reward-strip">
+          <div class="reward-strip-title">🎁 รางวัลที่จะได้รับเมื่อผ่าน</div>
+          <div class="reward-grid">
+            <div class="reward-cell"><div class="reward-val" id="prevPM25">-</div><div class="reward-lbl">kg PM2.5 ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val" id="prevCO2">-</div><div class="reward-lbl">kg CO₂ ลดได้</div></div>
+            <div class="reward-cell"><div class="reward-val" id="prevCoins">-</div><div class="reward-lbl">AgriCoins</div></div>
+          </div>
+        </div>
+
+        <button class="btn btn-amber" id="harvestBtn" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยว & ตรวจสอบการเผา</button>
+
+        <!-- Burn result shown after harvest declaration -->
+        <div id="harvestMapContainer" style="margin-top:0.75rem;"></div>
 
         <div class="burn-layer-panel" id="burnLayerPanel" hidden>
           <div class="burn-layer-row">
@@ -481,22 +496,6 @@
         </div>
 
         <div id="burnBanner" hidden></div>
-
-        <button class="btn btn-blue" onclick="doCheckBurn(false)">🔍 ตรวจสอบสถานะการเผา</button>
-
-        <div id="step3SkipSection" hidden>
-          <div class="divider-or">Demo Mode</div>
-          <button class="btn btn-purple" onclick="doCheckBurn(true)">🚀 ข้าม 60 วัน & รับ AgriCoins</button>
-        </div>
-
-        <div class="reward-strip">
-          <div class="reward-strip-title">🎁 รางวัลที่จะได้รับเมื่อผ่าน</div>
-          <div class="reward-grid">
-            <div class="reward-cell"><div class="reward-val" id="prevPM25">-</div><div class="reward-lbl">kg PM2.5 ลดได้</div></div>
-            <div class="reward-cell"><div class="reward-val" id="prevCO2">-</div><div class="reward-lbl">kg CO₂ ลดได้</div></div>
-            <div class="reward-cell"><div class="reward-val" id="prevCoins">-</div><div class="reward-lbl">AgriCoins</div></div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -506,7 +505,7 @@
     <div class="final-card success">
       <div class="final-icon">🎉</div>
       <div class="final-title">ยินดีด้วย!</div>
-      <div class="final-sub">คุณผ่านการตรวจสอบ 60 วันโดยไม่มีการเผา</div>
+      <div class="final-sub" id="successSubText">ไม่พบการเผาตลอดรอบการเพาะปลูก</div>
       <div class="final-coins">
         <div>คุณได้รับ</div>
         <div class="final-coins-num">🪙 +<span id="successCoins">0</span></div>
@@ -525,7 +524,7 @@
     <div class="final-card failed">
       <div class="final-icon">😔</div>
       <div class="final-title">พบการเผา</div>
-      <div class="final-sub">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
+      <div class="final-sub" id="failedSubText">ตรวจพบการเผาในแปลงของคุณ — ไม่ได้รับ AgriCoins ในรอบนี้</div>
       <div class="final-tip">💡 ลองใหม่ในฤดูกาลหน้า การไม่เผาช่วยลดมลพิษ PM2.5</div>
     </div>
     <div class="card-body">
@@ -776,29 +775,42 @@ function showCropVerifiedUI(v) {
 }
 async function proceedToStep3(){ showToast('กำลังไปขั้นตอนที่ 3...','green'); await loadStatus(); }
 
-// ── Burn result ───────────────────────────────────────────
-function renderBurn(result) {
-  const ba=result.burn_analysis||result, burned=ba.burn_detected;
-  const rai=activeCycle?activeCycle.area_rai:0;
-  const burnedRai=((ba.burned_area_ha||0)*HA_TO_RAI).toFixed(2);
+// ── Burn result rendering ─────────────────────────────────
+function renderBurnResult(burnAnalysis) {
+  const ba = burnAnalysis || {};
+  const burned = ba.burn_detected;
+  const rai = activeCycle ? activeCycle.area_rai : 0;
+  const burnedRai = ((ba.burned_area_ha||0)*HA_TO_RAI).toFixed(2);
+
+  // Update polygon style on map
   drawnItems.eachLayer(lyr=>{
     if(!lyr.setStyle)return;
-    lyr.setStyle(burned?{color:'#c0392b',fillColor:'#e74c3c',fillOpacity:0.4}:{color:'#7FAD6B',fillColor:'#a5c995',fillOpacity:0.35});
-    lyr.bindPopup(burned?`⚠️ พบการเผา ${ba.burn_percentage||0}%`:'✅ ไม่พบการเผา — แปลงสะอาด').openPopup();
+    lyr.setStyle(burned
+      ? {color:'#c0392b',fillColor:'#e74c3c',fillOpacity:0.4}
+      : {color:'#7FAD6B',fillColor:'#a5c995',fillOpacity:0.35});
+    lyr.bindPopup(burned
+      ? `⚠️ พบการเผา ${ba.burn_percentage||0}%`
+      : '✅ ไม่พบการเผา — แปลงสะอาด').openPopup();
   });
-  document.getElementById('mainMap').classList.toggle('burn-border',burned);
-  const banner=document.getElementById('burnBanner');
-  banner.innerHTML=`<div class="burn-banner ${burned?'burned':'clean'}">
+  document.getElementById('mainMap').classList.toggle('burn-border', burned);
+
+  const banner = document.getElementById('burnBanner');
+  banner.innerHTML = `<div class="burn-banner ${burned?'burned':'clean'}">
     <div class="burn-banner-icon">${burned?'⚠️':'✅'}</div>
     <div class="burn-banner-title">${burned?'พบการเผา!':'ไม่พบการเผา'}</div>
-    <div class="burn-banner-sub">${burned?`พบ ${ba.burn_percentage||0}% ของพื้นที่`:'แปลงสะอาด ไม่มีร่องรอยการเผา'}</div>
+    <div class="burn-banner-sub">${burned
+      ? `พบ ${ba.burn_percentage||0}% ของพื้นที่ถูกเผา`
+      : 'แปลงสะอาดตลอดรอบการเพาะปลูก ไม่มีร่องรอยการเผา'}</div>
     <div class="burn-stats">
       <div class="burn-stat-row"><span>ขนาดพื้นที่:</span><span>${rai.toFixed?rai.toFixed(1):rai} ไร่</span></div>
       <div class="burn-stat-row"><span>พื้นที่เผา:</span><span>${burnedRai} ไร่</span></div>
       <div class="burn-stat-row"><span>เปอร์เซ็นต์:</span><span>${ba.burn_percentage||0}%</span></div>
+      <div class="burn-stat-row"><span>ช่วงเวลาตรวจ:</span><span>${ba.days_checked||'-'} วัน</span></div>
       <div class="burn-stat-row"><span>วิธีตรวจจับ:</span><span>${ba.method||ba.source||'-'}</span></div>
     </div>
-  </div>`; banner.hidden=false; loadBurnScar();
+  </div>`;
+  banner.hidden = false;
+  loadBurnScar();
 }
 
 // ── Stepper / View ────────────────────────────────────────
@@ -832,11 +844,16 @@ async function loadStatus(){
   }catch(e){hideLoading();console.error(e);showNoCycle();}
 }
 function showNoCycle(){hideAll();updateStepper(0,'none');document.getElementById('noCycleCard').hidden=false;}
+
 function renderCycle(c){
-  hideAll(); updateStepper(c.current_step,c.final_status);
+  hideAll(); updateStepper(c.current_step, c.final_status);
+
+  // ── COMPLETED ──
   if(c.final_status==='completed'){
     document.getElementById('successCard').hidden=false;
     document.getElementById('successCoins').textContent=Math.round(c.reward?.agricoin_awarded||0);
+    document.getElementById('successSubText').textContent=
+      `ไม่พบการเผาตลอดรอบการเพาะปลูก (${c.days_info?.days_since_farming_start||'-'} วัน)`;
     setTimeout(()=>createMiniMap('successMiniMap',c.polygon,{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.35}),200);
     const rai=c.area_rai||0;
     if(rai>0){const coins=calcCoins(rai);document.getElementById('successImpact').innerHTML=`
@@ -857,8 +874,20 @@ function renderCycle(c){
       </div>`;}
     return;
   }
-  if(c.final_status==='failed'){document.getElementById('failedCard').hidden=false;setTimeout(()=>createMiniMap('failedMiniMap',c.polygon,{color:'#c0392b',weight:3,fillColor:'#e74c3c',fillOpacity:0.4}),200);return;}
+
+  // ── FAILED ──
+  if(c.final_status==='failed'){
+    document.getElementById('failedCard').hidden=false;
+    document.getElementById('failedSubText').textContent=
+      `ตรวจพบการเผาในแปลงของคุณระหว่างรอบการเพาะปลูก — ไม่ได้รับ AgriCoins ในรอบนี้`;
+    setTimeout(()=>createMiniMap('failedMiniMap',c.polygon,{color:'#c0392b',weight:3,fillColor:'#e74c3c',fillOpacity:0.4}),200);
+    return;
+  }
+
+  // ── STEP 1 ──
   if(c.current_step===1){showStep(1);return;}
+
+  // ── STEP 2 ──
   if(c.current_step===2){
     hideAll();updateStepper(2,'in_progress');document.getElementById('step2Card').hidden=false;
     document.getElementById('cropVerifiedBanner').hidden=true;document.getElementById('proceedToStep3Btn').hidden=true;
@@ -868,24 +897,33 @@ function renderCycle(c){
     else{document.getElementById('step2Wait').hidden=true;document.getElementById('step2Ready').hidden=false;document.getElementById('step2Submit').disabled=false;document.getElementById('step2SkipSection').hidden=true;}
     return;
   }
+
+  // ── STEP 3: Harvest + Burn Check ──
   if(c.current_step===3){
     hideAll();updateStepper(3,'in_progress');document.getElementById('step3Card').hidden=false;
-    if(c.steps.step3.status==='monitoring'){
-      document.getElementById('harvestSection').hidden=true;document.getElementById('harvestWaitSection').hidden=true;document.getElementById('monitorSection').hidden=false;
-      moveMapTo('monitorMapContainer');document.getElementById('mainMap').style.height='380px';
-      if(c.polygon)displayPoly(c.polygon);
-      const days=c.days_info?.days_remaining_monitoring??c.steps.step3.days_remaining??60;
-      document.getElementById('daysLeft').textContent=days;
-      document.getElementById('progressBar').style.width=Math.min(((60-days)/60)*100,100)+'%';
-      const coins=calcCoins(c.area_rai);
-      document.getElementById('prevPM25').textContent=coins.pm25Prevented;
-      document.getElementById('prevCO2').textContent=coins.co2Prevented;
-      document.getElementById('prevCoins').textContent=coins.totalCoins;
-      document.getElementById('step3SkipSection').hidden=!demoMode;
-      document.getElementById('burnBanner').hidden=true;
-    } else {
-      const cv=c.steps?.step2?.status==='completed'||c.steps?.step2?.crops_verified===true;
-      document.getElementById('harvestSection').hidden=!cv;document.getElementById('harvestWaitSection').hidden=cv;document.getElementById('monitorSection').hidden=true;
+
+    const cv = c.steps?.step2?.status==='completed';
+    document.getElementById('harvestWaitSection').hidden = cv;
+    document.getElementById('harvestSection').hidden = !cv;
+
+    if(cv){
+      // Show harvest summary info
+      const daysSincePlanting = c.days_info?.days_since_farming_start || '-';
+      document.getElementById('harvestAreaRai').textContent = (c.area_rai||0).toFixed(1);
+      document.getElementById('harvestDaysSincePlanting').textContent = daysSincePlanting;
+
+      // Show reward preview
+      const coins = calcCoins(c.area_rai);
+      document.getElementById('prevPM25').textContent = coins.pm25Prevented;
+      document.getElementById('prevCO2').textContent = coins.co2Prevented;
+      document.getElementById('prevCoins').textContent = coins.totalCoins;
+
+      // Move map to harvest section for visualization
+      moveMapTo('harvestMapContainer');
+      document.getElementById('mainMap').style.height = '380px';
+      if(c.polygon) displayPoly(c.polygon);
+
+      document.getElementById('burnBanner').hidden = true;
     }
     return;
   }
@@ -919,22 +957,54 @@ async function doStep2(skip){
   }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
 }
 
+// ═══════════════════════════════════════════════════════════
+// HARVEST: Now does burn check from planting→harvest in one step
+// ═══════════════════════════════════════════════════════════
 async function doHarvest(){
-  showLoading('กำลังบันทึก...');
+  showLoading('กำลังตรวจสอบการเผาตั้งแต่เริ่มปลูกจนถึงวันนี้...');
   try{
-    const r=await API.callBackend('/api/farming/declare-harvest',{user_id:currentUser.id,cycle_id:activeCycle.cycle_id,verify_satellite:true}); hideLoading();
-    if(r.success){if(r.harvest_satellite_check){const h=r.harvest_satellite_check;showToast(h.harvest_detected?`🌾 ดาวเทียมยืนยันการเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`:'⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยว','');}showToast(r.message,'green');document.getElementById('harvestSection').hidden=true;setTimeout(()=>loadStatus(),2000);}
-    else showToast(r.error,'red');
-  }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
-}
+    const r = await API.callBackend('/api/farming/declare-harvest', {
+      user_id: currentUser.id,
+      cycle_id: activeCycle.cycle_id,
+      verify_satellite: true
+    });
+    hideLoading();
 
-async function doCheckBurn(skip){
-  showLoading(skip?'กำลังข้าม 60 วัน & ตรวจสอบ...':'กำลังตรวจสอบการเผาจากดาวเทียม...');
-  try{
-    const r=await API.callBackend('/api/farming/check-burn-status',{user_id:currentUser.id,cycle_id:activeCycle.cycle_id,skip_wait:skip}); hideLoading();
-    if(r.burn_analysis)renderBurn(r);
-    if(r.status==='completed'||r.status==='failed'){showToast(r.message,r.status==='completed'?'green':'red');setTimeout(()=>loadStatus(),3500);}
-    else{showToast(r.message,'green');if(r.monitoring){document.getElementById('daysLeft').textContent=r.monitoring.days_remaining;document.getElementById('progressBar').style.width=Math.min(((60-r.monitoring.days_remaining)/60)*100,100)+'%';}}
+    if(!r.success){
+      showToast(r.error||'เกิดข้อผิดพลาด','red');
+      return;
+    }
+
+    // Show harvest satellite check info if available
+    if(r.harvest_satellite_check){
+      const h = r.harvest_satellite_check;
+      showToast(h.harvest_detected
+        ? `🌾 ดาวเทียมยืนยันเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`
+        : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยวชัดเจน', '');
+    }
+
+    // Render burn result on map
+    if(r.burn_check?.burn_analysis){
+      const ba = r.burn_check.burn_analysis;
+      ba.days_checked = r.burn_check.days_checked;
+      renderBurnResult(ba);
+    }
+
+    // Disable button after submission
+    document.getElementById('harvestBtn').disabled = true;
+    document.getElementById('harvestBtn').textContent = r.status === 'completed'
+      ? '✅ ผ่านการตรวจสอบ!'
+      : '❌ พบการเผา';
+
+    // Show final result
+    if(r.status === 'completed'){
+      showToast(r.message || '🎉 ผ่านการตรวจสอบ!', 'green');
+      setTimeout(() => loadStatus(), 3500);
+    } else if(r.status === 'failed'){
+      showToast(r.message || '❌ พบการเผา', 'red');
+      setTimeout(() => loadStatus(), 3500);
+    }
+
   }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
 }
 
