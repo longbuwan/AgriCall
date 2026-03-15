@@ -1326,6 +1326,27 @@
         </div>
 
         <div id="burnBanner" hidden></div>
+
+        <!-- Continue button — shown after burn check completes -->
+        <div id="burnContinueSection" hidden style="margin-top:1rem;">
+          <div class="alert success" id="burnContinueSuccess" hidden>
+            <div class="alert-icon">🎉</div>
+            <div class="alert-content">
+              <div class="alert-title">ผ่านการตรวจสอบ!</div>
+              <span id="burnContinueMsg">ตรวจสอบข้อมูลด้านบนเรียบร้อยแล้ว กดปุ่มด้านล่างเพื่อดูผลลัพธ์</span>
+            </div>
+          </div>
+          <div class="alert error" id="burnContinueFailed" hidden>
+            <div class="alert-icon">😔</div>
+            <div class="alert-content">
+              <div class="alert-title">พบการเผา</div>
+              <span id="burnContinueFailMsg">ตรวจสอบข้อมูลด้านบนเรียบร้อยแล้ว กดปุ่มด้านล่างเพื่อดูผลลัพธ์</span>
+            </div>
+          </div>
+          <button class="btn btn-green" id="burnContinueBtn" onclick="goToFinalResult()">
+            📋 ดูผลลัพธ์และรางวัล →
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1737,6 +1758,7 @@ function renderCycle(c){
       document.getElementById('mainMap').style.height = '380px';
       if(c.polygon) displayPoly(c.polygon);
       document.getElementById('burnBanner').hidden = true;
+      document.getElementById('burnContinueSection').hidden = true;
       document.getElementById('step3DemoSection').hidden = !demoMode;
     }
     return;
@@ -1803,6 +1825,11 @@ async function doHarvest(isDemoMode){
       ? '✅ ผ่านการตรวจสอบ!'
       : '❌ พบการเผา';
     document.getElementById('step3DemoSection').hidden = true;
+
+    // Show continue section instead of auto-redirecting
+    const continueSection = document.getElementById('burnContinueSection');
+    continueSection.hidden = false;
+
     if(r.status === 'completed'){
       const pendingDays = r.reward?.pending_days || 14;
       const relDate = r.reward?.release_date || '';
@@ -1810,12 +1837,32 @@ async function doHarvest(isDemoMode){
         `🎉 ผ่าน! +${r.reward?.agricoins||0} AgriCoins (ล็อก ${pendingDays} วัน → ${relDate})`,
         'green'
       );
-      setTimeout(() => loadStatus(), 3500);
+      document.getElementById('burnContinueSuccess').hidden = false;
+      document.getElementById('burnContinueFailed').hidden = true;
+      document.getElementById('burnContinueMsg').textContent =
+        `ได้รับ ${r.reward?.agricoins||0} AgriCoins — กดปุ่มด้านล่างเพื่อดูรายละเอียด`;
+      document.getElementById('burnContinueBtn').textContent = '🎉 ดูผลลัพธ์และรางวัล →';
+      document.getElementById('burnContinueBtn').className = 'btn btn-green';
     } else if(r.status === 'failed'){
       showToast(r.message || '❌ พบการเผา', 'red');
-      setTimeout(() => loadStatus(), 3500);
+      document.getElementById('burnContinueSuccess').hidden = true;
+      document.getElementById('burnContinueFailed').hidden = false;
+      document.getElementById('burnContinueFailMsg').textContent =
+        r.message || 'พบร่องรอยการเผา — กดปุ่มด้านล่างเพื่อดูรายละเอียด';
+      document.getElementById('burnContinueBtn').textContent = '📋 ดูผลลัพธ์ →';
+      document.getElementById('burnContinueBtn').className = 'btn btn-amber';
     }
+
+    // Scroll to the continue section
+    setTimeout(() => {
+      continueSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 500);
   }catch(e){hideLoading();showToast('เกิดข้อผิดพลาด: '+e.message,'red');}
+}
+
+// Navigate to final result page after user has reviewed burn data
+function goToFinalResult() {
+  loadStatus();
 }
 
 function toggleDemo(){
@@ -1845,6 +1892,7 @@ function startNew(){
   document.getElementById('step2Submit').hidden=false;document.getElementById('harvestSection').hidden=true;
   document.getElementById('harvestWaitSection').hidden=false;document.getElementById('step2Evidence').hidden=true;
   document.getElementById('burnBanner').hidden=true;
+  document.getElementById('burnContinueSection').hidden=true;
   document.getElementById('step3DemoSection').hidden=true;
   document.querySelectorAll('.mode-opt').forEach(b=>b.classList.remove('active'));
   document.querySelector('[data-mode="auto"]').classList.add('active');
