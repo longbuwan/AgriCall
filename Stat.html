@@ -10,929 +10,251 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Itim&display=swap" rel="stylesheet">
   <style>
-    /* Additional stats-specific styles with AgriCall theme */
-    body {
-      background: var(--light-cream);
-      font-family: 'Prompt', 'Kanit', sans-serif;
-    }
-    
-    /* Stats Header */
-    .stats-header {
-      background: var(--primary-green);
-      padding: 1.5rem;
-      box-shadow: 0 4px 16px var(--shadow-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    }
-    
-    .header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .logo-icon {
-      width: 45px;
-      height: 45px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-    }
-    
-    .logo-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--white);
-      font-family: 'Itim', cursive;
-    }
-    
-    .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: var(--white);
-      border: none;
-      border-radius: var(--radius-lg);
-      color: var(--primary-green);
-      text-decoration: none;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .back-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* Main Container */
-    .stats-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-    }
-    
-    /* Page Title */
-    .page-title {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    
-    .page-title h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--primary-green);
-      font-family: 'Itim', cursive;
-    }
-    
-    .page-title p {
-      color: var(--text-medium);
-      font-size: 1rem;
-    }
-    
-    /* View Toggle */
-    .view-toggle {
-      display: flex;
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 6px;
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .view-toggle-btn {
-      flex: 1;
-      padding: 0.875rem 1.5rem;
-      background: transparent;
-      border: none;
-      border-radius: var(--radius-md);
-      color: var(--text-medium);
-      font-size: 0.9375rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Prompt', sans-serif;
-    }
-    
-    .view-toggle-btn.active {
-      background: var(--gradient-eco);
-      color: white;
-      box-shadow: 0 4px 12px rgba(127, 173, 107, 0.3);
-    }
-    
-    /* Hero Stats Cards */
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    
-    .hero-card {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 2px solid transparent;
-    }
-    
-    .hero-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .hero-card.pm25 {
-      border-top: 4px solid var(--sky-blue);
-    }
-    
-    .hero-card.co2 {
-      border-top: 4px solid var(--primary-green);
-    }
-    
-    .hero-card-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      margin-bottom: 1.25rem;
-    }
-    
-    .hero-card.pm25 .hero-card-icon {
-      background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-    }
-    
-    .hero-card.co2 .hero-card-icon {
-      background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-    }
-    
-    .hero-card-label {
-      font-size: 0.875rem;
-      color: var(--text-medium);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-    
-    .hero-card-value {
-      font-size: 3rem;
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-    
-    .hero-card.pm25 .hero-card-value {
-      color: var(--sky-blue);
-    }
-    
-    .hero-card.co2 .hero-card-value {
-      color: var(--primary-green);
-    }
-    
-    .hero-card-unit {
-      font-size: 1rem;
-      color: var(--text-medium);
-      font-weight: 500;
-    }
-    
-    .hero-card-sub {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 2px solid var(--border-light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .hero-card-sub span {
-      font-size: 0.8125rem;
-      color: var(--text-medium);
-    }
-    
-    .hero-card-sub strong {
-      font-size: 1rem;
-      color: var(--text-dark);
-    }
-    
-    /* Info Cards Grid */
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    
-    .info-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      border: 2px solid var(--border-light);
-      text-align: center;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .info-card:hover {
-      border-color: var(--primary-green);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .info-card-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-    }
-    
-    .info-card-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--primary-green);
-      margin-bottom: 0.25rem;
-    }
-    
-    .info-card-label {
-      font-size: 0.8125rem;
-      color: var(--text-medium);
-      line-height: 1.4;
-    }
-    
-    /* Section Title */
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 3px solid var(--primary-green);
-    }
-    
-    .section-title h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin: 0;
-    }
-    
-    .section-badge {
-      background: var(--gradient-eco);
-      padding: 0.35rem 0.875rem;
-      border-radius: var(--radius-full);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: white;
-    }
-    
-    /* Charts Section */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    
-    .chart-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      border: 2px solid var(--border-light);
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .chart-card.full-width {
-      grid-column: span 2;
-    }
-    
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--border-light);
-    }
-    
-    .chart-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-dark);
-    }
-    
-    .chart-canvas-container {
-      position: relative;
-      height: 280px;
-    }
-    
-    /* Equivalency Cards */
-    .equivalency-section {
-      margin-bottom: 2rem;
-    }
-    
-    .equivalency-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-    
-    .equiv-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      border: 2px solid var(--border-light);
-      text-align: center;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .equiv-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--primary-green);
-    }
-    
-    .equiv-icon {
-      font-size: 2.5rem;
-      margin-bottom: 0.75rem;
-    }
-    
-    .equiv-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-green);
-      margin-bottom: 0.25rem;
-    }
-    
-    .equiv-label {
-      font-size: 0.8125rem;
-      color: var(--text-medium);
-      line-height: 1.4;
-    }
-    
-    /* Leaderboard */
-    .leaderboard-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      border: 2px solid var(--border-light);
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .leaderboard-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-light);
-      transition: background 0.2s;
-    }
-    
-    .leaderboard-item:hover {
-      background: rgba(127, 173, 107, 0.05);
-    }
-    
-    .leaderboard-item:last-child {
-      border-bottom: none;
-    }
-    
-    .leaderboard-rank {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-    
-    .leaderboard-rank.gold {
-      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-      color: #000;
-    }
-    
-    .leaderboard-rank.silver {
-      background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
-      color: #000;
-    }
-    
-    .leaderboard-rank.bronze {
-      background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
-      color: #fff;
-    }
-    
-    .leaderboard-rank.normal {
-      background: var(--border-light);
-      color: var(--text-medium);
-    }
-    
-    .leaderboard-info {
-      flex: 1;
-    }
-    
-    .leaderboard-name {
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      color: var(--text-dark);
-    }
-    
-    .leaderboard-stats {
-      font-size: 0.8125rem;
-      color: var(--text-medium);
-    }
-    
-    .leaderboard-value {
-      text-align: right;
-    }
-    
-    .leaderboard-primary {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--primary-green);
-    }
-    
-    .leaderboard-secondary {
-      font-size: 0.75rem;
-      color: var(--text-medium);
-    }
-    
-    /* Achievement Section */
-    .achievement-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    
-    .achievement-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      border: 2px solid var(--border-light);
-      text-align: center;
-      opacity: 0.5;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .achievement-card.unlocked {
-      opacity: 1;
-      border-color: var(--primary-green);
-      background: linear-gradient(135deg, #F1F8ED, #E8F5E9);
-    }
-    
-    .achievement-card.unlocked:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .achievement-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .achievement-name {
-      font-size: 0.8125rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      color: var(--text-dark);
-    }
-    
-    .achievement-desc {
-      font-size: 0.6875rem;
-      color: var(--text-medium);
-    }
-    
-    /* Loading State */
-    .loading-skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: var(--radius-md);
-    }
-    
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .hero-stats {
-        grid-template-columns: 1fr;
-      }
-      
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .chart-card.full-width {
-        grid-column: span 1;
-      }
-      
-      .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .equivalency-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .achievement-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    @media (max-width: 640px) {
-      .stats-container {
-        padding: 1rem;
-      }
-      
-      .page-title h1 {
-        font-size: 1.5rem;
-      }
-      
-      .hero-card {
-        padding: 1.5rem;
-      }
-      
-      .hero-card-value {
-        font-size: 2.25rem;
-      }
-      
-      .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-      }
-      
-      .info-card {
-        padding: 1rem;
-      }
-      
-      .info-card-value {
-        font-size: 1.5rem;
-      }
-      
-      .equivalency-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .view-toggle {
-        flex-direction: column;
-      }
-      
-      .chart-canvas-container {
-        height: 220px;
-      }
-    }
-    
-    /* Animations */
-    .fade-in {
-      animation: fadeIn 0.6s ease forwards;
-      opacity: 0;
-    }
-    
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .stagger-1 { animation-delay: 0.1s; }
-    .stagger-2 { animation-delay: 0.2s; }
-    .stagger-3 { animation-delay: 0.3s; }
-    .stagger-4 { animation-delay: 0.4s; }
-    .stagger-5 { animation-delay: 0.5s; }
+    body { background: var(--light-cream); font-family: 'Prompt', 'Kanit', sans-serif; }
+    
+    .stats-header { background: var(--primary-green); padding: 1.5rem; box-shadow: 0 4px 16px var(--shadow-color); position: sticky; top: 0; z-index: 100; border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+    .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo-section { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.25); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; }
+    .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--white); font-family: 'Itim', cursive; }
+    .back-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--white); border: none; border-radius: var(--radius-lg); color: var(--primary-green); text-decoration: none; font-size: 0.9375rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .back-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    
+    .stats-container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .page-title { text-align: center; margin-bottom: 2.5rem; }
+    .page-title h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-green); font-family: 'Itim', cursive; }
+    .page-title p { color: var(--text-medium); font-size: 1rem; }
+
+    /* Demo banner */
+    .demo-data-banner { background: linear-gradient(135deg, #FEF3C7, #FDE68A); border: 2px solid #F59E0B; border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    .demo-data-banner[hidden] { display: none; }
+    .demo-data-banner .ddb-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .demo-data-banner .ddb-text { flex: 1; }
+    .demo-data-banner .ddb-title { font-weight: 700; font-size: 0.9rem; color: #92400E; }
+    .demo-data-banner .ddb-desc { font-size: 0.8rem; color: #A16207; line-height: 1.4; margin-top: 0.15rem; }
+    .demo-data-banner .ddb-badge { background: #F59E0B; color: #fff; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; flex-shrink: 0; }
+
+    .view-toggle { display: flex; background: var(--white); border-radius: var(--radius-lg); padding: 6px; margin-bottom: 2rem; box-shadow: var(--shadow-sm); max-width: 600px; margin-left: auto; margin-right: auto; }
+    .view-toggle-btn { flex: 1; padding: 0.875rem 1.5rem; background: transparent; border: none; border-radius: var(--radius-md); color: var(--text-medium); font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Prompt', sans-serif; }
+    .view-toggle-btn.active { background: var(--gradient-eco); color: white; box-shadow: 0 4px 12px rgba(127,173,107,0.3); }
+    
+    .hero-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .hero-card { background: var(--white); border-radius: var(--radius-xl); padding: 2rem; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease, box-shadow 0.3s ease; border: 2px solid transparent; }
+    .hero-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .hero-card.pm25 { border-top: 4px solid var(--sky-blue); }
+    .hero-card.co2 { border-top: 4px solid var(--primary-green); }
+    .hero-card-icon { width: 64px; height: 64px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem; }
+    .hero-card.pm25 .hero-card-icon { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+    .hero-card.co2 .hero-card-icon { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+    .hero-card-label { font-size: 0.875rem; color: var(--text-medium); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: 600; }
+    .hero-card-value { font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; }
+    .hero-card.pm25 .hero-card-value { color: var(--sky-blue); }
+    .hero-card.co2 .hero-card-value { color: var(--primary-green); }
+    .hero-card-unit { font-size: 1rem; color: var(--text-medium); font-weight: 500; }
+    .hero-card-sub { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+    .hero-card-sub span { font-size: 0.8125rem; color: var(--text-medium); }
+    .hero-card-sub strong { font-size: 1rem; color: var(--text-dark); }
+    
+    .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .info-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; border: 2px solid var(--border-light); text-align: center; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
+    .info-card:hover { border-color: var(--primary-green); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .info-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .info-card-value { font-size: 1.75rem; font-weight: 700; color: var(--primary-green); margin-bottom: 0.25rem; }
+    .info-card-label { font-size: 0.8125rem; color: var(--text-medium); line-height: 1.4; }
+    
+    .section-title { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 3px solid var(--primary-green); }
+    .section-title h2 { font-size: 1.5rem; font-weight: 600; color: var(--text-dark); margin: 0; }
+    .section-badge { background: var(--gradient-eco); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); font-size: 0.8125rem; font-weight: 600; color: white; }
+    
+    .equivalency-section { margin-bottom: 2rem; }
+    .equivalency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .equiv-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; border: 2px solid var(--border-light); text-align: center; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
+    .equiv-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-green); }
+    .equiv-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .equiv-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-green); margin-bottom: 0.25rem; }
+    .equiv-label { font-size: 0.8125rem; color: var(--text-medium); line-height: 1.4; }
+    
+    .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .chart-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; border: 2px solid var(--border-light); box-shadow: var(--shadow-sm); }
+    .chart-card.full-width { grid-column: span 2; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light); }
+    .chart-title { font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: var(--text-dark); }
+    .chart-canvas-container { position: relative; height: 280px; }
+    
+    .leaderboard-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; border: 2px solid var(--border-light); margin-bottom: 2rem; box-shadow: var(--shadow-sm); }
+    .leaderboard-list { list-style: none; padding: 0; margin: 0; }
+    .leaderboard-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-light); transition: background 0.2s; }
+    .leaderboard-item:hover { background: rgba(127,173,107,0.05); }
+    .leaderboard-item:last-child { border-bottom: none; }
+    .leaderboard-rank { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+    .leaderboard-rank.gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+    .leaderboard-rank.silver { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #000; }
+    .leaderboard-rank.bronze { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; }
+    .leaderboard-rank.normal { background: var(--border-light); color: var(--text-medium); }
+    .leaderboard-info { flex: 1; }
+    .leaderboard-name { font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark); }
+    .leaderboard-stats { font-size: 0.8125rem; color: var(--text-medium); }
+    .leaderboard-value { text-align: right; }
+    .leaderboard-primary { font-size: 1.125rem; font-weight: 700; color: var(--primary-green); }
+    .leaderboard-secondary { font-size: 0.75rem; color: var(--text-medium); }
+    
+    .achievement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .achievement-card { background: var(--white); border-radius: var(--radius-lg); padding: 1.25rem; border: 2px solid var(--border-light); text-align: center; opacity: 0.5; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
+    .achievement-card.unlocked { opacity: 1; border-color: var(--primary-green); background: linear-gradient(135deg, #F1F8ED, #E8F5E9); }
+    .achievement-card.unlocked:hover { transform: scale(1.05); box-shadow: var(--shadow-md); }
+    .achievement-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .achievement-name { font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark); }
+    .achievement-desc { font-size: 0.6875rem; color: var(--text-medium); }
+    
+    .fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .stagger-1 { animation-delay: 0.1s; } .stagger-2 { animation-delay: 0.2s; } .stagger-3 { animation-delay: 0.3s; } .stagger-4 { animation-delay: 0.4s; } .stagger-5 { animation-delay: 0.5s; }
+    
+    @media (max-width: 1024px) { .hero-stats { grid-template-columns: 1fr; } .charts-grid { grid-template-columns: 1fr; } .chart-card.full-width { grid-column: span 1; } .info-grid { grid-template-columns: repeat(2, 1fr); } .equivalency-grid { grid-template-columns: repeat(2, 1fr); } .achievement-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .stats-container { padding: 1rem; } .page-title h1 { font-size: 1.5rem; } .hero-card { padding: 1.5rem; } .hero-card-value { font-size: 2.25rem; } .info-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } .info-card { padding: 1rem; } .info-card-value { font-size: 1.5rem; } .equivalency-grid { grid-template-columns: 1fr; } .view-toggle { flex-direction: column; } .chart-canvas-container { height: 220px; } }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="stats-header">
     <div class="header-content">
       <div class="logo-section">
         <div class="logo-icon">🌾</div>
         <span class="logo-text">AgriCall Stats</span>
       </div>
-      <a href="home.html" class="back-btn">
-        ← กลับหน้าหลัก / Back
-      </a>
+      <a href="home.html" class="back-btn">← กลับหน้าหลัก / Back</a>
     </div>
   </header>
   
-  <!-- Main Content -->
   <main class="stats-container">
-    <!-- Page Title -->
     <div class="page-title fade-in">
       <h1>🌍 Environmental Impact Dashboard</h1>
-      <p>ติดตามผลกระทบเชิงบวกต่อสิ่งแวดล้อมจากการไม่เผาตอซัง / Track your positive environmental impact from no-burn farming</p>
+      <p>ติดตามผลกระทบเชิงบวกต่อสิ่งแวดล้อมจากการไม่เผาตอซัง</p>
+    </div>
+
+    <!-- Demo Data Banner -->
+    <div class="demo-data-banner" id="demoBanner" hidden>
+      <div class="ddb-icon">⚠️</div>
+      <div class="ddb-text">
+        <div class="ddb-title">ข้อมูลตัวอย่าง (Demo Data)</div>
+        <div class="ddb-desc">ข้อมูลบางส่วนเป็นข้อมูลจำลองเพื่อแสดงตัวอย่างกราฟ — เมื่อมีการตรวจสอบจริงผ่านระบบ Burn Verification ข้อมูลจะเป็นข้อมูลจริงจากดาวเทียม</div>
+      </div>
+      <div class="ddb-badge">DEMO</div>
     </div>
     
-    <!-- View Toggle -->
     <div class="view-toggle fade-in stagger-1">
-      <button class="view-toggle-btn active" onclick="switchView('personal')" id="personalBtn">
-        👤 ข้อมูลของฉัน / My Stats
-      </button>
-      <button class="view-toggle-btn" onclick="switchView('platform')" id="platformBtn">
-        🌐 ข้อมูลทั้งแพลตฟอร์ม / Platform Stats
-      </button>
+      <button class="view-toggle-btn active" onclick="switchView('personal')" id="personalBtn">👤 ข้อมูลของฉัน / My Stats</button>
+      <button class="view-toggle-btn" onclick="switchView('platform')" id="platformBtn">🌐 ข้อมูลทั้งแพลตฟอร์ม / Platform Stats</button>
     </div>
     
-    <!-- Hero Stats -->
     <div class="hero-stats fade-in stagger-2">
       <div class="hero-card pm25">
         <div class="hero-card-icon">💨</div>
         <div class="hero-card-label">PM2.5 Prevented</div>
         <div class="hero-card-value" id="pm25Value">0</div>
         <div class="hero-card-unit">กิโลกรัม / kilograms</div>
-        <div class="hero-card-sub">
-          <span>พื้นที่ที่ไม่เผา</span>
-          <strong id="pm25Area">0 ไร่</strong>
-        </div>
+        <div class="hero-card-sub"><span>พื้นที่ที่ไม่เผา</span><strong id="pm25Area">0 ไร่</strong></div>
       </div>
-      
       <div class="hero-card co2">
         <div class="hero-card-icon">🌱</div>
         <div class="hero-card-label">CO₂ Prevented</div>
         <div class="hero-card-value" id="co2Value">0</div>
         <div class="hero-card-unit">กิโลกรัม / kilograms</div>
-        <div class="hero-card-sub">
-          <span>เทียบเท่าต้นไม้ดูดซับ</span>
-          <strong id="treesEquiv">0 ต้น/ปี</strong>
-        </div>
+        <div class="hero-card-sub"><span>เทียบเท่าต้นไม้ดูดซับ</span><strong id="treesEquiv">0 ต้น/ปี</strong></div>
       </div>
     </div>
     
-    <!-- Quick Info Cards -->
     <div class="info-grid fade-in stagger-3">
-      <div class="info-card">
-        <div class="info-card-icon">📊</div>
-        <div class="info-card-value" id="totalVerifications">0</div>
-        <div class="info-card-label">การตรวจสอบทั้งหมด<br>Total Verifications</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">✅</div>
-        <div class="info-card-value" id="noBurnCount">0</div>
-        <div class="info-card-label">ไม่พบการเผา<br>No Burn Detected</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🌾</div>
-        <div class="info-card-value" id="totalRai">0</div>
-        <div class="info-card-label">พื้นที่รวม (ไร่)<br>Total Area (Rai)</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">⭐</div>
-        <div class="info-card-value" id="successRate">0%</div>
-        <div class="info-card-label">อัตราความสำเร็จ<br>Success Rate</div>
-      </div>
+      <div class="info-card"><div class="info-card-icon">📊</div><div class="info-card-value" id="totalVerifications">0</div><div class="info-card-label">การตรวจสอบทั้งหมด<br>Total Verifications</div></div>
+      <div class="info-card"><div class="info-card-icon">✅</div><div class="info-card-value" id="noBurnCount">0</div><div class="info-card-label">ไม่พบการเผา<br>No Burn Detected</div></div>
+      <div class="info-card"><div class="info-card-icon">🌾</div><div class="info-card-value" id="totalRai">0</div><div class="info-card-label">พื้นที่รวม (ไร่)<br>Total Area (Rai)</div></div>
+      <div class="info-card"><div class="info-card-icon">⭐</div><div class="info-card-value" id="successRate">0%</div><div class="info-card-label">อัตราความสำเร็จ<br>Success Rate</div></div>
     </div>
     
-    <!-- Environmental Equivalency -->
     <div class="equivalency-section fade-in stagger-4">
-      <div class="section-title">
-        <h2>🌍 ผลกระทบเทียบเท่า / Environmental Equivalency</h2>
-      </div>
+      <div class="section-title"><h2>🌍 ผลกระทบเทียบเท่า / Environmental Equivalency</h2></div>
       <div class="equivalency-grid">
-        <div class="equiv-card">
-          <div class="equiv-icon">🚗</div>
-          <div class="equiv-value" id="carKm">0</div>
-          <div class="equiv-label">กิโลเมตรการขับรถ<br>km of car driving avoided</div>
-        </div>
-        <div class="equiv-card">
-          <div class="equiv-icon">🏠</div>
-          <div class="equiv-value" id="homeEnergy">0</div>
-          <div class="equiv-label">วันใช้ไฟฟ้าบ้าน<br>days of home electricity</div>
-        </div>
-        <div class="equiv-card">
-          <div class="equiv-icon">🌳</div>
-          <div class="equiv-value" id="treesPlanted">0</div>
-          <div class="equiv-label">ต้นไม้ที่ต้องปลูก<br>trees needed to absorb</div>
-        </div>
+        <div class="equiv-card"><div class="equiv-icon">🚗</div><div class="equiv-value" id="carKm">0</div><div class="equiv-label">กิโลเมตรการขับรถ<br>km of car driving avoided</div></div>
+        <div class="equiv-card"><div class="equiv-icon">🏠</div><div class="equiv-value" id="homeEnergy">0</div><div class="equiv-label">วันใช้ไฟฟ้าบ้าน<br>days of home electricity</div></div>
+        <div class="equiv-card"><div class="equiv-icon">🌳</div><div class="equiv-value" id="treesPlanted">0</div><div class="equiv-label">ต้นไม้ที่ต้องปลูก<br>trees needed to absorb</div></div>
       </div>
     </div>
     
-    <!-- Charts Section -->
     <div class="charts-grid fade-in stagger-5">
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">📈 PM2.5 Prevention Trend</div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="pm25Chart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">📊 CO₂ Prevention Trend</div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="co2Chart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">🥧 Verification Results</div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="verificationPieChart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">📍 Area by Province</div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="provinceChart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card full-width">
-        <div class="chart-header">
-          <div class="chart-title">📅 Monthly Impact Summary</div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="monthlyChart"></canvas>
-        </div>
-      </div>
+      <div class="chart-card"><div class="chart-header"><div class="chart-title">📈 PM2.5 Prevention Trend</div></div><div class="chart-canvas-container"><canvas id="pm25Chart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div class="chart-title">📊 CO₂ Prevention Trend</div></div><div class="chart-canvas-container"><canvas id="co2Chart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div class="chart-title">🥧 Verification Results</div></div><div class="chart-canvas-container"><canvas id="verificationPieChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div class="chart-title">📍 Area by Province</div></div><div class="chart-canvas-container"><canvas id="provinceChart"></canvas></div></div>
+      <div class="chart-card full-width"><div class="chart-header"><div class="chart-title">📅 Monthly Impact Summary</div></div><div class="chart-canvas-container"><canvas id="monthlyChart"></canvas></div></div>
     </div>
     
-    <!-- Achievements Section -->
-    <div class="section-title">
-      <h2>🏆 ความสำเร็จ / Achievements</h2>
-      <span class="section-badge" id="achievementCount">0/8</span>
-    </div>
+    <div class="section-title"><h2>🏆 ความสำเร็จ / Achievements</h2><span class="section-badge" id="achievementCount">0/8</span></div>
     <div class="achievement-grid">
-      <div class="achievement-card" id="achieve1">
-        <div class="achievement-icon">🌱</div>
-        <div class="achievement-name">First Step</div>
-        <div class="achievement-desc">ตรวจสอบครั้งแรก</div>
-      </div>
-      <div class="achievement-card" id="achieve2">
-        <div class="achievement-icon">🌿</div>
-        <div class="achievement-name">Green Guardian</div>
-        <div class="achievement-desc">5 ครั้งไม่พบการเผา</div>
-      </div>
-      <div class="achievement-card" id="achieve3">
-        <div class="achievement-icon">🌳</div>
-        <div class="achievement-name">Forest Saver</div>
-        <div class="achievement-desc">ป้องกัน CO₂ 1,000 kg</div>
-      </div>
-      <div class="achievement-card" id="achieve4">
-        <div class="achievement-icon">💨</div>
-        <div class="achievement-name">Air Protector</div>
-        <div class="achievement-desc">ป้องกัน PM2.5 100 kg</div>
-      </div>
-      <div class="achievement-card" id="achieve5">
-        <div class="achievement-icon">🏅</div>
-        <div class="achievement-name">Area Master</div>
-        <div class="achievement-desc">ตรวจสอบ 100 ไร่</div>
-      </div>
-      <div class="achievement-card" id="achieve6">
-        <div class="achievement-icon">⭐</div>
-        <div class="achievement-name">Consistency King</div>
-        <div class="achievement-desc">100% ไม่พบการเผา</div>
-      </div>
-      <div class="achievement-card" id="achieve7">
-        <div class="achievement-icon">🚀</div>
-        <div class="achievement-name">Super Farmer</div>
-        <div class="achievement-desc">ป้องกัน CO₂ 10,000 kg</div>
-      </div>
-      <div class="achievement-card" id="achieve8">
-        <div class="achievement-icon">👑</div>
-        <div class="achievement-name">Eco Champion</div>
-        <div class="achievement-desc">Top 10 ของแพลตฟอร์ม</div>
-      </div>
+      <div class="achievement-card" id="achieve1"><div class="achievement-icon">🌱</div><div class="achievement-name">First Step</div><div class="achievement-desc">ตรวจสอบครั้งแรก</div></div>
+      <div class="achievement-card" id="achieve2"><div class="achievement-icon">🌿</div><div class="achievement-name">Green Guardian</div><div class="achievement-desc">5 ครั้งไม่พบการเผา</div></div>
+      <div class="achievement-card" id="achieve3"><div class="achievement-icon">🌳</div><div class="achievement-name">Forest Saver</div><div class="achievement-desc">ป้องกัน CO₂ 1,000 kg</div></div>
+      <div class="achievement-card" id="achieve4"><div class="achievement-icon">💨</div><div class="achievement-name">Air Protector</div><div class="achievement-desc">ป้องกัน PM2.5 100 kg</div></div>
+      <div class="achievement-card" id="achieve5"><div class="achievement-icon">🏅</div><div class="achievement-name">Area Master</div><div class="achievement-desc">ตรวจสอบ 100 ไร่</div></div>
+      <div class="achievement-card" id="achieve6"><div class="achievement-icon">⭐</div><div class="achievement-name">Consistency King</div><div class="achievement-desc">100% ไม่พบการเผา</div></div>
+      <div class="achievement-card" id="achieve7"><div class="achievement-icon">🚀</div><div class="achievement-name">Super Farmer</div><div class="achievement-desc">ป้องกัน CO₂ 10,000 kg</div></div>
+      <div class="achievement-card" id="achieve8"><div class="achievement-icon">👑</div><div class="achievement-name">Eco Champion</div><div class="achievement-desc">Top 10 ของแพลตฟอร์ม</div></div>
     </div>
     
-    <!-- Leaderboard (Platform View Only) -->
     <div class="leaderboard-card" id="leaderboardSection" style="display: none;">
-      <div class="section-title">
-        <h2>🏆 Top Environmental Heroes</h2>
-      </div>
-      <ul class="leaderboard-list" id="leaderboardList">
-        <!-- Populated by JavaScript -->
-      </ul>
+      <div class="section-title"><h2>🏆 Top Environmental Heroes</h2></div>
+      <ul class="leaderboard-list" id="leaderboardList"></ul>
     </div>
   </main>
   
-  <!-- Toast -->
   <div id="toast" class="toast" style="display: none;"></div>
-  
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="spinner"></div>
-  </div>
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;"><div class="spinner"></div></div>
   
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
-    // Check authentication
     const currentUser = Auth.getCurrentUser();
-    if (!currentUser) {
-      window.location.href = 'index.html';
-    }
+    if (!currentUser) window.location.href = 'index.html';
     
-    // Constants for calculations
-    const PM25_PER_RAI = 4.18;  // kg PM2.5 per rai
-    const CO2_PER_RAI = 446.11; // kg CO2 per rai
-    const HA_TO_RAI = 6.25;     // 1 hectare = 6.25 rai
-    const CO2_PER_TREE_YEAR = 21; // kg CO2 absorbed per tree per year
-    const CO2_PER_CAR_KM = 0.21;  // kg CO2 per km driven
-    const CO2_PER_HOME_DAY = 15;  // kg CO2 per day home electricity
+    const PM25_PER_RAI = 3.88;
+    const CO2_PER_RAI = 898;
+    const HA_TO_RAI = 6.25;
+    const CO2_PER_TREE_YEAR = 21;
+    const CO2_PER_CAR_KM = 0.21;
+    const CO2_PER_HOME_DAY = 15;
     
-    // State
     let currentView = 'personal';
     let personalData = null;
     let platformData = null;
     let charts = {};
+    let hasDemo = { personal: false, platform: false };
     
-    // Chart.js default configuration with AgriCall colors
     Chart.defaults.color = '#5A6C5B';
     Chart.defaults.borderColor = '#E5EBE2';
     Chart.defaults.font.family = "'Prompt', 'Kanit', sans-serif";
     
-    // Initialize
     async function initializeStats() {
       try {
         Loading.show();
-        
-        // Load both personal and platform data
-        await Promise.all([
-          loadPersonalStats(),
-          loadPlatformStats()
-        ]);
-        
-        // Display personal stats by default
+        await Promise.all([loadPersonalStats(), loadPlatformStats()]);
         updateDisplay();
         initializeCharts();
         updateAchievements();
-        
         Loading.hide();
       } catch (error) {
         Loading.hide();
         console.error('Error initializing stats:', error);
-        Toast.error('ไม่สามารถโหลดข้อมูลได้ / Failed to load statistics');
+        Toast.error('ไม่สามารถโหลดข้อมูลได้');
       }
     }
     
-    // Load personal statistics - REAL DATA ONLY
     async function loadPersonalStats() {
       try {
-        const result = await API.callBackend('/api/stats/personal', {
-          user_id: currentUser.id
-        });
-        
+        const result = await API.callBackend('/api/stats/personal', { user_id: currentUser.id });
         if (result.success) {
           personalData = result.stats;
-          console.log('📊 Personal stats loaded:', personalData);
-          
-          if (result.is_real_data) {
-            console.log('✅ Using REAL verification data');
-          }
+          hasDemo.personal = result.has_demo_data || false;
+          console.log('📊 Personal stats loaded:', personalData, 'demo:', hasDemo.personal);
         } else {
           personalData = createEmptyStats();
-          console.log('ℹ️ No personal stats available yet');
         }
       } catch (error) {
         console.error('Error loading personal stats:', error);
@@ -940,21 +262,15 @@
       }
     }
     
-    // Load platform statistics - REAL DATA ONLY
     async function loadPlatformStats() {
       try {
         const result = await API.callBackend('/api/stats/platform', {});
-        
         if (result.success) {
           platformData = result.stats;
-          console.log('📊 Platform stats loaded:', platformData);
-          
-          if (result.is_real_data) {
-            console.log('✅ Using REAL platform data');
-          }
+          hasDemo.platform = result.has_demo_data || false;
+          console.log('📊 Platform stats loaded:', platformData, 'demo:', hasDemo.platform);
         } else {
           platformData = createEmptyStats();
-          console.log('ℹ️ No platform stats available yet');
         }
       } catch (error) {
         console.error('Error loading platform stats:', error);
@@ -962,53 +278,37 @@
       }
     }
     
-    // Create empty stats structure
     function createEmptyStats() {
-      return {
-        total_verifications: 0,
-        no_burn_count: 0,
-        burn_detected_count: 0,
-        total_area_rai: 0,
-        verified_no_burn_area_rai: 0,
-        pm25_prevented: 0,
-        co2_prevented: 0,
-        success_rate: "0",
-        monthly_data: [],
-        province_data: [],
-        leaderboard: [],
-        recent_verifications: []
-      };
+      return { total_verifications: 0, no_burn_count: 0, burn_detected_count: 0, total_area_rai: 0, verified_no_burn_area_rai: 0, pm25_prevented: 0, co2_prevented: 0, success_rate: "0", monthly_data: [], province_data: [], leaderboard: [], recent_verifications: [] };
     }
     
-    // Switch between personal and platform view
     function switchView(view) {
       currentView = view;
-      
       document.getElementById('personalBtn').classList.toggle('active', view === 'personal');
       document.getElementById('platformBtn').classList.toggle('active', view === 'platform');
       document.getElementById('leaderboardSection').style.display = view === 'platform' ? 'block' : 'none';
-      
       updateDisplay();
       updateCharts();
       updateAchievements();
     }
     
-    // Update display with current data
     function updateDisplay() {
       const data = currentView === 'personal' ? personalData : platformData;
       if (!data) return;
       
-      // Animate number updates
+      // Show/hide demo banner
+      const showDemo = currentView === 'personal' ? hasDemo.personal : hasDemo.platform;
+      document.getElementById('demoBanner').hidden = !showDemo;
+      
       animateNumber('pm25Value', data.pm25_prevented, 1);
       animateNumber('co2Value', data.co2_prevented, 0);
       animateNumber('totalVerifications', data.total_verifications, 0);
       animateNumber('noBurnCount', data.no_burn_count, 0);
       animateNumber('totalRai', data.total_area_rai, 0);
       
-      document.getElementById('pm25Area').textContent = `${data.verified_no_burn_area_rai.toFixed(1)} ไร่`;
+      document.getElementById('pm25Area').textContent = `${(data.verified_no_burn_area_rai||0).toFixed(1)} ไร่`;
       document.getElementById('successRate').textContent = `${data.success_rate}%`;
       
-      // Calculate equivalencies
       const treesEquiv = Math.round(data.co2_prevented / CO2_PER_TREE_YEAR);
       const carKm = Math.round(data.co2_prevented / CO2_PER_CAR_KM);
       const homeDays = Math.round(data.co2_prevented / CO2_PER_HOME_DAY);
@@ -1018,365 +318,104 @@
       animateNumber('homeEnergy', homeDays, 0);
       animateNumber('treesPlanted', treesEquiv, 0);
       
-      // Update leaderboard if platform view
-      if (currentView === 'platform' && data.leaderboard) {
-        updateLeaderboard(data.leaderboard);
-      }
+      if (currentView === 'platform' && data.leaderboard) updateLeaderboard(data.leaderboard);
     }
     
-    // Animate number counting
-    function animateNumber(elementId, targetValue, decimals = 0) {
-      const element = document.getElementById(elementId);
-      const startValue = parseFloat(element.textContent.replace(/,/g, '')) || 0;
-      const duration = 1000;
-      const startTime = performance.now();
-      
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentValue = startValue + (targetValue - startValue) * easeOut;
-        
-        if (decimals > 0) {
-          element.textContent = currentValue.toFixed(decimals);
-        } else {
-          element.textContent = Math.round(currentValue).toLocaleString();
-        }
-        
-        if (progress < 1) {
-          requestAnimationFrame(update);
-        }
+    function animateNumber(elementId, targetValue, decimals) {
+      const el = document.getElementById(elementId);
+      const start = parseFloat(el.textContent.replace(/,/g, '')) || 0;
+      const dur = 1000, t0 = performance.now();
+      function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const v = start + (targetValue - start) * ease;
+        el.textContent = decimals > 0 ? v.toFixed(decimals) : Math.round(v).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
       }
-      
-      requestAnimationFrame(update);
+      requestAnimationFrame(tick);
     }
     
-    // Initialize all charts
     function initializeCharts() {
       const data = currentView === 'personal' ? personalData : platformData;
       if (!data) return;
       
-      // PM2.5 Chart
-      const pm25Ctx = document.getElementById('pm25Chart').getContext('2d');
-      charts.pm25 = new Chart(pm25Ctx, {
+      charts.pm25 = new Chart(document.getElementById('pm25Chart').getContext('2d'), {
         type: 'line',
-        data: {
-          labels: data.monthly_data.map(d => d.month),
-          datasets: [{
-            label: 'PM2.5 Prevented (kg)',
-            data: data.monthly_data.map(d => d.pm25_prevented),
-            borderColor: '#5B8AC8',
-            backgroundColor: 'rgba(91, 138, 200, 0.1)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#5B8AC8',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: '#E5EBE2' }
-            },
-            x: {
-              grid: { display: false }
-            }
-          }
-        }
+        data: { labels: data.monthly_data.map(d=>d.month), datasets: [{ label: 'PM2.5 (kg)', data: data.monthly_data.map(d=>d.pm25_prevented), borderColor: '#5B8AC8', backgroundColor: 'rgba(91,138,200,0.1)', fill: true, tension: 0.4, pointBackgroundColor: '#5B8AC8', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#E5EBE2' } }, x: { grid: { display: false } } } }
       });
       
-      // CO2 Chart
-      const co2Ctx = document.getElementById('co2Chart').getContext('2d');
-      charts.co2 = new Chart(co2Ctx, {
+      charts.co2 = new Chart(document.getElementById('co2Chart').getContext('2d'), {
         type: 'bar',
-        data: {
-          labels: data.monthly_data.map(d => d.month),
-          datasets: [{
-            label: 'CO₂ Prevented (kg)',
-            data: data.monthly_data.map(d => d.co2_prevented),
-            backgroundColor: 'rgba(127, 173, 107, 0.8)',
-            borderColor: '#7FAD6B',
-            borderWidth: 2,
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: '#E5EBE2' }
-            },
-            x: {
-              grid: { display: false }
-            }
-          }
-        }
+        data: { labels: data.monthly_data.map(d=>d.month), datasets: [{ label: 'CO₂ (kg)', data: data.monthly_data.map(d=>d.co2_prevented), backgroundColor: 'rgba(127,173,107,0.8)', borderColor: '#7FAD6B', borderWidth: 2, borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#E5EBE2' } }, x: { grid: { display: false } } } }
       });
       
-      // Verification Pie Chart
-      const pieCtx = document.getElementById('verificationPieChart').getContext('2d');
-      charts.pie = new Chart(pieCtx, {
+      charts.pie = new Chart(document.getElementById('verificationPieChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-          labels: ['ไม่พบการเผา', 'พบการเผา'],
-          datasets: [{
-            data: [data.no_burn_count, data.burn_detected_count],
-            backgroundColor: ['#7FAD6B', '#EF5350'],
-            borderWidth: 0,
-            cutout: '70%'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 20,
-                usePointStyle: true
-              }
-            }
-          }
-        }
+        data: { labels: ['ไม่พบการเผา', 'พบการเผา'], datasets: [{ data: [data.no_burn_count, data.burn_detected_count], backgroundColor: ['#7FAD6B', '#EF5350'], borderWidth: 0, cutout: '70%' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } } }
       });
       
-      // Province Chart
-      const provinceData = platformData?.province_data || [
-        { province: 'เชียงใหม่', area_rai: 100 },
-        { province: 'เชียงราย', area_rai: 80 },
-        { province: 'ลำพูน', area_rai: 60 },
-        { province: 'ลำปาง', area_rai: 40 },
-        { province: 'อื่นๆ', area_rai: 20 }
-      ];
-      
-      const provinceCtx = document.getElementById('provinceChart').getContext('2d');
-      charts.province = new Chart(provinceCtx, {
+      const prov = platformData?.province_data?.length ? platformData.province_data : [{ province: 'ยังไม่มีข้อมูล', area_rai: 0 }];
+      charts.province = new Chart(document.getElementById('provinceChart').getContext('2d'), {
         type: 'polarArea',
-        data: {
-          labels: provinceData.map(d => d.province),
-          datasets: [{
-            data: provinceData.map(d => d.area_rai),
-            backgroundColor: [
-              'rgba(127, 173, 107, 0.7)',
-              'rgba(91, 138, 200, 0.7)',
-              'rgba(165, 201, 149, 0.7)',
-              'rgba(255, 167, 38, 0.7)',
-              'rgba(239, 83, 80, 0.7)'
-            ],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 15,
-                usePointStyle: true
-              }
-            }
-          }
-        }
+        data: { labels: prov.map(d=>d.province), datasets: [{ data: prov.map(d=>d.area_rai), backgroundColor: ['rgba(127,173,107,0.7)','rgba(91,138,200,0.7)','rgba(165,201,149,0.7)','rgba(255,167,38,0.7)','rgba(239,83,80,0.7)'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } } } }
       });
       
-      // Monthly Impact Chart
-      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-      charts.monthly = new Chart(monthlyCtx, {
+      charts.monthly = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
         type: 'line',
-        data: {
-          labels: data.monthly_data.map(d => d.month),
-          datasets: [
-            {
-              label: 'พื้นที่ (ไร่)',
-              data: data.monthly_data.map(d => d.area_rai),
-              borderColor: '#7FAD6B',
-              backgroundColor: 'rgba(127, 173, 107, 0.1)',
-              fill: true,
-              tension: 0.4,
-              yAxisID: 'y'
-            },
-            {
-              label: 'การตรวจสอบ',
-              data: data.monthly_data.map(d => d.verifications),
-              borderColor: '#5B8AC8',
-              backgroundColor: 'rgba(91, 138, 200, 0.1)',
-              fill: true,
-              tension: 0.4,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: {
-            mode: 'index',
-            intersect: false
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                padding: 20,
-                usePointStyle: true
-              }
-            }
-          },
-          scales: {
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              grid: { color: '#E5EBE2' }
-            },
-            y1: {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              grid: { drawOnChartArea: false }
-            },
-            x: {
-              grid: { display: false }
-            }
-          }
-        }
+        data: { labels: data.monthly_data.map(d=>d.month), datasets: [
+          { label: 'พื้นที่ (ไร่)', data: data.monthly_data.map(d=>d.area_rai), borderColor: '#7FAD6B', backgroundColor: 'rgba(127,173,107,0.1)', fill: true, tension: 0.4, yAxisID: 'y' },
+          { label: 'การตรวจสอบ', data: data.monthly_data.map(d=>d.verifications), borderColor: '#5B8AC8', backgroundColor: 'rgba(91,138,200,0.1)', fill: true, tension: 0.4, yAxisID: 'y1' }
+        ] },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', labels: { padding: 20, usePointStyle: true } } }, scales: { y: { type: 'linear', display: true, position: 'left', grid: { color: '#E5EBE2' } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } }, x: { grid: { display: false } } } }
       });
     }
     
-    // Update charts with new data
     function updateCharts() {
       const data = currentView === 'personal' ? personalData : platformData;
       if (!data || !charts.pm25) return;
-      
-      // Update PM2.5 chart
-      charts.pm25.data.labels = data.monthly_data.map(d => d.month);
-      charts.pm25.data.datasets[0].data = data.monthly_data.map(d => d.pm25_prevented);
+      charts.pm25.data.labels = data.monthly_data.map(d=>d.month);
+      charts.pm25.data.datasets[0].data = data.monthly_data.map(d=>d.pm25_prevented);
       charts.pm25.update();
-      
-      // Update CO2 chart
-      charts.co2.data.labels = data.monthly_data.map(d => d.month);
-      charts.co2.data.datasets[0].data = data.monthly_data.map(d => d.co2_prevented);
+      charts.co2.data.labels = data.monthly_data.map(d=>d.month);
+      charts.co2.data.datasets[0].data = data.monthly_data.map(d=>d.co2_prevented);
       charts.co2.update();
-      
-      // Update Pie chart
       charts.pie.data.datasets[0].data = [data.no_burn_count, data.burn_detected_count];
       charts.pie.update();
-      
-      // Update Province chart
-      if (data.province_data) {
-        charts.province.data.labels = data.province_data.map(d => d.province);
-        charts.province.data.datasets[0].data = data.province_data.map(d => d.area_rai);
-        charts.province.update();
-      }
-      
-      // Update Monthly chart
-      charts.monthly.data.labels = data.monthly_data.map(d => d.month);
-      charts.monthly.data.datasets[0].data = data.monthly_data.map(d => d.area_rai);
-      charts.monthly.data.datasets[1].data = data.monthly_data.map(d => d.verifications);
+      if (data.province_data?.length) { charts.province.data.labels = data.province_data.map(d=>d.province); charts.province.data.datasets[0].data = data.province_data.map(d=>d.area_rai); charts.province.update(); }
+      charts.monthly.data.labels = data.monthly_data.map(d=>d.month);
+      charts.monthly.data.datasets[0].data = data.monthly_data.map(d=>d.area_rai);
+      charts.monthly.data.datasets[1].data = data.monthly_data.map(d=>d.verifications);
       charts.monthly.update();
     }
     
-    // Update leaderboard
-    function updateLeaderboard(leaderboard) {
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = '';
-      
-      leaderboard.forEach((item, index) => {
-        const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal';
-        
-        list.innerHTML += `
-          <li class="leaderboard-item">
-            <div class="leaderboard-rank ${rankClass}">${item.rank}</div>
-            <div class="leaderboard-info">
-              <div class="leaderboard-name">${item.name}</div>
-              <div class="leaderboard-stats">${item.area_rai} ไร่ • ${item.verifications} การตรวจสอบ</div>
-            </div>
-            <div class="leaderboard-value">
-              <div class="leaderboard-primary">${(item.co2_prevented / 1000).toFixed(1)}t CO₂</div>
-              <div class="leaderboard-secondary">prevented</div>
-            </div>
-          </li>
-        `;
-      });
+    function updateLeaderboard(lb) {
+      const el = document.getElementById('leaderboardList');
+      el.innerHTML = lb.map((item, i) => {
+        const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'normal';
+        return `<li class="leaderboard-item"><div class="leaderboard-rank ${rc}">${item.rank}</div><div class="leaderboard-info"><div class="leaderboard-name">${item.name}</div><div class="leaderboard-stats">${item.area_rai} ไร่ • ${item.verifications} ตรวจสอบ</div></div><div class="leaderboard-value"><div class="leaderboard-primary">${(item.co2_prevented/1000).toFixed(1)}t CO₂</div><div class="leaderboard-secondary">prevented</div></div></li>`;
+      }).join('');
     }
     
-    // Update achievements
     function updateAchievements() {
       const data = currentView === 'personal' ? personalData : platformData;
       if (!data) return;
-      
-      let unlockedCount = 0;
-      
-      // Achievement 1: First verification
-      if (data.total_verifications >= 1) {
-        document.getElementById('achieve1').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 2: 5 no burns
-      if (data.no_burn_count >= 5) {
-        document.getElementById('achieve2').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 3: 1000 kg CO2
-      if (data.co2_prevented >= 1000) {
-        document.getElementById('achieve3').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 4: 100 kg PM2.5
-      if (data.pm25_prevented >= 100) {
-        document.getElementById('achieve4').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 5: 100 rai
-      if (data.total_area_rai >= 100) {
-        document.getElementById('achieve5').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 6: 100% success rate
-      if (parseFloat(data.success_rate) >= 100) {
-        document.getElementById('achieve6').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 7: 10000 kg CO2
-      if (data.co2_prevented >= 10000) {
-        document.getElementById('achieve7').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      // Achievement 8: Top 10 (platform only)
-      if (currentView === 'platform') {
-        document.getElementById('achieve8').classList.add('unlocked');
-        unlockedCount++;
-      }
-      
-      document.getElementById('achievementCount').textContent = `${unlockedCount}/8`;
+      let n = 0;
+      const check = (id, cond) => { if(cond){document.getElementById(id).classList.add('unlocked');n++;} else {document.getElementById(id).classList.remove('unlocked');} };
+      check('achieve1', data.total_verifications >= 1);
+      check('achieve2', data.no_burn_count >= 5);
+      check('achieve3', data.co2_prevented >= 1000);
+      check('achieve4', data.pm25_prevented >= 100);
+      check('achieve5', data.total_area_rai >= 100);
+      check('achieve6', parseFloat(data.success_rate) >= 100 && data.total_verifications > 0);
+      check('achieve7', data.co2_prevented >= 10000);
+      check('achieve8', currentView === 'platform');
+      document.getElementById('achievementCount').textContent = `${n}/8`;
     }
     
-    // Initialize on page load
     initializeStats();
   </script>
 </body>
