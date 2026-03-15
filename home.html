@@ -450,6 +450,17 @@
             <div class="pending-list" id="pendingList">
               <div class="pending-empty">ไม่มี AgriCoins ที่รอปลดล็อก</div>
             </div>
+            
+            <!-- Demo: Force release button -->
+            <div id="forceReleaseSection" hidden style="margin-top:0.75rem;">
+              <button id="forceReleaseBtn" onclick="forceReleasePending()"
+                style="width:100%;padding:0.7rem;border:1.5px dashed #fbbf24;border-radius:10px;
+                       background:rgba(251,191,36,0.12);color:#fbbf24;font-family:'Prompt',sans-serif;
+                       font-size:0.82rem;font-weight:600;cursor:pointer;display:flex;
+                       align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s;">
+                🚀 Demo: ข้าม 14 วัน — ปลดล็อกทั้งหมดทันที
+              </button>
+            </div>
           </div>
           
           <!-- Total -->
@@ -629,11 +640,16 @@
     
     function renderPendingItems(items) {
       const el = document.getElementById('pendingList');
+      const forceSection = document.getElementById('forceReleaseSection');
       
       if (!items.length) {
         el.innerHTML = '<div class="pending-empty">✅ ไม่มี AgriCoins ที่รอปลดล็อก</div>';
+        forceSection.hidden = true;
         return;
       }
+      
+      // Show demo force-release button when there are pending items
+      forceSection.hidden = false;
       
       const PENDING_DAYS = 14;
       
@@ -665,6 +681,47 @@
           </div>
         `;
       }).join('');
+    }
+    
+    // ═══════════════════════════════════════════════
+    // DEMO: Force release all pending coins
+    // ═══════════════════════════════════════════════
+    async function forceReleasePending() {
+      const btn = document.getElementById('forceReleaseBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังปลดล็อก...';
+      
+      try {
+        const res = await fetch(BACKEND + '/agricoin/force-release', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: currentUser.id })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.released_total > 0) {
+          // Show released banner
+          const banner = document.getElementById('releasedBanner');
+          document.getElementById('releasedText').textContent = data.message || 
+            `🚀 ปลดล็อก ${data.released_count} รายการ รวม ${Math.floor(data.released_total)} AgriCoins!`;
+          banner.hidden = false;
+          
+          Toast.success(data.message || 'ปลดล็อกสำเร็จ!');
+          
+          // Reload wallet to reflect changes
+          await loadWallet();
+        } else if (data.success) {
+          Toast.info('ไม่มี AgriCoins ที่รอปลดล็อก');
+        } else {
+          Toast.error(data.error || 'เกิดข้อผิดพลาด');
+        }
+      } catch (e) {
+        console.error('Force release error:', e);
+        Toast.error('เกิดข้อผิดพลาด: ' + e.message);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '🚀 Demo: ข้าม 14 วัน — ปลดล็อกทั้งหมดทันที';
     }
     
     // ═══════════════════════════════════════════════
