@@ -138,7 +138,6 @@
       box-shadow: 0 2px 12px rgba(217,119,6,0.12);
     }
     
-    /* Available balance */
     .wallet-available {
       background: linear-gradient(145deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
       padding: 1.35rem 1.25rem;
@@ -211,7 +210,6 @@
       line-height: 1.4;
     }
     
-    /* Pending section */
     .wallet-pending {
       background: linear-gradient(160deg, #78350F 0%, #5c2a0a 100%);
       padding: 1.1rem 1.25rem;
@@ -242,7 +240,6 @@
       line-height: 1.5;
     }
     
-    /* Pending items list */
     .pending-list { margin-top: 0.75rem; }
     .pending-item {
       background: rgba(255,255,255,0.06);
@@ -252,25 +249,15 @@
       border-left: 3px solid #fbbf24;
       transition: background 0.2s ease;
     }
-    .pending-item:hover {
-      background: rgba(255,255,255,0.1);
-    }
+    .pending-item:hover { background: rgba(255,255,255,0.1); }
     .pending-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.35rem;
     }
-    .pending-item-name {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #fff;
-    }
-    .pending-item-amount {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #fbbf24;
-    }
+    .pending-item-name { font-size: 0.82rem; font-weight: 600; color: #fff; }
+    .pending-item-amount { font-size: 0.95rem; font-weight: 700; color: #fbbf24; }
     .pending-item-meta {
       display: flex;
       justify-content: space-between;
@@ -304,7 +291,6 @@
       transition: width 0.6s var(--ease-out);
     }
     
-    /* Released notification */
     .released-banner {
       background: linear-gradient(135deg, rgba(127,173,107,0.06), rgba(165,201,149,0.1));
       border: 1.5px solid rgba(127,173,107,0.25);
@@ -326,15 +312,8 @@
     }
     .released-icon { font-size: 1.25rem; }
     
-    /* Empty pending state */
-    .pending-empty {
-      text-align: center;
-      padding: 0.6rem;
-      font-size: 0.78rem;
-      opacity: 0.65;
-    }
+    .pending-empty { text-align: center; padding: 0.6rem; font-size: 0.78rem; opacity: 0.65; }
     
-    /* Total row */
     .wallet-total {
       background: linear-gradient(135deg, #451a03, #3b0f00);
       padding: 0.65rem 1.25rem;
@@ -344,12 +323,208 @@
       font-size: 0.8rem;
       color: rgba(255,255,255,0.85);
     }
-    .wallet-total-val {
-      font-weight: 700;
-      font-size: 0.92rem;
-      color: #fff;
-    }
+    .wallet-total-val { font-weight: 700; font-size: 0.92rem; color: #fff; }
     
+    /* ═══════════════════════════════════════
+       BURN VERIFICATION — HERO CARD (URGENT)
+       ═══════════════════════════════════════ */
+    .burn-section {
+      margin-bottom: 1.5rem;
+      animation: cardFadeIn 0.5s var(--ease-out) 0.06s both;
+    }
+
+    .burn-section .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+      padding: 0 0.125rem;
+    }
+
+    /* The big hero card for Burn Verification */
+    .burn-hero-card {
+      background: linear-gradient(145deg, #7f1d1d 0%, #991b1b 35%, #b45309 100%);
+      border-radius: var(--radius-xl);
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(153,27,27,0.35), 0 2px 8px rgba(0,0,0,0.12);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      position: relative;
+      border: 1px solid rgba(239,68,68,0.2);
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .burn-hero-card:active {
+      transform: scale(0.985);
+    }
+
+    /* Animated ember/glow background */
+    .burn-hero-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(251,191,36,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.2) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, rgba(180,83,9,0.25) 0%, transparent 40%);
+      pointer-events: none;
+      animation: emberPulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes emberPulse {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
+    }
+
+    /* Large decorative fire emoji */
+    .burn-hero-card::after {
+      content: '🔥';
+      position: absolute;
+      font-size: 9rem;
+      opacity: 0.08;
+      right: -0.75rem;
+      bottom: -1.5rem;
+      pointer-events: none;
+      transform: rotate(10deg);
+      filter: blur(2px);
+    }
+
+    .burn-hero-inner {
+      padding: 1.5rem 1.5rem 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Urgent badge pill at top */
+    .burn-urgent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(239,68,68,0.25);
+      border: 1px solid rgba(239,68,68,0.4);
+      color: #fca5a5;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      animation: urgentBlink 2.5s ease-in-out infinite;
+    }
+
+    @keyframes urgentBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.75; }
+    }
+
+    .burn-urgent-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f87171;
+      animation: dotPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.7; }
+    }
+
+    .burn-hero-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.1rem;
+    }
+
+    .burn-hero-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .burn-hero-text { flex: 1; min-width: 0; }
+
+    .burn-hero-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .burn-hero-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      margin-bottom: 0.6rem;
+    }
+
+    .burn-hero-arrow {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.5);
+      flex-shrink: 0;
+      align-self: center;
+      transition: transform 0.25s var(--ease-out);
+    }
+
+    .burn-hero-card:active .burn-hero-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Stats strip at bottom */
+    .burn-stats-strip {
+      background: rgba(0,0,0,0.25);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      gap: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .burn-stat {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .burn-stat + .burn-stat::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10%;
+      height: 80%;
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .burn-stat-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fbbf24;
+      line-height: 1.2;
+    }
+
+    .burn-stat-label {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.55);
+      margin-top: 0.15rem;
+      font-weight: 500;
+    }
+
     /* ═══════════════════════════════════════
        NAVIGATION CARDS — Refined
        ═══════════════════════════════════════ */
@@ -358,8 +533,8 @@
       animation: cardFadeIn 0.5s var(--ease-out) both;
     }
     
-    .nav-section:nth-child(2) { animation-delay: 0.08s; }
-    .nav-section:nth-child(3) { animation-delay: 0.16s; }
+    .nav-section:nth-child(3) { animation-delay: 0.12s; }
+    .nav-section:nth-child(4) { animation-delay: 0.2s; }
     
     .nav-section .section-title {
       font-size: 1.05rem;
@@ -424,9 +599,7 @@
       pointer-events: none;
     }
     
-    .nav-card.primary::after {
-      background: none;
-    }
+    .nav-card.primary::after { background: none; }
     
     .nav-card-icon {
       width: 56px;
@@ -441,18 +614,13 @@
       transition: transform 0.3s var(--ease-spring);
     }
     
-    .nav-card:active .nav-card-icon {
-      transform: scale(0.92);
-    }
+    .nav-card:active .nav-card-icon { transform: scale(0.92); }
     
     .nav-card:not(.primary) .nav-card-icon {
       background: linear-gradient(135deg, rgba(127,173,107,0.08), rgba(165,201,149,0.12));
     }
     
-    .nav-card-content {
-      flex: 1;
-      min-width: 0;
-    }
+    .nav-card-content { flex: 1; min-width: 0; }
     
     .nav-card-title {
       font-size: 1.05rem;
@@ -474,19 +642,8 @@
       flex-shrink: 0;
     }
     
-    .nav-card:active .nav-card-arrow {
-      transform: translateX(3px);
-      opacity: 0.6;
-    }
-    
-    .nav-card.primary .nav-card-arrow {
-      opacity: 0.7;
-    }
-    
-    /* Warning card (Burn Verification) */
-    .nav-card.warning {
-      border-left: 3px solid var(--status-pending);
-    }
+    .nav-card:active .nav-card-arrow { transform: translateX(3px); opacity: 0.6; }
+    .nav-card.primary .nav-card-arrow { opacity: 0.7; }
     
     /* ═══════════════════════════════════════
        QUICK STATS — Clean grid
@@ -496,7 +653,7 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
       margin-top: 0.75rem;
-      animation: cardFadeIn 0.5s var(--ease-out) 0.24s both;
+      animation: cardFadeIn 0.5s var(--ease-out) 0.28s both;
     }
     
     .stat-card {
@@ -509,14 +666,8 @@
       transition: all 0.25s var(--ease-out);
     }
     
-    .stat-card:active {
-      transform: scale(0.97);
-    }
-    
-    .stat-icon {
-      font-size: 1.6rem;
-      margin-bottom: 0.4rem;
-    }
+    .stat-card:active { transform: scale(0.97); }
+    .stat-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
     
     .stat-value {
       font-size: 1.5rem;
@@ -527,11 +678,7 @@
       letter-spacing: -0.02em;
     }
     
-    .stat-label {
-      font-size: 0.78rem;
-      color: var(--text-medium);
-      font-weight: 500;
-    }
+    .stat-label { font-size: 0.78rem; color: var(--text-medium); font-weight: 500; }
     
     /* ═══════════════════════════════════════
        RESPONSIVE
@@ -552,6 +699,9 @@
       .nav-card-title { font-size: 0.95rem; }
       .nav-card-description { font-size: 0.78rem; }
       .user-info-card { padding: 1.25rem; }
+      .burn-hero-title { font-size: 1.15rem; }
+      .burn-hero-icon { width: 54px; height: 54px; font-size: 1.9rem; }
+      .burn-hero-inner { padding: 1.15rem 1.15rem 1rem; }
     }
   </style>
 </head>
@@ -576,6 +726,7 @@
     
     <!-- Main Content -->
     <div class="home-content">
+
       <!-- User Info Card -->
       <div class="user-info-card">
         <div class="user-profile">
@@ -597,7 +748,6 @@
         
         <!-- AGRICOIN WALLET -->
         <div class="wallet-section">
-          <!-- Available (usable) -->
           <div class="wallet-available">
             <div class="wallet-header">
               <div class="wallet-title">
@@ -612,7 +762,6 @@
             <div class="wallet-sub">💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม</div>
           </div>
           
-          <!-- Pending (locked) -->
           <div class="wallet-pending">
             <div class="pending-header">
               <div class="pending-title">
@@ -626,12 +775,10 @@
               เพื่อป้องกันการทุจริต — หลัง 14 วันจะโอนเข้ายอดใช้ได้ทันทีอัตโนมัติ
             </div>
             
-            <!-- Pending items -->
             <div class="pending-list" id="pendingList">
               <div class="pending-empty">ไม่มี AgriCoins ที่รอปลดล็อก</div>
             </div>
             
-            <!-- Demo: Force release button -->
             <div id="forceReleaseSection" hidden style="margin-top:0.75rem;">
               <button id="forceReleaseBtn" onclick="forceReleasePending()"
                 style="width:100%;padding:0.7rem;border:1.5px dashed #fbbf24;border-radius:var(--radius-md);
@@ -644,21 +791,66 @@
             </div>
           </div>
           
-          <!-- Total -->
           <div class="wallet-total">
             <span>รวมทั้งหมด (ใช้ได้ + รอปลดล็อก)</span>
             <span class="wallet-total-val" id="totalBalance">0 🪙</span>
           </div>
         </div>
         
-        <!-- Released notification -->
         <div class="released-banner" id="releasedBanner" hidden>
           <span class="released-icon">🎉</span>
           <span id="releasedText">AgriCoins ปลดล็อกแล้ว!</span>
         </div>
       </div>
-      
-      <!-- Navigation — Baling System -->
+
+      <!-- ════════════════════════════════════
+           BURN VERIFICATION — PRIORITY SECTION
+           ════════════════════════════════════ -->
+      <div class="burn-section">
+        <h2 class="section-title">🔥 การตรวจสอบการเผา / Burn Verification</h2>
+
+        <a href="burn-verification.html" class="burn-hero-card">
+          <div class="burn-hero-inner">
+            <!-- Urgent badge -->
+            <div class="burn-urgent-badge">
+              <div class="burn-urgent-dot"></div>
+              ต้องดำเนินการ · Required Action
+            </div>
+
+            <div class="burn-hero-body">
+              <div class="burn-hero-icon">🔥</div>
+              <div class="burn-hero-text">
+                <div class="burn-hero-title">Burn Verification</div>
+                <div class="burn-hero-desc">
+                  ตรวจสอบร่องรอยการเผาในแปลงเกษตร<br>
+                  รับ AgriCoins เมื่อผ่านการตรวจสอบ
+                </div>
+              </div>
+              <div class="burn-hero-arrow">→</div>
+            </div>
+          </div>
+
+          <!-- Stats strip -->
+          <div class="burn-stats-strip">
+            <div class="burn-stat">
+              <div class="burn-stat-val">🌾</div>
+              <div class="burn-stat-label">ป้องกันฝุ่นควัน</div>
+            </div>
+            <div class="burn-stat">
+              <div class="burn-stat-val">🪙</div>
+              <div class="burn-stat-label">รับ AgriCoins</div>
+            </div>
+            <div class="burn-stat">
+              <div class="burn-stat-val">🛰️</div>
+              <div class="burn-stat-label">ตรวจด้วย AI</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- ════════════════════════════════════
+           BALING SYSTEM — SECONDARY SECTION
+           ════════════════════════════════════ -->
       <div class="nav-section">
         <h2 class="section-title">🚜 ระบบการอัดฟาง / Baling System</h2>
         <div class="nav-grid">
@@ -667,14 +859,6 @@
             <div class="nav-card-content">
               <div class="nav-card-title" id="dashboardTitle">Dashboard</div>
               <div class="nav-card-description" id="dashboardDescription">จัดการงานของคุณ</div>
-            </div>
-            <div class="nav-card-arrow">→</div>
-          </a>
-          <a href="burn-verification.html" class="nav-card warning" id="burnVerifyLink">
-            <div class="nav-card-icon">🔥</div>
-            <div class="nav-card-content">
-              <div class="nav-card-title">Burn Verification</div>
-              <div class="nav-card-description">ตรวจสอบร่องรอยการเผาในแปลงเกษตร</div>
             </div>
             <div class="nav-card-arrow">→</div>
           </a>
@@ -761,9 +945,6 @@
       }
     };
     
-    // ═══════════════════════════════════════════════
-    // WALLET — Load available + pending balances
-    // ═══════════════════════════════════════════════
     async function loadWallet() {
       try {
         const res = await fetch(BACKEND + '/agricoin/wallet', {
@@ -853,9 +1034,6 @@
       }).join('');
     }
     
-    // ═══════════════════════════════════════════════
-    // DEMO: Force release all pending coins
-    // ═══════════════════════════════════════════════
     async function forceReleasePending() {
       const btn = document.getElementById('forceReleaseBtn');
       btn.disabled = true;
@@ -874,7 +1052,6 @@
           document.getElementById('releasedText').textContent = data.message || 
             `🚀 ปลดล็อก ${data.released_count} รายการ รวม ${Math.floor(data.released_total)} AgriCoins!`;
           banner.hidden = false;
-          
           Toast.success(data.message || 'ปลดล็อกสำเร็จ!');
           await loadWallet();
         } else if (data.success) {
@@ -891,9 +1068,6 @@
       btn.textContent = '🚀 Demo: ข้าม 14 วัน — ปลดล็อกทั้งหมดทันที';
     }
     
-    // ═══════════════════════════════════════════════
-    // Initialize page
-    // ═══════════════════════════════════════════════
     async function initializePage() {
       const config = userTypeConfig[currentUser.type];
       
