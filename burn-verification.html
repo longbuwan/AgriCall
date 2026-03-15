@@ -313,7 +313,7 @@
 
   <div class="alert purple" id="demoAlert" hidden>
     <div class="alert-icon">🚀</div>
-    <div class="alert-content"><div class="alert-title">Demo Mode เปิดใช้งาน</div>ข้ามเวลารอ 30 วันได้ การตรวจสอบดาวเทียมยังทำงานจริง</div>
+    <div class="alert-content"><div class="alert-title">Demo Mode เปิดใช้งาน</div>ข้ามเวลารอ 30 วัน (ขั้นตอน 2) · จำลองเก็บเกี่ยวแล้ว 3 เดือน (ขั้นตอน 3) · การตรวจสอบดาวเทียมยังใช้ข้อมูลจริง</div>
   </div>
 
   <!-- NO CYCLE -->
@@ -470,7 +470,24 @@
           </div>
         </div>
 
-        <button class="btn btn-amber" id="harvestBtn" onclick="doHarvest()">🌾 แจ้งเก็บเกี่ยว & ตรวจสอบการเผา</button>
+        <button class="btn btn-amber" id="harvestBtn" onclick="doHarvest(false)">🌾 แจ้งเก็บเกี่ยว & ตรวจสอบการเผา</button>
+
+        <!-- Demo mode section -->
+        <div id="step3DemoSection" hidden>
+          <div class="divider-or">Demo Mode</div>
+          <div class="alert purple" style="margin-bottom:0.5rem;">
+            <div class="alert-icon">🚀</div>
+            <div class="alert-content">
+              <div class="alert-title">Demo: จำลองเก็บเกี่ยวแล้ว 3 เดือน</div>
+              <div style="font-size:0.78rem;line-height:1.5;">
+                ✅ <strong>ข้ามการตรวจสอบเก็บเกี่ยว</strong> — ไม่ต้องรอ NDVI ลดจริง<br>
+                ✅ <strong>ใช้ภาพดาวเทียมย้อนหลัง 90 วัน</strong> — จำลองเหมือนเก็บเกี่ยวไปแล้ว 3 เดือน<br>
+                🛰️ <strong>การตรวจจับการเผายังใช้ข้อมูลจริง</strong> จาก Sentinel-2 / SAR
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-purple" onclick="doHarvest(true)">🚀 Demo: ข้ามเก็บเกี่ยว & ตรวจสอบ 90 วัน</button>
+        </div>
 
         <!-- Burn result shown after harvest declaration -->
         <div id="harvestMapContainer" style="margin-top:0.75rem;"></div>
@@ -924,6 +941,9 @@ function renderCycle(c){
       if(c.polygon) displayPoly(c.polygon);
 
       document.getElementById('burnBanner').hidden = true;
+
+      // Show demo section if demo mode is on
+      document.getElementById('step3DemoSection').hidden = !demoMode;
     }
     return;
   }
@@ -960,13 +980,17 @@ async function doStep2(skip){
 // ═══════════════════════════════════════════════════════════
 // HARVEST: Now does burn check from planting→harvest in one step
 // ═══════════════════════════════════════════════════════════
-async function doHarvest(){
-  showLoading('กำลังตรวจสอบการเผาตั้งแต่เริ่มปลูกจนถึงวันนี้...');
+async function doHarvest(isDemoMode){
+  const loadMsg = isDemoMode
+    ? 'Demo: กำลังตรวจสอบภาพดาวเทียมย้อนหลัง 90 วัน...'
+    : 'กำลังตรวจสอบการเผาตั้งแต่เริ่มปลูกจนถึงวันนี้...';
+  showLoading(loadMsg);
   try{
     const r = await API.callBackend('/api/farming/declare-harvest', {
       user_id: currentUser.id,
       cycle_id: activeCycle.cycle_id,
-      verify_satellite: true
+      verify_satellite: !isDemoMode,  // skip harvest verification in demo
+      demo_mode: isDemoMode
     });
     hideLoading();
 
@@ -975,12 +999,17 @@ async function doHarvest(){
       return;
     }
 
-    // Show harvest satellite check info if available
+    // Show harvest satellite check info if available (not in demo mode)
     if(r.harvest_satellite_check){
       const h = r.harvest_satellite_check;
       showToast(h.harvest_detected
         ? `🌾 ดาวเทียมยืนยันเก็บเกี่ยว (NDVI ลดลง ${(h.ndvi_drop||0).toFixed(2)})`
         : '⚠️ ดาวเทียมยังไม่พบสัญญาณเก็บเกี่ยวชัดเจน', '');
+    }
+
+    // Show demo info toast
+    if(r.demo_info){
+      showToast(`🚀 Demo: ตรวจย้อนหลัง ${r.burn_check?.days_checked||90} วัน (ข้อมูลดาวเทียมจริง)`, '');
     }
 
     // Render burn result on map
@@ -990,11 +1019,12 @@ async function doHarvest(){
       renderBurnResult(ba);
     }
 
-    // Disable button after submission
+    // Disable buttons after submission
     document.getElementById('harvestBtn').disabled = true;
     document.getElementById('harvestBtn').textContent = r.status === 'completed'
       ? '✅ ผ่านการตรวจสอบ!'
       : '❌ พบการเผา';
+    document.getElementById('step3DemoSection').hidden = true;
 
     // Show final result
     if(r.status === 'completed'){
@@ -1038,6 +1068,7 @@ function startNew(){
   document.getElementById('step2Submit').hidden=false;document.getElementById('harvestSection').hidden=true;
   document.getElementById('harvestWaitSection').hidden=false;document.getElementById('step2Evidence').hidden=true;
   document.getElementById('burnBanner').hidden=true;
+  document.getElementById('step3DemoSection').hidden=true;
   document.querySelectorAll('.mode-opt').forEach(b=>b.classList.remove('active'));
   document.querySelector('[data-mode="auto"]').classList.add('active');
   document.getElementById('mainMap').classList.remove('burn-border');document.getElementById('mainMap').classList.add('crosshair');
