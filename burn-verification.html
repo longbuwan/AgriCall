@@ -528,6 +528,11 @@
         <div class="final-coins-num">🪙 +<span id="successCoins">0</span></div>
         <div>AgriCoins</div>
       </div>
+      <div class="final-tip" id="pendingNotice">
+        🔒 AgriCoins จะถูกล็อกไว้ <strong>14 วัน</strong> เพื่อป้องกันการทุจริต<br>
+        หลัง 14 วันจะโอนเข้ายอดใช้ได้ทันทีอัตโนมัติ<br>
+        <span id="releaseDate" style="opacity:0.9;font-size:0.82rem;"></span>
+      </div>
     </div>
     <div class="card-body">
       <div class="mini-map" id="successMiniMap"></div>
@@ -871,6 +876,17 @@ function renderCycle(c){
     document.getElementById('successCoins').textContent=Math.round(c.reward?.agricoin_awarded||0);
     document.getElementById('successSubText').textContent=
       `ไม่พบการเผาตลอดรอบการเพาะปลูก (${c.days_info?.days_since_farming_start||'-'} วัน)`;
+    // Show pending release date (14 days from completion)
+    const completedDate = c.steps?.step3?.date;
+    if(completedDate){
+      const release = new Date(new Date(completedDate).getTime() + 14*24*60*60*1000);
+      const now = new Date();
+      const daysLeft = Math.max(0, Math.ceil((release - now) / (24*60*60*1000)));
+      const relStr = release.toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'numeric'});
+      document.getElementById('releaseDate').innerHTML = daysLeft > 0
+        ? `📅 ปลดล็อกวันที่ <strong>${relStr}</strong> (อีก ${daysLeft} วัน)`
+        : `✅ ปลดล็อกแล้ว! AgriCoins อยู่ในยอดใช้ได้`;
+    }
     setTimeout(()=>createMiniMap('successMiniMap',c.polygon,{color:'#7FAD6B',weight:3,fillColor:'#a5c995',fillOpacity:0.35}),200);
     const rai=c.area_rai||0;
     if(rai>0){const coins=calcCoins(rai);document.getElementById('successImpact').innerHTML=`
@@ -1028,7 +1044,13 @@ async function doHarvest(isDemoMode){
 
     // Show final result
     if(r.status === 'completed'){
-      showToast(r.message || '🎉 ผ่านการตรวจสอบ!', 'green');
+      // Show pending info
+      const pendingDays = r.reward?.pending_days || 14;
+      const relDate = r.reward?.release_date || '';
+      showToast(
+        `🎉 ผ่าน! +${r.reward?.agricoins||0} AgriCoins (ล็อก ${pendingDays} วัน → ${relDate})`,
+        'green'
+      );
       setTimeout(() => loadStatus(), 3500);
     } else if(r.status === 'failed'){
       showToast(r.message || '❌ พบการเผา', 'red');
