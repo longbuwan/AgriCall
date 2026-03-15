@@ -7,32 +7,21 @@
   <link rel="stylesheet" href="style.css">
   <style>
     /* ═══════════════════════════════════════
-       MARKET HEADER — Rich gradient + glass
+       MARKET HEADER — Green gradient, white text
        ═══════════════════════════════════════ */
     .market-header {
-      background: linear-gradient(160deg, #7FAD6B 0%, #5a9447 60%, #4a8540 100%);
-      color: #ffffff;
-      padding: var(--space-lg) var(--space-lg) var(--space-md);
-      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      background: linear-gradient(160deg, #7FAD6B 0%, #5a9447 60%, #4a8540 100%) !important;
+      color: #ffffff !important;
+      padding: 1.5rem 1.5rem 1rem;
+      border-radius: 0 0 24px 24px;
       box-shadow: 0 4px 20px rgba(74,124,89,0.25);
       position: sticky;
       top: 0;
       z-index: 100;
-      background-image:
-        radial-gradient(ellipse at 85% 15%, rgba(255,255,255,0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 15% 80%, rgba(255,255,255,0.04) 0%, transparent 40%);
     }
 
-    /* Force all text inside market-header to be white */
-    .market-header,
-    .market-header h1,
-    .market-header h2,
-    .market-header h3,
-    .market-header p,
-    .market-header span,
-    .market-header .market-title,
-    .market-header .market-subtitle,
-    .market-header .balance-amount {
+    /* Force ALL text inside header to white */
+    .market-header *:not(.search-bar) {
       color: #ffffff !important;
     }
 
@@ -40,8 +29,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: var(--space-md);
-      gap: var(--space-sm);
+      margin-bottom: 1rem;
+      gap: 0.75rem;
     }
 
     .market-title-group { flex: 1; min-width: 0; }
@@ -50,9 +39,10 @@
       font-family: 'Itim', cursive;
       font-size: 1.6rem;
       margin: 0;
+      margin-bottom: 0;
       display: flex;
       align-items: center;
-      gap: var(--space-xs);
+      gap: 0.5rem;
       text-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
@@ -60,27 +50,27 @@
       font-size: 0.82rem;
       opacity: 0.92;
       margin-top: 0.2rem;
+      margin-bottom: 0;
       font-weight: 400;
     }
 
     .market-header .back-btn {
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.18) !important;
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.15) !important;
       width: 40px;
       height: 40px;
-      border-radius: var(--radius-full);
+      border-radius: 9999px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+      transition: all 0.25s ease;
       flex-shrink: 0;
-      box-shadow: none;
+      box-shadow: none !important;
     }
-    .market-header .back-btn:hover { background: rgba(255,255,255,0.28); }
+    .market-header .back-btn:hover { background: rgba(255,255,255,0.28) !important; }
     .market-header .back-btn:active { transform: scale(0.92); }
 
     /* AgriCoin Balance Widget — Glass pill */
@@ -113,20 +103,24 @@
       letter-spacing: -0.01em;
     }
 
-    /* Search bar override for header context */
+    /* Search bar inside green header — white bg, dark text */
     .market-header .search-bar-container { margin-bottom: 0; }
     .market-header .search-bar {
-      background: rgba(255,255,255,0.95);
-      border: none;
+      background: rgba(255,255,255,0.95) !important;
+      border: none !important;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       font-size: 0.9rem;
-      padding: 0.75rem 1rem 0.75rem 1rem;
-      color: #1a2e1a;
+      padding: 0.75rem 1rem;
+      color: #1a2e1a !important;
+      border-radius: 24px;
+      width: 100%;
+      font-family: 'Prompt', sans-serif;
     }
     .market-header .search-bar:focus {
+      outline: none;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 3px rgba(255,255,255,0.3);
     }
-    .market-header .search-bar::placeholder { color: #8B9A8C; }
+    .market-header .search-bar::placeholder { color: #8B9A8C !important; }
 
     /* ═══════════════════════════════════════
        AGRICOIN BALANCE CARD — Premium gold
