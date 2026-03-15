@@ -15,7 +15,6 @@
       flex-direction: column;
     }
     
-    /* Main Content */
     .home-content {
       flex: 1;
       max-width: 1200px;
@@ -53,9 +52,7 @@
       flex-shrink: 0;
     }
     
-    .user-details {
-      flex: 1;
-    }
+    .user-details { flex: 1; }
     
     .user-name {
       font-size: 1.25rem;
@@ -93,17 +90,23 @@
       margin-top: 0.25rem;
     }
     
-    /* AgriCoin Section */
-    .agricoin-section {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    /* ═══════════════════════════════════════
+       AGRICOIN WALLET — SPLIT BALANCE UI
+       ═══════════════════════════════════════ */
+    .wallet-section {
       border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    /* Available balance — gold gradient */
+    .wallet-available {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       padding: 1.25rem;
       color: var(--white);
       position: relative;
       overflow: hidden;
     }
-    
-    .agricoin-section::before {
+    .wallet-available::before {
       content: '🌾';
       position: absolute;
       font-size: 8rem;
@@ -112,60 +115,176 @@
       top: -2rem;
       pointer-events: none;
     }
-    
-    .agricoin-header {
+    .wallet-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
       position: relative;
       z-index: 1;
     }
-    
-    .agricoin-title {
+    .wallet-title {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 600;
     }
-    
-    .agricoin-icon {
-      font-size: 1.5rem;
-    }
-    
-    .agricoin-balance {
+    .wallet-title-icon { font-size: 1.4rem; }
+    .wallet-balance-row {
       display: flex;
       align-items: baseline;
-      gap: 0.25rem;
+      gap: 0.35rem;
       position: relative;
       z-index: 1;
     }
-    
-    .agricoin-amount {
-      font-size: 2rem;
+    .wallet-amount {
+      font-size: 2.25rem;
       font-weight: 700;
       line-height: 1;
     }
-    
-    .agricoin-label {
+    .wallet-unit {
       font-size: 0.875rem;
       opacity: 0.9;
     }
-    
-    .agricoin-info {
-      font-size: 0.8125rem;
-      opacity: 0.9;
-      margin-top: 0.5rem;
+    .wallet-sub {
+      font-size: 0.78rem;
+      opacity: 0.85;
+      margin-top: 0.35rem;
       position: relative;
       z-index: 1;
     }
     
-    /* Navigation Cards */
-    .nav-section {
-      margin-bottom: 1.5rem;
+    /* Pending section — darker amber */
+    .wallet-pending {
+      background: linear-gradient(135deg, #92400E, #78350F);
+      padding: 1rem 1.25rem;
+      color: #fde68a;
+    }
+    .pending-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .pending-title {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .pending-amount {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .pending-info {
+      font-size: 0.72rem;
+      opacity: 0.8;
+      line-height: 1.4;
     }
     
+    /* Pending items list */
+    .pending-list {
+      margin-top: 0.75rem;
+    }
+    .pending-item {
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-left: 3px solid #fbbf24;
+    }
+    .pending-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.3rem;
+    }
+    .pending-item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .pending-item-amount {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+    .pending-item-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      opacity: 0.8;
+    }
+    .pending-countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: rgba(251,191,36,0.2);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      color: #fbbf24;
+      font-size: 0.7rem;
+    }
+    .pending-progress {
+      height: 3px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .pending-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    
+    /* Released notification */
+    .released-banner {
+      background: rgba(127,173,107,0.08);
+      border: 1.5px solid rgba(127,173,107,0.3);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--secondary-green);
+      font-weight: 500;
+      animation: slideIn 0.4s ease;
+    }
+    .released-banner[hidden] { display: none; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .released-icon { font-size: 1.3rem; }
+    
+    /* Empty pending state */
+    .pending-empty {
+      text-align: center;
+      padding: 0.5rem;
+      font-size: 0.78rem;
+      opacity: 0.7;
+    }
+    
+    /* Total row */
+    .wallet-total {
+      background: rgba(0,0,0,0.15);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.9);
+    }
+    .wallet-total-val { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    
+    /* Navigation Cards */
+    .nav-section { margin-bottom: 1.5rem; }
     .section-title {
       font-size: 1.125rem;
       font-weight: 600;
@@ -173,13 +292,11 @@
       margin-bottom: 0.75rem;
       padding: 0 0.25rem;
     }
-    
     .nav-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 0.875rem;
     }
-    
     .nav-card {
       background: var(--white);
       border-radius: var(--radius-lg);
@@ -194,17 +311,11 @@
       gap: 1rem;
       border: 2px solid transparent;
     }
-    
-    .nav-card:active {
-      transform: scale(0.98);
-      box-shadow: var(--shadow-sm);
-    }
-    
+    .nav-card:active { transform: scale(0.98); box-shadow: var(--shadow-sm); }
     .nav-card.primary {
       background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
       color: var(--white);
     }
-    
     .nav-card-icon {
       width: 60px;
       height: 60px;
@@ -216,47 +327,11 @@
       font-size: 2rem;
       flex-shrink: 0;
     }
-    
-    .nav-card:not(.primary) .nav-card-icon {
-      background: rgba(127, 173, 107, 0.1);
-    }
-    
-    .nav-card-content {
-      flex: 1;
-    }
-    
-    .nav-card-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-    
-    .nav-card-description {
-      font-size: 0.875rem;
-      opacity: 0.8;
-      line-height: 1.4;
-    }
-    
-    .nav-card-arrow {
-      font-size: 1.5rem;
-      opacity: 0.6;
-    }
-    
-    /* Coming Soon Badge */
-    .coming-soon-badge {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.3);
-      padding: 0.125rem 0.5rem;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-    
-    .nav-card:not(.primary) .coming-soon-badge {
-      background: rgba(127, 173, 107, 0.2);
-      color: var(--primary-green);
-    }
+    .nav-card:not(.primary) .nav-card-icon { background: rgba(127, 173, 107, 0.1); }
+    .nav-card-content { flex: 1; }
+    .nav-card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .nav-card-description { font-size: 0.875rem; opacity: 0.8; line-height: 1.4; }
+    .nav-card-arrow { font-size: 1.5rem; opacity: 0.6; }
     
     /* Quick Stats */
     .quick-stats {
@@ -265,7 +340,6 @@
       gap: 0.75rem;
       margin-top: 1rem;
     }
-    
     .stat-card {
       background: var(--white);
       border-radius: var(--radius-lg);
@@ -273,12 +347,7 @@
       box-shadow: var(--shadow-sm);
       text-align: center;
     }
-    
-    .stat-icon {
-      font-size: 1.75rem;
-      margin-bottom: 0.5rem;
-    }
-    
+    .stat-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
     .stat-value {
       font-size: 1.5rem;
       font-weight: 700;
@@ -286,60 +355,21 @@
       line-height: 1;
       margin-bottom: 0.25rem;
     }
+    .stat-label { font-size: 0.8125rem; color: var(--text-medium); }
     
-    .stat-label {
-      font-size: 0.8125rem;
-      color: var(--text-medium);
-    }
-    
-    /* Tablet and Desktop */
     @media (min-width: 768px) {
-      .nav-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .quick-stats {
-        grid-template-columns: repeat(4, 1fr);
-      }
+      .nav-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-stats { grid-template-columns: repeat(4, 1fr); }
     }
-    
-    /* Mobile Optimizations */
     @media (max-width: 480px) {
-      .home-content {
-        padding: 0.75rem;
-      }
-      
-      .user-avatar {
-        width: 60px;
-        height: 60px;
-        font-size: 1.75rem;
-      }
-      
-      .user-name {
-        font-size: 1.125rem;
-      }
-      
-      .agricoin-amount {
-        font-size: 1.75rem;
-      }
-      
-      .nav-card {
-        padding: 1rem;
-      }
-      
-      .nav-card-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.75rem;
-      }
-      
-      .nav-card-title {
-        font-size: 1rem;
-      }
-      
-      .nav-card-description {
-        font-size: 0.8125rem;
-      }
+      .home-content { padding: 0.75rem; }
+      .user-avatar { width: 60px; height: 60px; font-size: 1.75rem; }
+      .user-name { font-size: 1.125rem; }
+      .wallet-amount { font-size: 1.75rem; }
+      .nav-card { padding: 1rem; }
+      .nav-card-icon { width: 50px; height: 50px; font-size: 1.75rem; }
+      .nav-card-title { font-size: 1rem; }
+      .nav-card-description { font-size: 0.8125rem; }
     }
   </style>
 </head>
@@ -352,16 +382,12 @@
           <span class="logo-icon"><img src="Adobe Express - file.png" class="emoji"></span>
           <span>AgriCall</span>
         </a>
-        
         <div class="dashboard-user">
           <div class="user-info">
             <div class="user-name" id="headerUserName">Loading...</div>
             <div class="user-type" id="headerUserType">Loading...</div>
           </div>
-          
-          <button class="logout-btn" onclick="logout()">
-            🚪 ออกจากระบบ
-          </button>
+          <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
         </div>
       </nav>
     </header>
@@ -387,86 +413,98 @@
           </div>
         </div>
         
-        <!-- AgriCoin Section -->
-        <div class="agricoin-section">
-          <div class="agricoin-header">
-            <div class="agricoin-title">
-              <span class="agricoin-icon"><img src="Untitled_design-removebg-preview.png" class="coin"></span>
-              <span>AgriCoin Balance</span>
+        <!-- ═══════════════════════════════════
+             AGRICOIN WALLET — SPLIT BALANCE
+             ═══════════════════════════════════ -->
+        <div class="wallet-section">
+          <!-- Available (usable) -->
+          <div class="wallet-available">
+            <div class="wallet-header">
+              <div class="wallet-title">
+                <span class="wallet-title-icon"><img src="Untitled_design-removebg-preview.png" class="coin" onerror="this.outerHTML='🪙'"></span>
+                <span>AgriCoin — ใช้ได้ทันที</span>
+              </div>
+            </div>
+            <div class="wallet-balance-row">
+              <span class="wallet-amount" id="availableBalance">0</span>
+              <span class="wallet-unit">AgriCoins</span>
+            </div>
+            <div class="wallet-sub">💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม</div>
+          </div>
+          
+          <!-- Pending (locked) -->
+          <div class="wallet-pending">
+            <div class="pending-header">
+              <div class="pending-title">
+                <span>🔒</span>
+                <span>รอปลดล็อก (<span id="pendingDays">14</span> วัน)</span>
+              </div>
+              <div class="pending-amount" id="pendingTotal">0</div>
+            </div>
+            <div class="pending-info">
+              AgriCoins จากการตรวจสอบไม่เผาจะถูกล็อกไว้ 14 วัน<br>
+              เพื่อป้องกันการทุจริต — หลัง 14 วันจะโอนเข้ายอดใช้ได้ทันทีอัตโนมัติ
+            </div>
+            
+            <!-- Pending items -->
+            <div class="pending-list" id="pendingList">
+              <div class="pending-empty">ไม่มี AgriCoins ที่รอปลดล็อก</div>
             </div>
           </div>
-          <div class="agricoin-balance">
-            <span class="agricoin-amount" id="agricoinBalance">0</span>
-            <span class="agricoin-label">AgriCoins</span>
+          
+          <!-- Total -->
+          <div class="wallet-total" style="background: linear-gradient(135deg, #451a03, #3b0f00);">
+            <span>รวมทั้งหมด (ใช้ได้ + รอปลดล็อก)</span>
+            <span class="wallet-total-val" id="totalBalance">0 🪙</span>
           </div>
-          <div class="agricoin-info">
-            💡 ใช้ AgriCoin เพื่อรับส่วนลดในแพลตฟอร์ม<br>
-            Use AgriCoin for discounts on the platform
-          </div>
+        </div>
+        
+        <!-- Released notification -->
+        <div class="released-banner" id="releasedBanner" hidden>
+          <span class="released-icon">🎉</span>
+          <span id="releasedText">AgriCoins ปลดล็อกแล้ว!</span>
         </div>
       </div>
       
-     <div class="nav-section">
-  <h2 class="section-title">🚜 ระบบการอัดฟาง / Baling System</h2>
-
-  <div class="nav-grid">
-    <!-- Dashboard -->
-    <a href="dashboard.html" class="nav-card primary" id="dashboardLink">
-      <div class="nav-card-icon" id="dashboardIcon">📊</div>
-      <div class="nav-card-content">
-        <div class="nav-card-title" id="dashboardTitle">Dashboard</div>
-        <div class="nav-card-description" id="dashboardDescription">
-          จัดการงานของคุณ
+      <!-- Navigation -->
+      <div class="nav-section">
+        <h2 class="section-title">🚜 ระบบการอัดฟาง / Baling System</h2>
+        <div class="nav-grid">
+          <a href="dashboard.html" class="nav-card primary" id="dashboardLink">
+            <div class="nav-card-icon" id="dashboardIcon">📊</div>
+            <div class="nav-card-content">
+              <div class="nav-card-title" id="dashboardTitle">Dashboard</div>
+              <div class="nav-card-description" id="dashboardDescription">จัดการงานของคุณ</div>
+            </div>
+            <div class="nav-card-arrow">→</div>
+          </a>
+          <a href="burn-verification.html" class="nav-card warning" id="burnVerifyLink">
+            <div class="nav-card-icon">🔥</div>
+            <div class="nav-card-content">
+              <div class="nav-card-title">Burn Verification</div>
+              <div class="nav-card-description">ตรวจสอบร่องรอยการเผาในแปลงเกษตร</div>
+            </div>
+            <div class="nav-card-arrow">→</div>
+          </a>
         </div>
       </div>
-      <div class="nav-card-arrow">→</div>
-    </a>
-
-    <!-- Burn Verification -->
-    <a href="burn-verification.html" class="nav-card warning" id="burnVerifyLink">
-      <div class="nav-card-icon">🔥</div>
-      <div class="nav-card-content">
-        <div class="nav-card-title">Burn Verification</div>
-        <div class="nav-card-description">
-          ตรวจสอบร่องรอยการเผาในแปลงเกษตร
-        </div>
-      </div>
-      <div class="nav-card-arrow">→</div>
-    </a>
-  </div>
-</div>
-
       
-      <!-- Other Features -->
       <div class="nav-section">
         <h2 class="section-title">🌟 ฟีเจอร์เพิ่มเติม / Additional Features</h2>
         <div class="nav-grid">
           <a href="market.html" class="nav-card">
             <div class="nav-card-icon">🛒</div>
             <div class="nav-card-content">
-              <div class="nav-card-title">
-                Marketplace
-                
-              </div>
-              <div class="nav-card-description">
-                ตลาดซื้อขายสินค้าทางการเกษตร<br>
-                Eco Marketplace
-              </div>
+              <div class="nav-card-title">Marketplace</div>
+              <div class="nav-card-description">ตลาดซื้อขายสินค้าทางการเกษตร<br>Eco Marketplace</div>
             </div>
             <div class="nav-card-arrow">→</div>
           </a>
-          
           <a href="Stat.html" class="nav-card">
             <div class="nav-card-icon">📈</div>
             <div class="nav-card-content">
-              <div class="nav-card-title">
-                Web Statistics
-   
-              </div>
-              <div class="nav-card-description">
-                สถิติและข้อมูลเชิงลึก<br>
-                Platform analytics
-              </div>
+              <div class="nav-card-title">Web Statistics</div>
+              <div class="nav-card-description">สถิติและข้อมูลเชิงลึก<br>Platform analytics</div>
             </div>
             <div class="nav-card-arrow">→</div>
           </a>
@@ -480,35 +518,26 @@
           <div class="stat-value" id="totalOrders">0</div>
           <div class="stat-label">Total Orders</div>
         </div>
-        
         <div class="stat-card">
           <div class="stat-icon">✅</div>
           <div class="stat-value" id="completedOrders">0</div>
           <div class="stat-label">Completed</div>
         </div>
-        
         <div class="stat-card">
           <div class="stat-icon">⏳</div>
           <div class="stat-value" id="pendingOrders">0</div>
           <div class="stat-label">Pending</div>
         </div>
-        
         <div class="stat-card">
           <div class="stat-icon">⭐</div>
           <div class="stat-value" id="avgRating">0.0</div>
-          <div class="stat-label">Avg Rating</div>
-        </div>
-          <div class="stat-card">
           <div class="stat-label">Avg Rating</div>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Toast Notification -->
   <div id="toast" class="toast" style="display: none;"></div>
-  
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="spinner"></div>
   </div>
@@ -516,156 +545,197 @@
   <script src="utils.js"></script>
   <script src="api.js"></script>
   <script>
-    // Check authentication
     const currentUser = Auth.getCurrentUser();
-    if (!currentUser) {
-      window.location.href = 'index.html';
-    }
+    if (!currentUser) window.location.href = 'index.html';
     
-    // User type configuration
+    const BACKEND = 'https://agricall.onrender.com';
+    
     const userTypeConfig = {
       customer: {
-        icon: '👨‍💼',
-        label: 'ลูกค้า / Customer',
-        labelShort: 'ลูกค้า',
-        dashboardTitle: 'Customer Dashboard',
-        dashboardDescription: 'สั่งซื้อและติดตามงาน',
-        dashboardIcon: '👨‍💼',
-        dashboardUrl: 'customer-dashboard.html'
+        icon: '👨‍💼', label: 'ลูกค้า / Customer', labelShort: 'ลูกค้า',
+        dashboardTitle: 'Customer Dashboard', dashboardDescription: 'สั่งซื้อและติดตามงาน',
+        dashboardIcon: '👨‍💼', dashboardUrl: 'customer-dashboard.html'
       },
       farmer: {
-        icon: '👨‍🌾',
-        label: 'เกษตรกร / Farmer',
-        labelShort: 'เกษตรกร',
-        dashboardTitle: 'Farmer Dashboard',
-        dashboardDescription: 'รับงานและจัดการนา',
-        dashboardIcon: '👨‍🌾',
-        dashboardUrl: 'farmer-dashboard.html'
+        icon: '👨‍🌾', label: 'เกษตรกร / Farmer', labelShort: 'เกษตรกร',
+        dashboardTitle: 'Farmer Dashboard', dashboardDescription: 'รับงานและจัดการนา',
+        dashboardIcon: '👨‍🌾', dashboardUrl: 'farmer-dashboard.html'
       },
       baler: {
-        icon: '🚜',
-        label: 'คนอัดฟาง / Baler',
-        labelShort: 'คนอัดฟาง',
-        dashboardTitle: 'Baler Dashboard',
-        dashboardDescription: 'รับงานอัดฟาง',
-        dashboardIcon: '🚜',
-        dashboardUrl: 'baler-dashboard.html'
+        icon: '🚜', label: 'คนอัดฟาง / Baler', labelShort: 'คนอัดฟาง',
+        dashboardTitle: 'Baler Dashboard', dashboardDescription: 'รับงานอัดฟาง',
+        dashboardIcon: '🚜', dashboardUrl: 'baler-dashboard.html'
       }
     };
-     async function loadUserBalance() {
+    
+    // ═══════════════════════════════════════════════
+    // WALLET — Load available + pending balances
+    // ═══════════════════════════════════════════════
+    async function loadWallet() {
       try {
-        Loading.show();
-        const result = await API.callBackend('/agricoin/balance', {
-          user_id: currentUser.id
+        const res = await fetch(BACKEND + '/agricoin/wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: currentUser.id })
         });
+        const data = await res.json();
         
-        Loading.hide();
-        
-        if (result.success) {
-          userBalance = result.balance;
-          updateBalanceDisplay();
-        } else {
-          console.error('Failed to load balance:', result.error);
-          Toast.error('ไม่สามารถโหลดยอด AgriCoin ได้');
+        if (!data.success) {
+          console.error('Wallet error:', data.error);
+          // Fallback to legacy balance
+          await loadLegacyBalance();
+          return;
         }
-      } catch (error) {
-        Loading.hide();
-        console.error('Failed to load balance:', error);
-        Toast.error('เกิดข้อผิดพลาดในการโหลดยอด AgriCoin');
+        
+        // Update available balance
+        document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);
+        
+        // Update pending
+        const pendingTotal = data.pending_total || 0;
+        document.getElementById('pendingTotal').textContent = Math.floor(pendingTotal) + ' 🪙';
+        document.getElementById('pendingDays').textContent = data.pending_days || 14;
+        
+        // Update total
+        document.getElementById('totalBalance').textContent = Math.floor(data.total_balance) + ' 🪙';
+        
+        // Render pending items
+        renderPendingItems(data.pending_items || []);
+        
+        // Show release notification if coins were just released
+        if (data.coins_released_now > 0) {
+          const banner = document.getElementById('releasedBanner');
+          document.getElementById('releasedText').textContent =
+            `🎉 ${Math.floor(data.coins_released_now)} AgriCoins ปลดล็อกแล้ว! โอนเข้ายอดใช้ได้ทันทีเรียบร้อย`;
+          banner.hidden = false;
+          // Auto-hide after 10 seconds
+          setTimeout(() => { banner.hidden = true; }, 10000);
+        }
+        
+      } catch (e) {
+        console.error('Wallet fetch error:', e);
+        await loadLegacyBalance();
       }
     }
-
-        function updateBalanceDisplay() {
-
-      document.getElementById('agricoinBalance').textContent = userBalance.toFixed(0);
+    
+    async function loadLegacyBalance() {
+      try {
+        const result = await API.callBackend('/agricoin/balance', { user_id: currentUser.id });
+        if (result.success) {
+          document.getElementById('availableBalance').textContent = Math.floor(result.balance);
+          document.getElementById('totalBalance').textContent = Math.floor(result.balance) + ' 🪙';
+        }
+      } catch (e) { console.error('Legacy balance error:', e); }
     }
-
+    
+    function renderPendingItems(items) {
+      const el = document.getElementById('pendingList');
+      
+      if (!items.length) {
+        el.innerHTML = '<div class="pending-empty">✅ ไม่มี AgriCoins ที่รอปลดล็อก</div>';
+        return;
+      }
+      
+      const PENDING_DAYS = 14;
+      
+      el.innerHTML = items.map(item => {
+        const daysLeft = item.days_remaining;
+        const daysDone = PENDING_DAYS - daysLeft;
+        const pct = Math.min((daysDone / PENDING_DAYS) * 100, 100);
+        
+        // Format date
+        const relDate = item.release_date_short || item.release_date?.substring(0, 10) || '-';
+        
+        return `
+          <div class="pending-item">
+            <div class="pending-item-header">
+              <div class="pending-item-name">🌾 ${item.field_name || 'แปลงเกษตร'}</div>
+              <div class="pending-item-amount">+${Math.floor(item.amount)} 🪙</div>
+            </div>
+            <div class="pending-item-meta">
+              <span>${item.area_rai ? item.area_rai.toFixed(1) + ' ไร่' : ''}</span>
+              <span class="pending-countdown">
+                ${daysLeft > 0
+                  ? `⏳ อีก ${daysLeft} วัน (${relDate})`
+                  : '✅ พร้อมปลดล็อก!'}
+              </span>
+            </div>
+            <div class="pending-progress">
+              <div class="pending-progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ═══════════════════════════════════════════════
     // Initialize page
+    // ═══════════════════════════════════════════════
     async function initializePage() {
-      await loadUserBalance();
       const config = userTypeConfig[currentUser.type];
       
-      // Update header user info
+      // Header
       document.getElementById('headerUserName').textContent = currentUser.name;
       document.getElementById('headerUserType').textContent = config.labelShort;
       
-      // Update user info card
+      // User card
       document.getElementById('userAvatar').textContent = config.icon;
       document.getElementById('userName').textContent = currentUser.name;
       document.getElementById('userTypeBadge').textContent = config.label;
       document.getElementById('userPhone').textContent = currentUser.phone;
       
-      // Update AgriCoin balance
-    
-      
-      // Show rating for farmers and balers
+      // Rating
       if (currentUser.type === 'farmer' || currentUser.type === 'baler') {
-        const ratingElement = document.getElementById('userRating');
-        ratingElement.style.display = 'flex';
+        document.getElementById('userRating').style.display = 'flex';
         document.getElementById('ratingValue').textContent = currentUser.avg_rating?.toFixed(1) || '0.0';
         document.getElementById('ratingCount').textContent = currentUser.total_ratings || '0';
       }
       
-      // Update dashboard link
+      // Dashboard link
       const dashboardLink = document.getElementById('dashboardLink');
       dashboardLink.href = config.dashboardUrl;
       document.getElementById('dashboardIcon').textContent = config.dashboardIcon;
       document.getElementById('dashboardTitle').textContent = config.dashboardTitle;
       document.getElementById('dashboardDescription').textContent = config.dashboardDescription;
       
+      // Load wallet (available + pending)
+      await loadWallet();
+      
       // Load quick stats
       await loadQuickStats();
     }
     
-    // Load quick statistics
     async function loadQuickStats() {
       try {
         Loading.show();
-        
         const filter = {};
-        if (currentUser.type === 'customer') {
-          filter.customer_id = currentUser.id;
-        } else if (currentUser.type === 'farmer') {
-          filter.farmer_id = currentUser.id;
-        } else if (currentUser.type === 'baler') {
-          filter.baler_id = currentUser.id;
-        }
+        if (currentUser.type === 'customer') filter.customer_id = currentUser.id;
+        else if (currentUser.type === 'farmer') filter.farmer_id = currentUser.id;
+        else if (currentUser.type === 'baler') filter.baler_id = currentUser.id;
         
         const result = await API.getOrders(filter);
-        
         if (result.success) {
           const orders = result.orders;
-          const total = orders.length;
-          const completed = orders.filter(o => o.status === 'delivered').length;
-          const pending = orders.filter(o => o.status === 'pending').length;
-          
-          document.getElementById('totalOrders').textContent = total;
-          document.getElementById('completedOrders').textContent = completed;
-          document.getElementById('pendingOrders').textContent = pending;
+          document.getElementById('totalOrders').textContent = orders.length;
+          document.getElementById('completedOrders').textContent = orders.filter(o => o.status === 'delivered').length;
+          document.getElementById('pendingOrders').textContent = orders.filter(o => o.status === 'pending').length;
           document.getElementById('avgRating').textContent = currentUser.avg_rating?.toFixed(1) || '0.0';
-          
           document.getElementById('quickStats').style.display = 'grid';
         }
-        
         Loading.hide();
-      } catch (error) {
+      } catch (e) {
         Loading.hide();
-        console.error('Error loading stats:', error);
+        console.error('Stats error:', e);
       }
     }
     
-    // Logout function
     function logout() {
       if (confirm('คุณต้องการออกจากระบบหรือไม่?\nAre you sure you want to logout?')) {
         Auth.logout();
         Toast.success('ออกจากระบบสำเร็จ / Logged out successfully');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
       }
     }
     
-    // Initialize on page load
     initializePage();
   </script>
 </body>
