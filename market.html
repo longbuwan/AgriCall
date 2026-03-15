@@ -10,8 +10,8 @@
        MARKET HEADER — Rich gradient + glass
        ═══════════════════════════════════════ */
     .market-header {
-      background: linear-gradient(160deg, var(--primary-green) 0%, var(--secondary-green) 60%, #4a8540 100%);
-      color: white;
+      background: linear-gradient(160deg, #7FAD6B 0%, #5a9447 60%, #4a8540 100%);
+      color: #ffffff;
       padding: var(--space-lg) var(--space-lg) var(--space-md);
       border-radius: 0 0 var(--radius-xl) var(--radius-xl);
       box-shadow: 0 4px 20px rgba(74,124,89,0.25);
@@ -21,6 +21,19 @@
       background-image:
         radial-gradient(ellipse at 85% 15%, rgba(255,255,255,0.08) 0%, transparent 50%),
         radial-gradient(ellipse at 15% 80%, rgba(255,255,255,0.04) 0%, transparent 40%);
+    }
+
+    /* Force all text inside market-header to be white */
+    .market-header,
+    .market-header h1,
+    .market-header h2,
+    .market-header h3,
+    .market-header p,
+    .market-header span,
+    .market-header .market-title,
+    .market-header .market-subtitle,
+    .market-header .balance-amount {
+      color: #ffffff !important;
     }
 
     .market-header-top {
@@ -40,7 +53,6 @@
       display: flex;
       align-items: center;
       gap: var(--space-xs);
-      color: var(--white);
       text-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
@@ -51,11 +63,11 @@
       font-weight: 400;
     }
 
-    .back-btn {
+    .market-header .back-btn {
       background: rgba(255,255,255,0.18);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,0.15);
-      color: var(--white);
+      color: #ffffff !important;
       width: 40px;
       height: 40px;
       border-radius: var(--radius-full);
@@ -64,11 +76,12 @@
       justify-content: center;
       font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.25s var(--ease-out, cubic-bezier(0.16,1,0.3,1));
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
       flex-shrink: 0;
+      box-shadow: none;
     }
-    .back-btn:hover { background: rgba(255,255,255,0.28); }
-    .back-btn:active { transform: scale(0.92); }
+    .market-header .back-btn:hover { background: rgba(255,255,255,0.28); }
+    .market-header .back-btn:active { transform: scale(0.92); }
 
     /* AgriCoin Balance Widget — Glass pill */
     .agricoin-balance-widget {
@@ -108,11 +121,12 @@
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       font-size: 0.9rem;
       padding: 0.75rem 1rem 0.75rem 1rem;
+      color: #1a2e1a;
     }
     .market-header .search-bar:focus {
       box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 3px rgba(255,255,255,0.3);
     }
-    .market-header .search-bar::placeholder { color: var(--text-light); }
+    .market-header .search-bar::placeholder { color: #8B9A8C; }
 
     /* ═══════════════════════════════════════
        AGRICOIN BALANCE CARD — Premium gold
