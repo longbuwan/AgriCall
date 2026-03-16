@@ -586,26 +586,48 @@
 </head>
 <body>
   <!-- Market Header -->
-  <div class="market-header">
-    <div class="market-header-top">
-      <button class="back-btn" onclick="window.location.href='home.html'">←</button>
-      
-      <div class="market-title-group">
-        <h1 class="market-title">
-          <img src="Adobe Express - file.png" class="emoji"> Eco Market
-        </h1>
-        <p class="market-subtitle">สินค้าเกษตรเพื่อสิ่งแวดล้อม · ลด PM2.5</p>
-      </div>
-      <div class="agricoin-balance-widget" id="balanceWidget">
-        <span class="coin-icon"><img src="Untitled_design-removebg-preview.png" class="coin"></span>
-        <span class="balance-amount" id="balanceAmount">0</span>
-      </div>
+<div class="market-header">
+  <div class="market-header-top">
+    <a href="home.html" class="back-btn">←</a>
+    
+    <div class="market-title-group">
+      <h1 class="market-title">
+        <img src="Adobe Express - file.png" class="emoji" alt="AgriCall" style="width:1.6em;height:1.6em;"> Eco Market
+      </h1>
+      <p class="market-subtitle">สินค้าเกษตรเพื่อสิ่งแวดล้อม · ลด PM2.5</p>
     </div>
 
-    <div class="search-bar-container">
-      <input type="text" class="search-bar" placeholder="ค้นหาสินค้าเกษตรที่เป็นมิตรกับสิ่งแวดล้อม..." id="searchInput">
+    <div class="agricoin-balance-widget">
+      <span class="coin-icon"><img src="Untitled_design-removebg-preview.png" class="coin" style="width:1.3em;height:1.3em;" onerror="this.outerHTML='🪙'"></span>
+      <span class="balance-amount" id="balanceAmount">0</span>
     </div>
   </div>
+
+  <div class="search-bar-container">
+    <input type="text" class="search-bar" placeholder="ค้นหาสินค้าเกษตรที่เป็นมิตรกับสิ่งแวดล้อม..." id="searchInput">
+  </div>
+</div>
+
+<style>
+.market-header .back-btn {
+  background: rgba(255,255,255,0.18) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #fff !important;
+  text-decoration: none;
+}
+.market-header .back-btn:hover { background: rgba(255,255,255,0.28) !important; }
+.market-header .back-btn:active { transform: scale(0.92); }
+</style>
 
   <div class="container">
     <!-- AgriCoin Balance Card -->
