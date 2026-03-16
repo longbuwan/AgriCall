@@ -115,8 +115,10 @@
   </style>
 </head>
 <body>
- <header class="dashboard-header">
+<header class="dashboard-header">
   <nav class="dashboard-nav">
+    <button class="back-btn" onclick="window.location.href='home.html'">←</button>
+    
     <a href="home.html" class="dashboard-logo">
       <span class="logo-icon"><img src="Adobe Express - file.png" class="emoji" alt="AgriCall"></span>
       <span>AgriCall</span>
@@ -132,6 +134,26 @@
 </header>
 
 <style>
+.back-btn {
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #fff;
+  font-family: 'Prompt', sans-serif;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: rgba(255,255,255,0.28); }
+.back-btn:active { transform: scale(0.92); }
+
 .agricoin-balance-widget {
   background: rgba(255,255,255,0.18);
   backdrop-filter: blur(12px);
@@ -145,6 +167,21 @@
 .coin-icon { display: flex; align-items: center; font-size: 1.3rem; }
 .coin { width: 1.3em; height: 1.3em; vertical-align: middle; }
 .balance-amount { font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+
+/* Remove logo frame */
+.dashboard-logo .logo-icon { 
+  display: flex; 
+  align-items: center; 
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.dashboard-logo .logo-icon .emoji { 
+  width: 1.6em; 
+  height: 1.6em; 
+  vertical-align: middle; 
+}
 </style>
 
 <script>
@@ -163,7 +200,6 @@ async function loadHeaderBalance() {
 }
 loadHeaderBalance();
 </script>
-  
   <main class="stats-container">
     <div class="page-title fade-in">
       <h1>🌍 Environmental Impact Dashboard</h1>
