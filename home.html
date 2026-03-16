@@ -451,22 +451,83 @@
 <body>
   <div class="home-container">
 
-    <header class="dashboard-header">
-      <nav class="dashboard-nav">
-        <a href="#" class="dashboard-logo">
-          <span class="logo-icon"><img src="Adobe Express - file.png" class="emoji" alt="AgriCall"></span>
-          <span>AgriCall</span>
-        </a>
-        <div class="dashboard-user">
-          <div class="user-info">
-            <div class="user-name" id="headerUserName">Loading...</div>
-            <div class="user-type" id="headerUserType">Loading...</div>
-          </div>
-          <button class="logout-btn" onclick="logout()">🚪 ออกจากระบบ</button>
-        </div>
-      </nav>
-    </header>
+   <header class="dashboard-header">
+  <nav class="dashboard-nav">
+    <a href="home.html" class="dashboard-logo">
+      <span class="logo-icon"><img src="Adobe Express - file.png" class="emoji" alt="AgriCall"></span>
+      <span>AgriCall</span>
+    </a>
+    
+    <div class="dashboard-user">
+      <div class="agricoin-balance-widget">
+        <span class="coin-icon"><img src="Untitled_design-removebg-preview.png" class="coin" style="width:1.3em;height:1.3em;" onerror="this.outerHTML='🪙'"></span>
+        <span class="balance-amount" id="headerBalance">0</span>
+      </div>
+    </div>
+  </nav>
+</header>
 
+<style>
+.agricoin-balance-widget {
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(12px);
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.coin-icon { 
+  display: flex; 
+  align-items: center; 
+  font-size: 1.3rem;
+  animation: coinSpin 3s ease-in-out infinite;
+}
+@keyframes coinSpin {
+  0%, 100% { transform: rotateY(0deg); }
+  50% { transform: rotateY(180deg); }
+}
+.coin { width: 1.3em; height: 1.3em; vertical-align: middle; }
+.balance-amount { 
+  font-size: 1rem; 
+  font-weight: 700; 
+  color: #fff; 
+  letter-spacing: -0.01em; 
+}
+
+/* Remove logo frame */
+.dashboard-logo .logo-icon { 
+  display: flex; 
+  align-items: center; 
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.dashboard-logo .logo-icon .emoji { 
+  width: 1.6em; 
+  height: 1.6em; 
+  vertical-align: middle; 
+}
+</style>
+
+<script>
+async function loadHeaderBalance() {
+  try {
+    const res = await fetch('https://agricall.onrender.com/agricoin/wallet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('headerBalance').textContent = Math.floor(data.available_balance);
+    }
+  } catch (e) { console.error('Balance load failed:', e); }
+}
+loadHeaderBalance();
+</script>
     <div class="home-content">
 
       <!-- User Info + Wallet -->
