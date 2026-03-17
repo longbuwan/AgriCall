@@ -680,7 +680,7 @@ document.getElementById('pendingDays').textContent =
 document.getElementById('totalBalance').innerHTML =
     Math.floor(data.total_balance) +
     ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
-';
+
 
         renderPendingItems(data.pending_items || []);
         if (data.coins_released_now > 0) {
