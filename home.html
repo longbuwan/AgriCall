@@ -531,7 +531,7 @@
 
           <div class="wallet-total">
             <span>รวมทั้งหมด (ใช้ได้ + รอปลดล็อก)</span>
-            <span class="wallet-total-val" id="totalBalance">0 🪙</span>
+            <span class="wallet-total-val" id="totalBalance">0 </span>
           </div>
         </div>
 
@@ -671,9 +671,11 @@
         const data = await res.json();
         if (!data.success) { await loadLegacyBalance(); return; }
         document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);
-        document.getElementById('pendingTotal').textContent = Math.floor(data.pending_total || 0) + ' 🪙';
+        document.getElementById('pendingTotal').textContent = Math.floor(data.pending_total || 0) + ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML='🪙'">
+';
         document.getElementById('pendingDays').textContent = data.pending_days || 14;
-        document.getElementById('totalBalance').textContent = Math.floor(data.total_balance) + ' 🪙';
+        document.getElementById('totalBalance').textContent = Math.floor(data.total_balance) + ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML='🪙'">
+';
 
         renderPendingItems(data.pending_items || []);
         if (data.coins_released_now > 0) {
