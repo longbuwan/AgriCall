@@ -672,7 +672,7 @@
         if (!data.success) { await loadLegacyBalance(); return; }
         document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);document.getElementById('pendingTotal').innerHTML =
     Math.floor(data.pending_total || 0) +
-    ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
+    ' <img src="Untitled_design-removebg-preview.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
 
 document.getElementById('pendingDays').textContent =
     data.pending_days || 14;
