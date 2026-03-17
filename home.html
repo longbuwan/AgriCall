@@ -670,11 +670,16 @@
         });
         const data = await res.json();
         if (!data.success) { await loadLegacyBalance(); return; }
-        document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);
-        document.getElementById('pendingTotal').textContent = Math.floor(data.pending_total || 0) + ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML='🪙'">
-';
-        document.getElementById('pendingDays').textContent = data.pending_days || 14;
-        document.getElementById('totalBalance').textContent = Math.floor(data.total_balance) + ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML='🪙'">
+        document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);document.getElementById('pendingTotal').innerHTML =
+    Math.floor(data.pending_total || 0) +
+    ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
+
+document.getElementById('pendingDays').textContent =
+    data.pending_days || 14;
+
+document.getElementById('totalBalance').innerHTML =
+    Math.floor(data.total_balance) +
+    ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
 ';
 
         renderPendingItems(data.pending_items || []);
