@@ -672,14 +672,14 @@
         if (!data.success) { await loadLegacyBalance(); return; }
         document.getElementById('availableBalance').textContent = Math.floor(data.available_balance);document.getElementById('pendingTotal').innerHTML =
     Math.floor(data.pending_total || 0) +
-    ' <img src="Untitled_design-removebg-preview.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
+    ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
 
 document.getElementById('pendingDays').textContent =
     data.pending_days || 14;
 
 document.getElementById('totalBalance').innerHTML =
     Math.floor(data.total_balance) +
-    ' <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
+    ' <img src="Untitled_design-removebg-preview.png" class="coin" onerror="this.outerHTML=\'🪙\'">';
 
 
         renderPendingItems(data.pending_items || []);
@@ -718,7 +718,7 @@ document.getElementById('totalBalance').innerHTML =
         return `<div class="pending-item">
           <div class="pending-item-header">
             <div class="pending-item-name">🌾 ${item.field_name || 'แปลงเกษตร'}</div>
-            <div class="pending-item-amount">+${Math.floor(item.amount)} 🪙</div>
+            <div class="pending-item-amount">+${Math.floor(item.amount)} <img src="Untitled_design-removebg-preview-modified.png" class="coin" onerror="this.outerHTML=\'🪙\'"></div>
           </div>
           <div class="pending-item-meta">
             <span>${item.area_rai ? item.area_rai.toFixed(1) + ' ไร่' : ''}</span>
