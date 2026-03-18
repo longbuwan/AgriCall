@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -569,7 +570,9 @@
           <label>📝 ชื่อแปลง (ไม่บังคับ)</label>
           <input type="text" id="fieldName" placeholder="เช่น นาข้าวแปลง 1">
         </div>
-        
+        <div class="alert error" id="step1Err" hidden>
+          <div class="alert-icon">⚠️</div><div class="alert-content" id="step1ErrText"></div>
+        </div>
         <button class="btn btn-green" id="step1Submit" disabled onclick="submitStep1()">🌱 ลงทะเบียนเริ่มปลูก</button>
       </div>
     </div>
